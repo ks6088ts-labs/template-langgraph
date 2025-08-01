@@ -163,4 +163,3 @@ cython_debug/
 *.env
 requirements.txt
 assets/
-data/
