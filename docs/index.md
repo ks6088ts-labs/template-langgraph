@@ -1,1 +1,1 @@
-# template-python
+# template-langgraph

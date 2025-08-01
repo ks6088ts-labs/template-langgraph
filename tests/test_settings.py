@@ -3,7 +3,7 @@ from logging import getLogger
 
 from dotenv import load_dotenv
 
-from template_python.settings import Settings
+from template_langgraph.settings import Settings
 
 logger = getLogger(__name__)
 
@@ -20,5 +20,5 @@ def test_settings(caplog):
             verbose=True,
         ), "Failed to load environment variables from .env.template"
         settings = Settings()
-        assert settings.project_name == "template-python", "Default project name should be 'template-python'"
+        assert settings.project_name == "template-langgraph", "Default project name should be 'template-langgraph'"
         logger.debug(f"Settings initialized: {settings}")

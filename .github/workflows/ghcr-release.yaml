@@ -4,7 +4,7 @@ on:
     tags:
       - "v*"
 env:
-  IMAGE_NAME: template-python
+  IMAGE_NAME: template-langgraph
 jobs:
   ghcr:
     runs-on: ubuntu-latest

@@ -4,13 +4,13 @@ from typing import Annotated
 import typer
 from dotenv import load_dotenv
 
-from template_python.loggers import get_logger
-from template_python.settings import Settings
+from template_langgraph.loggers import get_logger
+from template_langgraph.settings import Settings
 
 # Initialize the Typer application
 app = typer.Typer(
     add_completion=False,
-    help="template-python CLI",
+    help="template-langgraph CLI",
 )
 
 # Set up logging
