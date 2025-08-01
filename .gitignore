@@ -162,3 +162,5 @@ cython_debug/
 # Project
 *.env
 requirements.txt
+assets/
+data/

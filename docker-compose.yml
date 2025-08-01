@@ -1,0 +1,8 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.15.1
+    container_name: qdrant
+    ports:
+      - "6333:6333" # Dashboard: http://localhost:6333/dashboard
+    volumes:
+      - ./assets/qdrant_data:/qdrant/storage
