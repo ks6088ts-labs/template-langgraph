@@ -4,7 +4,7 @@
 [![ghcr-release](https://github.com/ks6088ts-labs/template-langgraph/actions/workflows/ghcr-release.yaml/badge.svg)](https://github.com/ks6088ts-labs/template-langgraph/actions/workflows/ghcr-release.yaml)
 [![docs](https://github.com/ks6088ts-labs/template-langgraph/actions/workflows/github-pages.yaml/badge.svg)](https://github.com/ks6088ts-labs/template-langgraph/actions/workflows/github-pages.yaml)
 
-# template-python
+# template-langgraph
 
 This is a template repository for Python
 

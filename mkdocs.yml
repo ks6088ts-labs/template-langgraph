@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
-site_name: template-python
+site_name: template-langgraph
 site_url: ""
 repo_url: https://github.com/ks6088ts-labs/template-langgraph
 repo_name: ks6088ts-labs/template-langgraph

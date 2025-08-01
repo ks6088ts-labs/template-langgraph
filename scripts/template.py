@@ -10,7 +10,7 @@ from template_python.settings import Settings
 # Initialize the Typer application
 app = typer.Typer(
     add_completion=False,
-    help="template-python CLI",
+    help="template-langgraph CLI",
 )
 
 # Set up logging
