@@ -1,0 +1,42 @@
+name: azure-static-web-apps
+on:
+  workflow_dispatch:
+  # Uncomment the following lines to enable automatic deployment on push to main branch
+  # push:
+  #   branches:
+  #     - main
+permissions:
+  contents: write
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        platform:
+          - "ubuntu-latest"
+        python-version:
+          - "3.13"
+    runs-on: ${{ matrix.platform }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up uv
+        shell: bash
+        run: pipx install uv
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Generate documentation
+        shell: bash
+        run: |
+          make install-deps-docs
+          make docs
+      - name: Deploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "./site"
+          skip_app_build: true
+          skip_api_build: true

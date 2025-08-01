@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
+site_name: template-python
+site_url: ""
+repo_url: https://github.com/ks6088ts/template-python
+repo_name: ks6088ts/template-python
+nav:
+  - Home: index.md
+theme:
+  name: material
+  # https://squidfunk.github.io/mkdocs-material/setup/changing-the-colors/#automatic-light-dark-mode
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  icon:
+    repo: fontawesome/brands/github
+  language: en
+extra:
+  social:
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/ks6088ts/
+    - icon: fontawesome/brands/github
+      link: https://github.com/ks6088ts
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/ks6088ts
+  analytics:
+    provider: google
+    property: G-0ZTKFXVQ5K
