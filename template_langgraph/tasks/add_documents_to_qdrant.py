@@ -2,8 +2,8 @@ import logging
 
 from qdrant_client.models import PointStruct
 
+from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
-from template_langgraph.models.azure_openais import AzureOpenAiWrapper
 from template_langgraph.tools.csv_loaders import CsvLoaderWrapper
 from template_langgraph.tools.qdrants import QdrantClientWrapper
 
