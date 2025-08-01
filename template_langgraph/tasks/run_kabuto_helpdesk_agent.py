@@ -1,17 +1,8 @@
 import logging
 import sys
 
-from langchain_core.tools import tool
-
 from template_langgraph.agents.kabuto_helpdesk_agent import KabutoHelpdeskAgent
 from template_langgraph.loggers import get_logger
-
-
-@tool
-def get_weather(city: str) -> str:
-    """天気情報を取得します"""
-    return f"{city}は晴れです"
-
 
 logger = get_logger(__name__)
 logger.setLevel(logging.INFO)
