@@ -6,3 +6,15 @@ services:
       - "6333:6333" # Dashboard: http://localhost:6333/dashboard
     volumes:
       - ./assets/qdrant_data:/qdrant/storage
+  elasticsearch:
+    build:
+      dockerfile: elasticsearch.Dockerfile
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    volumes:
+      - ./assets/es_data:/usr/share/elasticsearch/data
