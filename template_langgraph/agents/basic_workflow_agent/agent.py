@@ -94,3 +94,6 @@ class BasicWorkflowAgent:
     def draw_mermaid_png(self) -> bytes:
         """Draw the graph in Mermaid format."""
         return self.create_graph().get_graph().draw_mermaid_png()
+
+
+graph = BasicWorkflowAgent().create_graph()
