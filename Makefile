@@ -107,3 +107,11 @@ docs-serve: ## serve documentation
 
 .PHONY: ci-test-docs
 ci-test-docs: install-deps-docs docs ## run CI test for documentation
+
+# ---
+# Project
+# ---
+
+.PHONY: langgraph-studio
+langgraph-studio: ## run LangGraph Studio
+	uv run langgraph dev --no-reload

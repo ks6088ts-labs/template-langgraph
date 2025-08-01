@@ -27,6 +27,7 @@ docs = [
 dev-dependencies = [
     "coverage>=7.8.0",
     "jupyterlab>=4.4.2",
+    "langgraph-cli[inmem]>=0.3.6",
     "pre-commit>=4.2.0",
     "pytest>=8.3.5",
     "pytest-cov>=6.1.1",
