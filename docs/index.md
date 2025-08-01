@@ -24,6 +24,10 @@ uv run python -m template_langgraph.tasks.search_documents_on_elasticsearch
 # Run Kabuto Helpdesk Agent
 uv run python -m template_langgraph.tasks.run_kabuto_helpdesk_agent "KABUTOの起動時に、画面全体が紫色に点滅し、システムがフリーズします。"
 uv run python -m template_langgraph.tasks.run_kabuto_helpdesk_agent "KABUTOのマニュアルから禅モードに関する情報を教えて下さい"
+
+# BasicWorkflowAgent
+uv run python -m template_langgraph.tasks.draw_basic_workflow_agent_mermaid_png "data/basic_workflow_agent.png"
+uv run python -m template_langgraph.tasks.run_basic_workflow_agent "KABUTOの起動時に、画面全体が紫色に点滅し、システムがフリーズします。"
 ```
 
 ## References
