@@ -26,4 +26,4 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 # Copy application code after dependencies are installed
 COPY . .
 
-CMD ["python", "template_python/core.py"]
+CMD ["python", "template_langgraph/core.py"]

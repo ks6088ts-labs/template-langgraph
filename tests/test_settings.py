@@ -3,7 +3,7 @@ from logging import getLogger
 
 from dotenv import load_dotenv
 
-from template_python.settings import Settings
+from template_langgraph.settings import Settings
 
 logger = getLogger(__name__)
 

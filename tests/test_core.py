@@ -3,7 +3,7 @@ from logging import getLogger
 
 import pytest
 
-from template_python.core import hello_world
+from template_langgraph.core import hello_world
 
 logger = getLogger(__name__)
 
