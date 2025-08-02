@@ -30,6 +30,11 @@ uv run python -m template_langgraph.tasks.draw_basic_workflow_agent_mermaid_png 
 uv run python -m template_langgraph.tasks.run_basic_workflow_agent
 # KABUTOの起動時に、画面全体が紫色に点滅し、システムがフリーズします。KABUTO のマニュアルから、関連する情報を取得したり過去のシステムのトラブルシュート事例が蓄積されたデータベースから、関連する情報を取得して質問に答えてください
 # 天狗のいたずら という現象について KABUTO のマニュアルから、関連する情報を取得したり過去のシステムのトラブルシュート事例が蓄積されたデータベースから、関連する情報を取得して質問に答えてください
+
+# IssueFormatterAgent
+uv run python -m template_langgraph.tasks.run_issue_formatter_agent
+# KABUTOにログインできない！パスワードは合ってるはずなのに…若手社員である山田太郎は、Windows 11 を立ち上げ、日課のように自社の業務システムKABUTOのログイン画面を開きます。しかし、そこには、意味をなさない「虚無」という文字だけがただひっそりと表示されていたのです。これは質問でもあり不具合の報告でもあります。岡本太郎さんに本件調査依頼します。
+
 ```
 
 ## References
