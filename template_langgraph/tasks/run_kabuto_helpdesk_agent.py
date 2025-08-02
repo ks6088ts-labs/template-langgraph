@@ -6,7 +6,6 @@ from template_langgraph.loggers import get_logger
 
 logger = get_logger(__name__)
 logger.setLevel(logging.INFO)
-COLLECTION_NAME = "documents"
 
 if __name__ == "__main__":
     question = "「鬼灯」を実行すると、KABUTOが急に停止します。原因と対策を教えてください。"
