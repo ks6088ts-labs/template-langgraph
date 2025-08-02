@@ -76,7 +76,9 @@ class ChatWithToolsAgent:
         workflow.add_edge("finalize", END)
 
         # Compile the graph
-        return workflow.compile()
+        return workflow.compile(
+            name=ChatWithToolsAgent.__name__,
+        )
 
     def initialize(self, state: AgentState) -> AgentState:
         """Initialize the agent with the given state."""

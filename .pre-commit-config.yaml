@@ -13,4 +13,4 @@ repos:
     args: [ --fix ]
   - id: ruff-format
     types_or: [ python, pyi ]
-exclude: 'generated/.*|artifacts/.*'
+exclude: 'generated/.*|artifacts/.*|.*\.json$'

@@ -3,6 +3,7 @@
     "."
   ],
   "graphs": {
+    "supervisor_agent": "template_langgraph.agents.supervisor_agent:graph",
     "chat_with_tools_agent": "template_langgraph.agents.chat_with_tools_agent.agent:graph",
     "kabuto_helpdesk_agent": "template_langgraph.agents.kabuto_helpdesk_agent:graph",
     "issue_formatter_agent": "template_langgraph.agents.issue_formatter_agent.agent:graph",

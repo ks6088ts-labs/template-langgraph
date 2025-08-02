@@ -43,6 +43,8 @@ uv run python -m template_langgraph.tasks.run_issue_formatter_agent
 
 - [Build a custom workflow](https://langchain-ai.github.io/langgraph/concepts/why-langgraph/)
 - [LangGraphの(LLMなし)Human-in-the-loopを試してみた](https://qiita.com/te_yama/items/db38201af60dec76384d)
+- [🤖 LangGraph Multi-Agent Supervisor](https://github.com/langchain-ai/langgraph-supervisor-py)
+- [Software Design誌「実践LLMアプリケーション開発」第24回サンプルコード](https://github.com/mahm/softwaredesign-llm-application/tree/main/24)
 
 ### Sample Codes
 

@@ -24,7 +24,9 @@ class IssueFormatterAgent:
         workflow.add_edge("analyze", END)
 
         # Compile the graph
-        return workflow.compile()
+        return workflow.compile(
+            name=IssueFormatterAgent.__name__,
+        )
 
     def analyze(self, state: AgentState) -> AgentState:
         """Analyze the issue and extract relevant information."""
