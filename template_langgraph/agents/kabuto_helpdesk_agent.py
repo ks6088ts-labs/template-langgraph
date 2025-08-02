@@ -36,3 +36,6 @@ class KabutoHelpdeskAgent:
                 ]
             }
         )
+
+
+graph = KabutoHelpdeskAgent().agent
