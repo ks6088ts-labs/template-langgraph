@@ -32,7 +32,9 @@ class TaskDecomposerAgent:
                 "end": END,
             },
         )
-        return workflow.compile()
+        return workflow.compile(
+            name=TaskDecomposerAgent.__name__,
+        )
 
     def chat(self, state: AgentState) -> AgentState:
         """Chat with tools using the state."""
