@@ -25,9 +25,9 @@ uv run python -m template_langgraph.tasks.search_documents_on_elasticsearch
 uv run python -m template_langgraph.tasks.run_kabuto_helpdesk_agent "KABUTOの起動時に、画面全体が紫色に点滅し、システムがフリーズします。"
 uv run python -m template_langgraph.tasks.run_kabuto_helpdesk_agent "KABUTOのマニュアルから禅モードに関する情報を教えて下さい"
 
-# BasicWorkflowAgent
-uv run python -m template_langgraph.tasks.draw_basic_workflow_agent_mermaid_png "data/basic_workflow_agent.png"
-uv run python -m template_langgraph.tasks.run_basic_workflow_agent
+# ChatWithToolsAgent
+uv run python -m template_langgraph.tasks.draw_chat_with_tools_agent_mermaid_png "data/chat_with_tools_agent.png"
+uv run python -m template_langgraph.tasks.run_chat_with_tools_agent
 # KABUTOの起動時に、画面全体が紫色に点滅し、システムがフリーズします。KABUTO のマニュアルから、関連する情報を取得したり過去のシステムのトラブルシュート事例が蓄積されたデータベースから、関連する情報を取得して質問に答えてください
 # 天狗のいたずら という現象について KABUTO のマニュアルから、関連する情報を取得したり過去のシステムのトラブルシュート事例が蓄積されたデータベースから、関連する情報を取得して質問に答えてください
 
@@ -42,6 +42,7 @@ uv run python -m template_langgraph.tasks.run_issue_formatter_agent
 ### LangGraph
 
 - [Build a custom workflow](https://langchain-ai.github.io/langgraph/concepts/why-langgraph/)
+- [LangGraphの(LLMなし)Human-in-the-loopを試してみた](https://qiita.com/te_yama/items/db38201af60dec76384d)
 
 ### Sample Codes
 
