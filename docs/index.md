@@ -28,7 +28,6 @@ uv run python -m template_langgraph.tasks.run_kabuto_helpdesk_agent "KABUTOの�
 # BasicWorkflowAgent
 uv run python -m template_langgraph.tasks.draw_basic_workflow_agent_mermaid_png "data/basic_workflow_agent.png"
 uv run python -m template_langgraph.tasks.run_basic_workflow_agent
-# 私の名前はフグ田 サザエ。東京都世田谷区桜新町あさひが丘3丁目に住んでいる 24 歳の主婦です。夫のノリスケと子供のタラちゃんがいます
 # KABUTOの起動時に、画面全体が紫色に点滅し、システムがフリーズします。KABUTO のマニュアルから、関連する情報を取得したり過去のシステムのトラブルシュート事例が蓄積されたデータベースから、関連する情報を取得して質問に答えてください
 # 天狗のいたずら という現象について KABUTO のマニュアルから、関連する情報を取得したり過去のシステムのトラブルシュート事例が蓄積されたデータベースから、関連する情報を取得して質問に答えてください
 ```
