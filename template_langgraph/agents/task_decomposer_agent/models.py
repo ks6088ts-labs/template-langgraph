@@ -19,6 +19,10 @@ class Task(BaseModel):
     assigned_to: str | None = Field(None, description="Name of the agent assigned to the task")
 
 
+class TaskList(BaseModel):
+    tasks: Sequence[Task] = Field(..., description="List of tasks to be decomposed")
+
+
 class AgentInput(BaseModel):
     request: str = Field(..., description="Request from the user")
 
@@ -29,4 +33,4 @@ class AgentOutput(BaseModel):
 
 class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
-    decomposed_tasks: Sequence[Task]
+    task_list: TaskList
