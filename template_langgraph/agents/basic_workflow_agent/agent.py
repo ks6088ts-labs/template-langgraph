@@ -62,7 +62,8 @@ class BasicWorkflowAgent:
         workflow.add_node("finalize", self.finalize)
 
         # Create edges
-        workflow.add_edge(START, "initialize")
+        # workflow.add_edge(START, "initialize")
+        workflow.add_edge(START, "chat_with_tools")
         workflow.add_edge("initialize", "do_something")
         workflow.add_edge("do_something", "extract_profile")
         workflow.add_edge("extract_profile", "chat_with_tools")
