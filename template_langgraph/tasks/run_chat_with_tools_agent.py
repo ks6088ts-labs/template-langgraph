@@ -1,7 +1,7 @@
 import logging
 
-from template_langgraph.agents.basic_workflow_agent.agent import AgentState
-from template_langgraph.agents.basic_workflow_agent.agent import graph as basic_workflow_agent_graph
+from template_langgraph.agents.chat_with_tools_agent.agent import AgentState
+from template_langgraph.agents.chat_with_tools_agent.agent import graph as chat_with_tools_agent_graph
 from template_langgraph.loggers import get_logger
 
 logger = get_logger(__name__)
@@ -11,7 +11,7 @@ logger.setLevel(logging.INFO)
 def stream_graph_updates(
     state: AgentState,
 ) -> dict:
-    for event in basic_workflow_agent_graph.stream(input=state):
+    for event in chat_with_tools_agent_graph.stream(input=state):
         logger.info("-" * 20)
         logger.info(f"Event: {event}")
     return event

@@ -3,7 +3,7 @@ import json
 from langchain_core.messages import ToolMessage
 from langgraph.graph import END, StateGraph
 
-from template_langgraph.agents.basic_workflow_agent.models import AgentState
+from template_langgraph.agents.chat_with_tools_agent.models import AgentState
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
 from template_langgraph.tools.elasticsearch_tool import search_elasticsearch
@@ -36,7 +36,7 @@ class BasicToolNode:
         return {"messages": outputs}
 
 
-class BasicWorkflowAgent:
+class ChatWithToolsAgent:
     def __init__(self):
         self.llm = AzureOpenAiWrapper().chat_model
 
@@ -80,7 +80,7 @@ class BasicWorkflowAgent:
 
     def initialize(self, state: AgentState) -> AgentState:
         """Initialize the agent with the given state."""
-        logger.info(f"Initializing BasicWorkflowAgent with state: {state}")
+        logger.info(f"Initializing ChatWithToolsAgent with state: {state}")
         # Here you can add any initialization logic if needed
         return state
 
@@ -119,7 +119,7 @@ class BasicWorkflowAgent:
 
     def finalize(self, state: AgentState) -> AgentState:
         """Finalize the agent's work and prepare the output."""
-        logger.info(f"Finalizing BasicWorkflowAgent with state: {state}")
+        logger.info(f"Finalizing ChatWithToolsAgent with state: {state}")
         # Here you can add any finalization logic if needed
         return state
 
@@ -128,4 +128,4 @@ class BasicWorkflowAgent:
         return self.create_graph().get_graph().draw_mermaid_png()
 
 
-graph = BasicWorkflowAgent().create_graph()
+graph = ChatWithToolsAgent().create_graph()
