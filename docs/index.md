@@ -12,11 +12,10 @@ uv run python scripts/qdrant_operator.py delete-collection --collection-name qa_
 uv run python scripts/qdrant_operator.py add-documents --collection-name qa_kabuto --verbose
 uv run python scripts/qdrant_operator.py search-documents --collection-name qa_kabuto --question "「鬼灯」を実行すると、KABUTOが急に停止します。原因と対策を教えてください。" --verbose
 
-# Add documents to Elasticsearch
-uv run python -m template_langgraph.tasks.add_documents_to_elasticsearch
-
-# Search Elasticsearch
-uv run python -m template_langgraph.tasks.search_documents_on_elasticsearch
+# Elasticsearch
+uv run python scripts/elasticsearch_operator.py --help
+uv run python scripts/elasticsearch_operator.py add-documents --index-name docs_kabuto --verbose
+uv run python scripts/elasticsearch_operator.py search-documents --index-name docs_kabuto --query "禅モード" --verbose
 
 # Run Kabuto Helpdesk Agent
 uv run python -m template_langgraph.tasks.run_kabuto_helpdesk_agent "KABUTOの起動時に、画面全体が紫色に点滅し、システムがフリーズします。"

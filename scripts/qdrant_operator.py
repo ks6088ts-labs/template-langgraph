@@ -12,7 +12,7 @@ from template_langgraph.tools.qdrants import QdrantClientWrapper
 # Initialize the Typer application
 app = typer.Typer(
     add_completion=False,
-    help="template-langgraph CLI",
+    help="Qdrant operator CLI",
 )
 
 # Set up logging
