@@ -17,24 +17,23 @@ uv run python scripts/elasticsearch_operator.py --help
 uv run python scripts/elasticsearch_operator.py add-documents --index-name docs_kabuto --verbose
 uv run python scripts/elasticsearch_operator.py search-documents --index-name docs_kabuto --query "禅モード" --verbose
 
-# Run Kabuto Helpdesk Agent
-uv run python -m template_langgraph.tasks.run_kabuto_helpdesk_agent "KABUTOの起動時に、画面全体が紫色に点滅し、システムがフリーズします。"
-uv run python -m template_langgraph.tasks.run_kabuto_helpdesk_agent "KABUTOのマニュアルから禅モードに関する情報を教えて下さい"
+# Agents
 
-# ChatWithToolsAgent
-uv run python -m template_langgraph.tasks.run_chat_with_tools_agent
+## Draw agent graph
+AGENT_NAME=chat_with_tools_agent
+uv run python scripts/graph_runner.py png --name $AGENT_NAME --verbose --output data/$AGENT_NAME.png
+
+## Run agents
+AGENT_NAME=chat_with_tools_agent
+AGENT_NAME=kabuto_helpdesk_agent
+uv run python scripts/graph_runner.py run --name $AGENT_NAME --verbose --question "KABUTOのマニュアルから禅モードに関する情報を教えて下さい"
 # KABUTOの起動時に、画面全体が紫色に点滅し、システムがフリーズします。KABUTO のマニュアルから、関連する情報を取得したり過去のシステムのトラブルシュート事例が蓄積されたデータベースから、関連する情報を取得して質問に答えてください
 # 天狗のいたずら という現象について KABUTO のマニュアルから、関連する情報を取得したり過去のシステムのトラブルシュート事例が蓄積されたデータベースから、関連する情報を取得して質問に答えてください
+# KABUTOの起動時に、画面全体が紫色に点滅し、システムがフリーズします。
+# KABUTOのマニュアルから禅モードに関する情報を教えて下さい
 
-# IssueFormatterAgent
-uv run python -m template_langgraph.tasks.run_issue_formatter_agent
-# KABUTOにログインできない！パスワードは合ってるはずなのに…若手社員である山田太郎は、Windows 11 を立ち上げ、日課のように自社の業務システムKABUTOのログイン画面を開きます。しかし、そこには、意味をなさない「虚無」という文字だけがただひっそりと表示されていたのです。これは質問でもあり不具合の報告でもあります。岡本太郎さんに本件調査依頼します。
-
-# Draw mermaid diagram for Agents
-AGENT_NAME=chat_with_tools_agent
-uv run python scripts/draw_mermaid_png.py \
-  --name $AGENT_NAME \
-  --output data/$AGENT_NAME.png
+AGENT_NAME=issue_formatter_agent
+uv run python scripts/graph_runner.py run --name $AGENT_NAME --verbose --question "KABUTOにログインできない！パスワードは合ってるはずなのに…若手社員である山田太郎は、Windows 11 を立ち上げ、日課のように自社の業務システムKABUTOのログイン画面を開きます。しかし、そこには、意味をなさない「虚無」という文字だけがただひっそりと表示されていたのです。これは質問でもあり不具合の報告でもあります。岡本太郎さんに本件調査依頼します。"
 ```
 
 ## References
