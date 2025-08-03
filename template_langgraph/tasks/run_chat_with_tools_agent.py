@@ -19,15 +19,15 @@ def stream_graph_updates(
 
 if __name__ == "__main__":
     user_input = input("User: ")
-    state = AgentState(
-        messages=[
-            {
-                "role": "user",
-                "content": user_input,
-            }
-        ],
-        profile=None,
-    )
-    last_event = stream_graph_updates(state)
-    for value in last_event.values():
-        logger.info(f"Final state: {value['messages'][-1].content}")  # noqa: E501
+    for event in chat_with_tools_agent_graph.stream(
+        input=AgentState(
+            messages=[
+                {
+                    "role": "user",
+                    "content": user_input,
+                }
+            ],
+        )
+    ):
+        logger.info("-" * 20)
+        logger.info(f"Event: {event}")

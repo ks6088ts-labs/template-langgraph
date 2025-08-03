@@ -46,7 +46,6 @@ class ChatWithToolsAgent:
         workflow = StateGraph(AgentState)
 
         # Create nodes
-        workflow.add_node("initialize", self.initialize)
         workflow.add_node("chat_with_tools", self.chat_with_tools)
         workflow.add_node(
             "tools",
@@ -57,34 +56,23 @@ class ChatWithToolsAgent:
                 ]
             ),
         )
-        workflow.add_node("finalize", self.finalize)
 
         # Create edges
-        workflow.set_entry_point("initialize")
-        workflow.add_edge("initialize", "chat_with_tools")
+        workflow.set_entry_point("chat_with_tools")
         workflow.add_conditional_edges(
-            "chat_with_tools",
-            self.route_tools,
-            # The following dictionary lets you tell the graph to interpret the condition's outputs as a specific node
-            # It defaults to the identity function, but if you
-            # want to use a node named something else apart from "tools",
-            # You can update the value of the dictionary to something else
-            # e.g., "tools": "my_tools"
-            {"tools": "tools", END: "finalize"},
+            source="chat_with_tools",
+            path=self.route_tools,
+            path_map={
+                "tools": "tools",
+                END: END,
+            },
         )
         workflow.add_edge("tools", "chat_with_tools")
-        workflow.add_edge("finalize", END)
 
         # Compile the graph
         return workflow.compile(
             name=ChatWithToolsAgent.__name__,
         )
-
-    def initialize(self, state: AgentState) -> AgentState:
-        """Initialize the agent with the given state."""
-        logger.info(f"Initializing ChatWithToolsAgent with state: {state}")
-        # Here you can add any initialization logic if needed
-        return state
 
     def chat_with_tools(self, state: AgentState) -> AgentState:
         """Chat with tools using the state."""
@@ -118,16 +106,6 @@ class ChatWithToolsAgent:
         if hasattr(ai_message, "tool_calls") and len(ai_message.tool_calls) > 0:
             return "tools"
         return END
-
-    def finalize(self, state: AgentState) -> AgentState:
-        """Finalize the agent's work and prepare the output."""
-        logger.info(f"Finalizing ChatWithToolsAgent with state: {state}")
-        # Here you can add any finalization logic if needed
-        return state
-
-    def draw_mermaid_png(self) -> bytes:
-        """Draw the graph in Mermaid format."""
-        return self.create_graph().get_graph().draw_mermaid_png()
 
 
 graph = ChatWithToolsAgent().create_graph()
