@@ -74,9 +74,5 @@ class TaskDecomposerAgent:
         logger.info("Looping back to chat for further processing.")
         return "loopback"
 
-    def draw_mermaid_png(self) -> bytes:
-        """Draw the graph in Mermaid format."""
-        return self.create_graph().get_graph().draw_mermaid_png()
-
 
 graph = TaskDecomposerAgent().create_graph()
