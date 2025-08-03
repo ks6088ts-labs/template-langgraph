@@ -1,4 +1,4 @@
-from langgraph.graph import END, StateGraph
+from langgraph.graph import StateGraph
 
 from template_langgraph.agents.issue_formatter_agent.models import AgentState, Issue
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
@@ -21,7 +21,7 @@ class IssueFormatterAgent:
 
         # Create edges
         workflow.set_entry_point("analyze")
-        workflow.add_edge("analyze", END)
+        workflow.set_finish_point("analyze")
 
         # Compile the graph
         return workflow.compile(
