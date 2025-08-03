@@ -6,14 +6,11 @@
 # Start Docker containers
 docker compose up -d
 
-# Delete collection from Qdrant
-uv run python -m template_langgraph.tasks.delete_qdrant_collection
-
-# Add documents to Qdrant
-uv run python -m template_langgraph.tasks.add_documents_to_qdrant
-
-# Search Qdrant
-uv run python -m template_langgraph.tasks.search_documents_on_qdrant
+# Qdrant
+uv run python scripts/qdrant_operator.py --help
+uv run python scripts/qdrant_operator.py delete-collection --collection-name qa_kabuto --verbose
+uv run python scripts/qdrant_operator.py add-documents --collection-name qa_kabuto --verbose
+uv run python scripts/qdrant_operator.py search-documents --collection-name qa_kabuto --question "「鬼灯」を実行すると、KABUTOが急に停止します。原因と対策を教えてください。" --verbose
 
 # Add documents to Elasticsearch
 uv run python -m template_langgraph.tasks.add_documents_to_elasticsearch
