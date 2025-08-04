@@ -54,7 +54,7 @@ def run_workflow(
             ensure_ascii=False,
         )
     )
-    logger.info(f"Input: {response['data']['outputs']['requirements']}, Output: {response['data']['outputs']['text']}")
+    logger.info(f"Output: {response['data']['outputs']['text']}")
 
 
 if __name__ == "__main__":
