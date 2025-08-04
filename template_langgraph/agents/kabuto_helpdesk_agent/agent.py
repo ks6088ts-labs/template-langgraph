@@ -2,8 +2,9 @@ from langgraph.prebuilt import create_react_agent
 
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
+from template_langgraph.tools.dify_tool import run_dify_workflow
 from template_langgraph.tools.elasticsearch_tool import search_elasticsearch
-from template_langgraph.tools.qdrants import search_qdrant
+from template_langgraph.tools.qdrant_tool import search_qdrant
 
 logger = get_logger(__name__)
 
@@ -13,6 +14,7 @@ class KabutoHelpdeskAgent:
         if tools is None:
             # Default tool for searching Qdrant
             tools = [
+                run_dify_workflow,
                 search_qdrant,
                 search_elasticsearch,
                 # Add other tools as needed
