@@ -31,7 +31,6 @@ class ElasticsearchClientWrapper:
     ):
         if settings is None:
             settings = get_elasticsearch_settings()
-        print(f"Elasticsearch URL: {settings.elasticsearch_url}")
         self.client = Elasticsearch(
             settings.elasticsearch_url,
         )
