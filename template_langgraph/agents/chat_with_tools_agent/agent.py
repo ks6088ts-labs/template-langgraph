@@ -7,7 +7,7 @@ from template_langgraph.agents.chat_with_tools_agent.models import AgentState
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
 from template_langgraph.tools.elasticsearch_tool import search_elasticsearch
-from template_langgraph.tools.qdrants import search_qdrant
+from template_langgraph.tools.qdrant_tool import search_qdrant
 
 logger = get_logger(__name__)
 

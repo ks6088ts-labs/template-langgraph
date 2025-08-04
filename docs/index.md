@@ -1,13 +1,17 @@
 # template-langgraph
 
-## Operations
+## Overview
+
+```shell
+# Set up environment
+docker compose up -d
+```
+
+## Testing
 
 see [test_all.sh](../scripts/test_all.sh) for all operations
 
 ```shell
-# Start Docker containers
-docker compose up -d
-
 # Test all scripts
 bash scripts/test_all.sh
 ```

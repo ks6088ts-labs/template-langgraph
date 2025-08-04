@@ -3,7 +3,7 @@ from langgraph.prebuilt import create_react_agent
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
 from template_langgraph.tools.elasticsearch_tool import search_elasticsearch
-from template_langgraph.tools.qdrants import search_qdrant
+from template_langgraph.tools.qdrant_tool import search_qdrant
 
 logger = get_logger(__name__)
 

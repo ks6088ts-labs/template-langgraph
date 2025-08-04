@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Stop on errors, undefined variables, and pipe failures
+set -euo pipefail
+
+# Run Docker Compose to set up the environment
+docker compose up -d --wait
+
 # Qdrant
 uv run python scripts/qdrant_operator.py --help
 uv run python scripts/qdrant_operator.py delete-collection --collection-name qa_kabuto --verbose
@@ -24,7 +30,7 @@ AGENT_NAMES=(
     "task_decomposer_agent"
 )
 for AGENT_NAME in "${AGENT_NAMES[@]}"; do
-    uv run python scripts/agent_runner.py png --name "$AGENT_NAME" --verbose --output "generated/${AGENT_NAME}.png"
+    uv run python scripts/agent_operator.py png --name "$AGENT_NAME" --verbose --output "generated/${AGENT_NAME}.png"
 done
 
 ## Run agents
@@ -38,5 +44,8 @@ NAME_QUESTION_ARRAY=(
 for NAME_QUESTION in "${NAME_QUESTION_ARRAY[@]}"; do
     IFS=':' read -r AGENT_NAME QUESTION <<< "$NAME_QUESTION"
     echo "Running agent: $AGENT_NAME with question: $QUESTION"
-    uv run python scripts/agent_runner.py run --name "$AGENT_NAME" --verbose --question "$QUESTION"
+    uv run python scripts/agent_operator.py run --name "$AGENT_NAME" --verbose --question "$QUESTION"
 done
+
+# Clean up Docker Compose environment
+docker compose down --remove-orphans
