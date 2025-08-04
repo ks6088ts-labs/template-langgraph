@@ -1,6 +1,8 @@
 from functools import lru_cache
 
 import httpx
+from langchain.tools import tool
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -48,3 +50,36 @@ class DifyClientWrapper:
             )
             response.raise_for_status()
             return response.json()
+
+
+class DifyWorkflowInput(BaseModel):
+    requirements: str = Field(
+        default="生成 AI のサービス概要を教えてください。日本語でお願いします",
+        description="Requirements for running the Dify workflow",
+    )
+
+
+class DifyWorkflowOutput(BaseModel):
+    response: dict = Field(description="Output data from the Dify workflow")
+
+
+@tool(args_schema=DifyWorkflowInput)
+def run_dify_workflow(
+    requirements: str = "生成 AI のサービス概要を教えてください。日本語でお願いします",
+) -> DifyWorkflowOutput:
+    """
+    Difyワークフローを実行します。
+    指定された入力パラメータでワークフローを実行し、結果を返します。
+    """
+    wrapper = DifyClientWrapper()
+    response = wrapper.run_workflow(
+        inputs={
+            "inputs": {
+                "requirements": requirements,
+            },
+            "response_mode": "blocking",
+            "user": "abc-123",
+        }
+    )
+
+    return DifyWorkflowOutput(response=response)
