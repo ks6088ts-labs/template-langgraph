@@ -3664,6 +3664,7 @@ version = "0.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "elasticsearch" },
+    { name = "httpx" },
     { name = "langchain-community" },
     { name = "langchain-openai" },
     { name = "langchain-text-splitters" },
@@ -3695,6 +3696,7 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "elasticsearch", specifier = ">=9.1.0" },
+    { name = "httpx", specifier = ">=0.28.1" },
     { name = "langchain-community", specifier = ">=0.3.27" },
     { name = "langchain-openai", specifier = ">=0.3.28" },
     { name = "langchain-text-splitters", specifier = ">=0.3.9" },
