@@ -90,6 +90,13 @@ class ElasticsearchClientWrapper:
                 return True
         return False
 
+    def delete_index(self, index_name: str) -> bool:
+        """Delete an index in Elasticsearch."""
+        if self.client.indices.exists(index=index_name):
+            result = self.client.indices.delete(index=index_name)
+            return result.get("acknowledged", False)
+        return False
+
     def add_documents(
         self,
         index_name: str,

@@ -6,8 +6,8 @@ from qdrant_client.models import PointStruct
 
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
-from template_langgraph.tools.csv_loaders import CsvLoaderWrapper
 from template_langgraph.tools.qdrants import QdrantClientWrapper
+from template_langgraph.utilities.csv_loaders import CsvLoaderWrapper
 
 # Initialize the Typer application
 app = typer.Typer(

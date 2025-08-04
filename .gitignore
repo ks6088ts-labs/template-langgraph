@@ -164,3 +164,4 @@ cython_debug/
 requirements.txt
 assets/
 .langgraph_api
+generated/

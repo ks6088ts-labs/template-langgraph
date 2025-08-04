@@ -5,14 +5,14 @@ from dotenv import load_dotenv
 
 from template_langgraph.agents.chat_with_tools_agent.agent import graph as chat_with_tools_agent_graph
 from template_langgraph.agents.issue_formatter_agent.agent import graph as issue_formatter_agent_graph
-from template_langgraph.agents.kabuto_helpdesk_agent import graph as kabuto_helpdesk_agent_graph
+from template_langgraph.agents.kabuto_helpdesk_agent.agent import graph as kabuto_helpdesk_agent_graph
 from template_langgraph.agents.task_decomposer_agent.agent import graph as task_decomposer_agent_graph
 from template_langgraph.loggers import get_logger
 
 # Initialize the Typer application
 app = typer.Typer(
     add_completion=False,
-    help="template-langgraph CLI",
+    help="agent runner CLI",
 )
 
 # Set up logging
@@ -90,55 +90,19 @@ def run(
     if verbose:
         logger.setLevel(logging.DEBUG)
 
-    if name == "chat_with_tools_agent":
-        from template_langgraph.agents.chat_with_tools_agent.agent import (
-            AgentState,
-        )
-
-        for event in chat_with_tools_agent_graph.stream(
-            input=AgentState(
-                messages=[
-                    {
-                        "role": "user",
-                        "content": question,
-                    }
-                ],
-            )
-        ):
-            logger.info("-" * 20)
-            logger.info(f"Event: {event}")
-
-    if name == "issue_formatter_agent":
-        from template_langgraph.agents.issue_formatter_agent.agent import (
-            AgentState,
-        )
-
-        for event in issue_formatter_agent_graph.stream(
-            input=AgentState(
-                messages=[
-                    {
-                        "role": "user",
-                        "content": question,
-                    }
-                ],
-            )
-        ):
-            logger.info("-" * 20)
-            logger.info(f"Event: {event}")
-
-    if name == "kabuto_helpdesk_agent":
-        from template_langgraph.agents.kabuto_helpdesk_agent import KabutoHelpdeskAgent
-
-        agent = KabutoHelpdeskAgent(
-            tools=None,  # ツールはカスタムせず、デフォルトのツールを使用
-        )
-        response = agent.run(
-            question=question,
-        )
-        logger.info(f"Agent result: {response}")
-
-        # エージェントの応答を表示
-        logger.info(f"Answer: {response['messages'][-1].content}")
+    graph = get_agent_graph(name)
+    for event in graph.stream(
+        input={
+            "messages": [
+                {
+                    "role": "user",
+                    "content": question,
+                }
+            ],
+        }
+    ):
+        logger.info("-" * 20)
+        logger.info(f"Event: {event}")
 
 
 if __name__ == "__main__":

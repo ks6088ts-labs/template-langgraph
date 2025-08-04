@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 from template_langgraph.loggers import get_logger
 from template_langgraph.tools.elasticsearch_tool import ElasticsearchClientWrapper
-from template_langgraph.tools.pdf_loaders import PdfLoaderWrapper
+from template_langgraph.utilities.pdf_loaders import PdfLoaderWrapper
 
 # Initialize the Typer application
 app = typer.Typer(
@@ -57,6 +57,67 @@ def search_documents(
 
 
 @app.command()
+def create_index(
+    index_name: str = typer.Option(
+        "docs_kabuto",
+        "--index-name",
+        "-i",
+        help="Name of the Elasticsearch index to create",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    # Set up logging
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    es = ElasticsearchClientWrapper()
+    logger.info(f"Creating Elasticsearch index: {index_name}")
+    result = es.create_index(
+        index_name=index_name,
+    )
+    if result:
+        logger.info(f"Created Elasticsearch index: {index_name}")
+    else:
+        logger.warning(f"Index {index_name} already exists.")
+
+
+@app.command()
+def delete_index(
+    index_name: str = typer.Option(
+        "docs_kabuto",
+        "--index-name",
+        "-i",
+        help="Name of the Elasticsearch index to delete",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    # Set up logging
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    es = ElasticsearchClientWrapper()
+    logger.info(f"Deleting Elasticsearch index: {index_name}")
+    result = es.delete_index(
+        index_name=index_name,
+    )
+    if result:
+        logger.info(f"Deleted Elasticsearch index: {index_name}")
+    else:
+        logger.warning(f"Index {index_name} does not exist or could not be deleted.")
+        return False
+
+
+@app.command()
 def add_documents(
     index_name: str = typer.Option(
         "docs_kabuto",
@@ -77,14 +138,6 @@ def add_documents(
 
     # Create Elasticsearch index
     es = ElasticsearchClientWrapper()
-    logger.info(f"Creating Elasticsearch index: {index_name}")
-    result = es.create_index(
-        index_name=index_name,
-    )
-    if result:
-        logger.info(f"Created Elasticsearch index: {index_name}")
-    else:
-        logger.warning(f"Index {index_name} already exists.")
 
     # Load documents from PDF files
     documents = PdfLoaderWrapper().load_pdf_docs()

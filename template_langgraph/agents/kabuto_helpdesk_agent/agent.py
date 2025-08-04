@@ -24,18 +24,5 @@ class KabutoHelpdeskAgent:
             debug=True,
         )
 
-    def run(self, question: str) -> dict:
-        logger.info(f"Running KabutoHelpdeskAgent with question: {question}")
-        return self.agent.invoke(
-            {
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": question,
-                    },
-                ]
-            }
-        )
-
 
 graph = KabutoHelpdeskAgent().agent
