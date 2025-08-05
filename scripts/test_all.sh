@@ -7,22 +7,24 @@ set -euo pipefail
 docker compose up -d --wait
 
 # Qdrant
+COLLECTION_NAME="qa_kabuto"
 uv run python scripts/qdrant_operator.py --help
-uv run python scripts/qdrant_operator.py delete-collection --collection-name qa_kabuto --verbose
-uv run python scripts/qdrant_operator.py add-documents --collection-name qa_kabuto --verbose
-uv run python scripts/qdrant_operator.py search-documents --collection-name qa_kabuto --question "「鬼灯」を実行すると、KABUTOが急に停止します。原因と対策を教えてください。" --verbose
+uv run python scripts/qdrant_operator.py delete-collection --collection-name $COLLECTION_NAME --verbose
+uv run python scripts/qdrant_operator.py add-documents     --collection-name $COLLECTION_NAME --verbose
+uv run python scripts/qdrant_operator.py search-documents  --collection-name $COLLECTION_NAME --verbose --question "「鬼灯」を実行すると、KABUTOが急に停止します。原因と対策を教えてください。"
 
 # Elasticsearch
+INDEX_NAME="docs_kabuto"
 uv run python scripts/elasticsearch_operator.py --help
-uv run python scripts/elasticsearch_operator.py delete-index --index-name docs_kabuto --verbose
-uv run python scripts/elasticsearch_operator.py create-index --index-name docs_kabuto --verbose
-uv run python scripts/elasticsearch_operator.py add-documents --index-name docs_kabuto --verbose
-uv run python scripts/elasticsearch_operator.py search-documents --index-name docs_kabuto --query "禅モード" --verbose
+uv run python scripts/elasticsearch_operator.py delete-index     --index-name $INDEX_NAME --verbose
+uv run python scripts/elasticsearch_operator.py create-index     --index-name $INDEX_NAME --verbose
+uv run python scripts/elasticsearch_operator.py add-documents    --index-name $INDEX_NAME --verbose
+uv run python scripts/elasticsearch_operator.py search-documents --index-name $INDEX_NAME --verbose --query "禅モード"
 
 # Azure Cosmos DB NoSQL
 uv run python scripts/cosmosdb_operator.py --help
-uv run python scripts/cosmosdb_operator.py add-documents --verbose
-uv run python scripts/cosmosdb_operator.py similarity-search --query "禅モード" --k 3 --verbose
+uv run python scripts/cosmosdb_operator.py add-documents     --verbose
+uv run python scripts/cosmosdb_operator.py similarity-search --verbose --query "禅モード" --k 3
 
 # Agents
 
