@@ -1,9 +1,7 @@
 from functools import lru_cache
 
 from azure.cosmos import CosmosClient, PartitionKey
-from langchain_community.vectorstores.azure_cosmos_db_no_sql import (
-    AzureCosmosDBNoSqlVectorSearch,
-)
+from langchain_azure_ai.vectorstores.azure_cosmos_db_no_sql import AzureCosmosDBNoSqlVectorSearch
 from langchain_core.documents import Document
 from langchain_core.tools import tool
 from pydantic import BaseModel, Field
@@ -74,6 +72,10 @@ class CosmosdbClientWrapper:
                 "partition_key": PartitionKey(path=settings.cosmosdb_partition_key),
             },
             cosmos_database_properties={},
+            vector_search_fields={
+                "text_field": "text",
+                "embedding_field": "embedding",
+            },
             full_text_policy={
                 "defaultLanguage": "en-US",
                 "fullTextPaths": [
