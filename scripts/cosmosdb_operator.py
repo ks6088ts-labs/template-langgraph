@@ -52,6 +52,7 @@ def add_documents(
     for id in ids:
         logger.debug(f"Added document ID: {id}")
 
+    # FIXME: deleting documents() is not working as expected
     # assert cosmosdb_client.delete_documents(ids=ids), "Failed to delete documents from Cosmos DB"
 
 
