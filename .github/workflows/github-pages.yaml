@@ -24,5 +24,8 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: pip install mkdocs-material
-      - run: mkdocs gh-deploy --force
+      - name: Set up uv
+        shell: bash
+        run: pipx install uv
+      - run: make install-deps-docs
+      - run: uv run mkdocs gh-deploy --force
