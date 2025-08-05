@@ -6,9 +6,7 @@ from langgraph.graph import END, StateGraph
 from template_langgraph.agents.chat_with_tools_agent.models import AgentState
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
-from template_langgraph.tools.dify_tool import run_dify_workflow
-from template_langgraph.tools.elasticsearch_tool import search_elasticsearch
-from template_langgraph.tools.qdrant_tool import search_qdrant
+from template_langgraph.tools.common import DEFAULT_TOOLS
 
 logger = get_logger(__name__)
 
@@ -40,11 +38,7 @@ class BasicToolNode:
 class ChatWithToolsAgent:
     def __init__(self):
         self.llm = AzureOpenAiWrapper().chat_model
-        self.tools = [
-            run_dify_workflow,
-            search_qdrant,
-            search_elasticsearch,
-        ]
+        self.tools = DEFAULT_TOOLS
 
     def create_graph(self):
         """Create the main graph for the agent."""
