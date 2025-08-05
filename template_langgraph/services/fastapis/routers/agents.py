@@ -32,21 +32,21 @@ class RunChatWithToolsAgentResponse(BaseModel):
 async def run_chat_with_tools_agent(
     request: RunChatWithToolsAgentRequest,
 ) -> RunChatWithToolsAgentResponse:
-    async for event in chat_with_tools_agent.astream(
-        input=AgentState(
-            messages=[
-                {
-                    "role": "user",
-                    "content": request.question,
-                },
-            ],
-        ),
-        config={
-            "recursion_limit": 30,
-        },
-    ):
-        logger.debug(f"Event received: {event}")
     try:
+        async for event in chat_with_tools_agent.astream(
+            input=AgentState(
+                messages=[
+                    {
+                        "role": "user",
+                        "content": request.question,
+                    },
+                ],
+            ),
+            config={
+                "recursion_limit": 30,
+            },
+        ):
+            logger.debug(f"Event received: {event}")
         response = event["chat_with_tools"]["messages"][0].content
         return RunChatWithToolsAgentResponse(response=response)
     except Exception as e:

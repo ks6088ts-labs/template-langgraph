@@ -119,3 +119,11 @@ langgraph-studio: ## run LangGraph Studio
 .PHONY: fastapi-dev
 fastapi-dev: ## run FastAPI
 	uv run fastapi dev ./template_langgraph/services/fastapis/main.py
+
+.PHONY: fastapi
+fastapi: ## run FastAPI in production mode
+	uv run fastapi run \
+		--host "0.0.0.0" \
+		--port 8000 \
+		--workers 4 \
+		template_langgraph/services/fastapis/main.py
