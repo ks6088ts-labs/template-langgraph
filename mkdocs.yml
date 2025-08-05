@@ -46,3 +46,14 @@ extra:
   analytics:
     provider: google
     property: G-0ZTKFXVQ5K
+plugins:
+  - i18n:
+      docs_structure: suffix
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: ja
+          name: 日本語
+          build: true
