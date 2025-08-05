@@ -115,3 +115,7 @@ ci-test-docs: install-deps-docs docs ## run CI test for documentation
 .PHONY: langgraph-studio
 langgraph-studio: ## run LangGraph Studio
 	uv run langgraph dev
+
+.PHONY: fastapi-dev
+fastapi-dev: ## run FastAPI
+	uv run fastapi dev ./template_langgraph/services/fastapis.py
