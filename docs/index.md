@@ -35,6 +35,9 @@ This template provides working examples of all these patterns using LangGraph.
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) - Modern Python package manager
 - [GNU Make](https://www.gnu.org/software/make/) - For running common tasks
 - [Docker](https://www.docker.com/) - For running vector databases (optional)
+- Azure
+  - [Azure OpenAI](https://learn.microsoft.com/ja-jp/azure/ai-foundry/openai/overview) - LLM API
+  - [Azure Cosmos DB](https://learn.microsoft.com/ja-jp/azure/cosmos-db/) - Data storage (optional)
 
 ## Quick Start
 
@@ -159,7 +162,7 @@ uv run jupyter lab
 
 ![jupyterlab.png](./images/jupyterlab.png)
 
-### Option 3: Command Line (Production-like)
+### Option 3: Command Line (Quick development)
 
 Run agents from the terminal:
 
@@ -190,6 +193,23 @@ The purple screen flashing during KABUTO startup indicates a "Shinobi Protocol" 
 3. **Restart KABUTO**: Use the "Dragon Ball" button for 5+ seconds if needed
 ')]}}
 ```
+
+### Option 4: FastAPI (Production-ready)
+
+Run the FastAPI server to expose the agent as an API:
+
+```shell
+uv run fastapi run \
+  --host "0.0.0.0" \
+  --port 8000 \
+  --workers 4 \
+  template_langgraph/services/fastapis/main.py
+# Access the API at http://localhost:8000/docs via Swagger UI
+```
+
+This allows you to interact with the agent programmatically via HTTP requests.
+
+![fastapi.png](./images/fastapi.png)
 
 ## Key Concepts Demonstrated
 

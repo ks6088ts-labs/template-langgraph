@@ -35,6 +35,9 @@
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) - モダンな Python パッケージマネージャー
 - [GNU Make](https://www.gnu.org/software/make/) - 一般的なタスクの実行用
 - [Docker](https://www.docker.com/) - ベクターデータベースの実行用（オプション）
+- Azure
+  - [Azure OpenAI](https://learn.microsoft.com/ja-jp/azure/ai-foundry/openai/overview) - LLM API
+  - [Azure Cosmos DB](https://learn.microsoft.com/ja-jp/azure/cosmos-db/) - データストレージ（オプション）
 
 ## クイックスタート
 
@@ -129,7 +132,7 @@ Pydantic モデルを使用して AI 応答から構造化データを取得す�
 - **`template_langgraph/tools/`** - 検索、データ取得用ツール実装
 - **`template_langgraph/utilities/`** - ドキュメント読み込みと処理用ヘルパー関数
 
-## 例の実行
+## サンプルコードの実行
 
 ### オプション 1: LangGraph Studio（開発用推奨）
 
@@ -159,7 +162,7 @@ uv run jupyter lab
 
 ![jupyterlab.png](./images/jupyterlab.png)
 
-### オプション 3: コマンドライン（本番環境的）
+### オプション 3: コマンドライン（クイックな開発）
 
 ターミナルからエージェントを実行：
 
@@ -190,6 +193,23 @@ KABUTO起動時の紫画面点滅は「忍者プロトコル」初期化エラ�
 3. **KABUTOの再起動**: 必要に応じて「ドラゴンボール」ボタンを5秒以上押す
 ')]}}
 ```
+
+### オプション 4: FastAPI サーバー（プロダクションレディ）
+
+FastAPI サーバーを実行して、エージェントを API として公開：
+
+```shell
+uv run fastapi run \
+  --host "0.0.0.0" \
+  --port 8000 \
+  --workers 4 \
+  template_langgraph/services/fastapis/main.py
+# http://localhost:8000/docs を開いて Swagger UI 経由で API にアクセス
+```
+
+これにより、HTTP リクエストを介してプログラム的にエージェントと対話できます。
+
+![fastapi.png](./images/fastapi.png)
 
 ## 実演されている主要概念
 
@@ -237,8 +257,8 @@ LangGraph が複数のインタラクションステップにわたってコン�
 
 ## 学習リソース
 
-- [LangGraph 文書](https://langchain-ai.github.io/langgraph/)
-- [LangChain 文書](https://python.langchain.com/)
+- [LangGraph 公式ドキュメント](https://langchain-ai.github.io/langgraph/)
+- [LangChain 公式ドキュメント](https://python.langchain.com/)
 
 ## アーキテクチャの例
 
