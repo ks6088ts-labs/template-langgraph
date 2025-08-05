@@ -5,6 +5,10 @@ repo_url: https://github.com/ks6088ts-labs/template-langgraph
 repo_name: ks6088ts-labs/template-langgraph
 nav:
   - Home: index.md
+  - Development: development.md
+  - Deployment: deployment.md
+  - FAQ: faq.md
+  - References: references.md
 theme:
   name: material
   # https://squidfunk.github.io/mkdocs-material/setup/changing-the-colors/#automatic-light-dark-mode
