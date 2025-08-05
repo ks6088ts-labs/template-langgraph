@@ -19,6 +19,11 @@ uv run python scripts/elasticsearch_operator.py create-index --index-name docs_k
 uv run python scripts/elasticsearch_operator.py add-documents --index-name docs_kabuto --verbose
 uv run python scripts/elasticsearch_operator.py search-documents --index-name docs_kabuto --query "禅モード" --verbose
 
+# Azure Cosmos DB NoSQL
+uv run python scripts/cosmosdb_operator.py --help
+uv run python scripts/cosmosdb_operator.py add-documents --verbose
+uv run python scripts/cosmosdb_operator.py similarity-search --query "禅モード" --k 3 --verbose
+
 # Agents
 
 ## Draw agent graph
