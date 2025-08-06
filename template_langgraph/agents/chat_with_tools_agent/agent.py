@@ -36,9 +36,9 @@ class BasicToolNode:
 
 
 class ChatWithToolsAgent:
-    def __init__(self):
+    def __init__(self, tools=DEFAULT_TOOLS):
         self.llm = AzureOpenAiWrapper().chat_model
-        self.tools = DEFAULT_TOOLS
+        self.tools = tools
 
     def create_graph(self):
         """Create the main graph for the agent."""

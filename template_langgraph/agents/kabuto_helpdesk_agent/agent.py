@@ -8,9 +8,7 @@ logger = get_logger(__name__)
 
 
 class KabutoHelpdeskAgent:
-    def __init__(self, tools=None):
-        if tools is None:
-            tools = DEFAULT_TOOLS
+    def __init__(self, tools=DEFAULT_TOOLS):
         self.agent = create_react_agent(
             model=AzureOpenAiWrapper().chat_model,
             tools=tools,
