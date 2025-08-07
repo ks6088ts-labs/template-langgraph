@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     azure_openai_api_version: str = "2024-10-21"
     azure_openai_model_chat: str = "gpt-4o"
     azure_openai_model_embedding: str = "text-embedding-3-small"
+    azure_openai_model_reasoning: str = "o4-mini"
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -41,6 +42,12 @@ class AzureOpenAiWrapper:
             api_key=settings.azure_openai_api_key,
             api_version=settings.azure_openai_api_version,
             azure_deployment=settings.azure_openai_model_embedding,
+        )
+        self.reasoning_model = AzureChatOpenAI(
+            azure_endpoint=settings.azure_openai_endpoint,
+            api_key=settings.azure_openai_api_key,
+            api_version=settings.azure_openai_api_version,
+            azure_deployment=settings.azure_openai_model_reasoning,
         )
 
     def create_embedding(self, text: str):
