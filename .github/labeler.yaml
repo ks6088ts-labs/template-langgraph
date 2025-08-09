@@ -1,0 +1,12 @@
+docs:
+  - docs/**/*
+github:
+  - .github/**/*
+agents:
+  - template_langgraph/agents/**/*
+llms:
+  - template_langgraph/llms/**/*
+services:
+  - template_langgraph/services/**/*
+tools:
+  - template_langgraph/tools/**/*
