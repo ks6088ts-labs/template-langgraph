@@ -6,6 +6,7 @@
 - [LangGraph の(LLM なし)Human-in-the-loop を試してみた](https://qiita.com/te_yama/items/db38201af60dec76384d)
 - [🤖 LangGraph Multi-Agent Supervisor](https://github.com/langchain-ai/langgraph-supervisor-py)
 - [Software Design 誌「実践 LLM アプリケーション開発」第 24 回サンプルコード](https://github.com/mahm/softwaredesign-llm-application/tree/main/24)
+- [Streamlit](https://python.langchain.com/docs/integrations/callbacks/streamlit/)
 
 ### Sample Codes
 

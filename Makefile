@@ -127,3 +127,8 @@ fastapi: ## run FastAPI in production mode
 		--port 8000 \
 		--workers 4 \
 		template_langgraph/services/fastapis/main.py
+
+.PHONY: streamlit
+streamlit: ## run Streamlit
+	uv run streamlit run \
+		template_langgraph/services/streamlits/main.py
