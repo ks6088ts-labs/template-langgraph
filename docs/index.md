@@ -211,6 +211,19 @@ This allows you to interact with the agent programmatically via HTTP requests.
 
 ![fastapi.png](./images/fastapi.png)
 
+### Option 5: Streamlit (PoC demo)
+
+Run the Streamlit app to expose the agent as a web interface:
+
+```shell
+uv run streamlit run \
+  template_langgraph/services/streamlits/main.py
+```
+
+Demonstration of the Streamlit app:
+
+[![streamlit.png](./images/streamlit.png)](https://youtu.be/z7QhEsqIGAk)
+
 ## Key Concepts Demonstrated
 
 ### 1. **ReAct Pattern** (Reasoning + Acting)

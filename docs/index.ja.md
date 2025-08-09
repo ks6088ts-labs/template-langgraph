@@ -211,6 +211,19 @@ uv run fastapi run \
 
 ![fastapi.png](./images/fastapi.png)
 
+### オプション 5: Streamlit（PoC デモ）
+
+Streamlit アプリを実行して、エージェントを Web インターフェースとして公開：
+
+```shell
+uv run streamlit run \
+  template_langgraph/services/streamlits/main.py
+```
+
+Streamlit アプリのデモ：
+
+[![streamlit.png](./images/streamlit.png)](https://youtu.be/z7QhEsqIGAk)
+
 ## 実演されている主要概念
 
 ### 1. **ReAct パターン**（推論 + 行動）
