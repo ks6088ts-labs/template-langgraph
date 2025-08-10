@@ -6,7 +6,7 @@ from langgraph.graph import END, StateGraph
 from template_langgraph.agents.chat_with_tools_agent.models import AgentState
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
-from template_langgraph.tools.common import DEFAULT_TOOLS
+from template_langgraph.tools.common import get_default_tools
 
 logger = get_logger(__name__)
 
@@ -24,19 +24,29 @@ class BasicToolNode:
             raise ValueError("No message found in input")
         outputs = []
         for tool_call in message.tool_calls:
-            tool_result = self.tools_by_name[tool_call["name"]].invoke(tool_call["args"])
-            outputs.append(
-                ToolMessage(
-                    content=json.dumps(tool_result.__str__(), ensure_ascii=False),
-                    name=tool_call["name"],
-                    tool_call_id=tool_call["id"],
+            try:
+                tool_result = self.tools_by_name[tool_call["name"]].invoke(tool_call["args"])
+                outputs.append(
+                    ToolMessage(
+                        content=json.dumps(tool_result.__str__(), ensure_ascii=False),
+                        name=tool_call["name"],
+                        tool_call_id=tool_call["id"],
+                    )
                 )
-            )
+            except Exception as e:
+                logger.error(f"Error occurred while invoking tools: {e}")
+                outputs.append(
+                    ToolMessage(
+                        content=json.dumps({"error": str(e)}, ensure_ascii=False),
+                        name=tool_call["name"],
+                        tool_call_id=tool_call["id"],
+                    )
+                )
         return {"messages": outputs}
 
 
 class ChatWithToolsAgent:
-    def __init__(self, tools=DEFAULT_TOOLS):
+    def __init__(self, tools=get_default_tools()):
         self.llm = AzureOpenAiWrapper().chat_model
         self.tools = tools
 
