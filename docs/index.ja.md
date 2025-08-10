@@ -222,7 +222,7 @@ uv run streamlit run \
 
 Streamlit アプリのデモ：
 
-[![streamlit.png](./images/streamlit.png)](https://youtu.be/z7QhEsqIGAk)
+[![streamlit.png](./images/streamlit.png)](https://youtu.be/undxBwyJ3Sc)
 
 ## 実演されている主要概念
 
