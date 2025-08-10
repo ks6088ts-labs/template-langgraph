@@ -21,6 +21,7 @@
 - [CSVLoader](https://python.langchain.com/docs/how_to/document_loader_csv/)
 - [Qdrant](https://github.com/qdrant/qdrant)
 - [Azure Cosmos DB No SQL](https://python.langchain.com/docs/integrations/vectorstores/azure_cosmos_db_no_sql/)
+- [Azure AI Search](https://python.langchain.com/docs/integrations/vectorstores/azuresearch/)
 
 ### Services
 
