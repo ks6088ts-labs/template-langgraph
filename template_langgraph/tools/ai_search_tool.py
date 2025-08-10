@@ -2,6 +2,8 @@ from functools import lru_cache
 
 from langchain_community.vectorstores.azuresearch import AzureSearch
 from langchain_core.documents import Document
+from langchain_core.tools import tool
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
@@ -58,3 +60,46 @@ class AiSearchClientWrapper:
             query=query,
             k=k,  # Number of results to return
         )
+
+
+class AiSearchInput(BaseModel):
+    query: str = Field(
+        default="禅モード",
+        description="Query to search in the AI Search index",
+    )
+    k: int = Field(
+        default=5,
+        description="Number of results to return from the similarity search",
+    )
+
+
+class AiSearchOutput(BaseModel):
+    content: str = Field(description="Content of the document")
+    id: str = Field(description="ID of the document")
+
+
+@tool(args_schema=AiSearchInput)
+def search_ai_search(query: str, k: int = 5) -> list[AiSearchOutput]:
+    """Search for similar documents in AI Search index.
+
+    Args:
+        query: The search query string
+        k: Number of results to return (default: 5)
+
+    Returns:
+        AiSearchOutput: A Pydantic model containing the search results
+    """
+    wrapper = AiSearchClientWrapper()
+    documents = wrapper.similarity_search(
+        query=query,
+        k=k,
+    )
+    outputs = []
+    for document in documents:
+        outputs.append(
+            {
+                "content": document.page_content,
+                "id": document.id,
+            }
+        )
+    return outputs

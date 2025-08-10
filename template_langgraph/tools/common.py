@@ -1,5 +1,6 @@
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
+from template_langgraph.tools.ai_search_tool import search_ai_search
 from template_langgraph.tools.cosmosdb_tool import search_cosmosdb
 from template_langgraph.tools.dify_tool import run_dify_workflow
 from template_langgraph.tools.elasticsearch_tool import search_elasticsearch
@@ -18,6 +19,7 @@ def get_default_tools():
         logger.error(f"Error occurred while getting SQL database tools: {e}")
         sql_database_tools = []
     return [
+        search_ai_search,
         search_cosmosdb,
         run_dify_workflow,
         search_qdrant,
