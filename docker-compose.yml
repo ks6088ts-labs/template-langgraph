@@ -18,3 +18,15 @@ services:
       - xpack.security.enabled=false
     volumes:
       - ./assets/es_data:/usr/share/elasticsearch/data
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./assets/postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db
+    restart: always
