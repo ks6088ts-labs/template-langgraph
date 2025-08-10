@@ -165,3 +165,4 @@ requirements.txt
 assets/
 .langgraph_api
 generated/
+*.db
