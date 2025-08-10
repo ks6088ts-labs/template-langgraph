@@ -6,6 +6,8 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "azure-cosmos>=4.9.0",
+    "azure-identity>=1.23.1",
+    "azure-search-documents>=11.5.3",
     "elasticsearch>=9.1.0",
     "fastapi[standard]>=0.116.1",
     "httpx>=0.28.1",
