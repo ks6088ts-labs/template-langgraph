@@ -34,7 +34,6 @@ class AzureOpenAiWrapper:
             api_key=settings.azure_openai_api_key,
             api_version=settings.azure_openai_api_version,
             azure_deployment=settings.azure_openai_model_chat,
-            temperature=0.0,
             streaming=True,
         )
         self.embedding_model = AzureOpenAIEmbeddings(

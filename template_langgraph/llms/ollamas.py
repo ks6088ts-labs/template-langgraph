@@ -26,6 +26,5 @@ class OllamaWrapper:
 
         self.chat_model = ChatOllama(
             model=settings.ollama_model_chat,
-            temperature=0.0,
             streaming=True,
         )
