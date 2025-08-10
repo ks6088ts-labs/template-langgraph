@@ -22,9 +22,10 @@ services:
     image: postgres:17
     container_name: postgres
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - ./assets/postgres_data:/var/lib/postgresql/data
+      - ./data:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
