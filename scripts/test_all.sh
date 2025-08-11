@@ -35,6 +35,7 @@ AGENT_NAMES=(
     "issue_formatter_agent"
     "kabuto_helpdesk_agent"
     "task_decomposer_agent"
+    "news_summarizer_agent"
 )
 for AGENT_NAME in "${AGENT_NAMES[@]}"; do
     uv run python scripts/agent_operator.py png --name "$AGENT_NAME" --verbose --output "generated/${AGENT_NAME}.png"
