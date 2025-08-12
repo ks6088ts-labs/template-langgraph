@@ -60,7 +60,7 @@ class MockClassifier(BaseClassifier):
 class LlmClassifier(BaseClassifier):
     """LLM-backed classifier using the provided model's structured output capability."""
 
-    def predict(self, prompt: str, image: str, llm: BaseChatModel) -> Result:  # noqa: D401
+    def predict(self, prompt: str, image: str, llm: BaseChatModel):
         logger.info(f"Classifying image with LLM: {prompt}")
         return llm.with_structured_output(Result).invoke(
             input=[
