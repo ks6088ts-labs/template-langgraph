@@ -29,6 +29,7 @@ dependencies = [
     "qdrant-client>=1.15.1",
     "streamlit>=1.48.0",
     "typer>=0.16.0",
+    "youtube-transcript-api>=1.2.2",
 ]
 
 [dependency-groups]
