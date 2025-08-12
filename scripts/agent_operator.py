@@ -5,6 +5,8 @@ import typer
 from dotenv import load_dotenv
 
 from template_langgraph.agents.chat_with_tools_agent.agent import graph as chat_with_tools_agent_graph
+from template_langgraph.agents.image_classifier_agent.agent import graph as image_classifier_agent_graph
+from template_langgraph.agents.image_classifier_agent.models import Results
 from template_langgraph.agents.issue_formatter_agent.agent import graph as issue_formatter_agent_graph
 from template_langgraph.agents.kabuto_helpdesk_agent.agent import graph as kabuto_helpdesk_agent_graph
 from template_langgraph.agents.news_summarizer_agent.agent import (
@@ -35,6 +37,8 @@ def get_agent_graph(name: str):
         return kabuto_helpdesk_agent_graph
     elif name == "news_summarizer_agent":
         return news_summarizer_agent_graph
+    elif name == "image_classifier_agent":
+        return image_classifier_agent_graph
     else:
         raise ValueError(f"Unknown agent name: {name}")
 
@@ -163,6 +167,55 @@ def news_summarizer_agent(
     articles: list[Article] = event["notify"]["articles"]
     for article in articles:
         logger.info(f"{article.structured_article.model_dump_json(indent=2)}")
+
+
+@app.command()
+def image_classifier_agent(
+    prompt: str = typer.Option(
+        "Please classify the image.",
+        "--prompt",
+        "-p",
+        help="Prompt for the agent",
+    ),
+    file_paths: str = typer.Option(
+        "./docs/images/fastapi.png,./docs/images/jupyterlab.png",
+        "--file-paths",
+        "-f",
+        help="Comma-separated list of file paths to classify",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    from template_langgraph.agents.image_classifier_agent.models import (
+        AgentInputState,
+        AgentState,
+    )
+
+    # Set up logging
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    graph = image_classifier_agent_graph
+    for event in graph.stream(
+        input=AgentState(
+            input=AgentInputState(
+                prompt=prompt,
+                id=str(uuid4()),
+                file_paths=file_paths.split(",") if file_paths else [],
+            ),
+            results=[],
+        )
+    ):
+        logger.info("-" * 20)
+        logger.info(f"Event: {event}")
+
+    results: list[Results] = event["notify"]["results"]
+    for result in results:
+        logger.info(f"{result.model_dump_json(indent=2)}")
 
 
 if __name__ == "__main__":

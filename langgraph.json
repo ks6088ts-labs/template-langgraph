@@ -8,7 +8,8 @@
     "kabuto_helpdesk_agent": "template_langgraph.agents.kabuto_helpdesk_agent.agent:graph",
     "issue_formatter_agent": "template_langgraph.agents.issue_formatter_agent.agent:graph",
     "task_decomposer_agent": "template_langgraph.agents.task_decomposer_agent.agent:graph",
-    "news_summarizer_agent": "template_langgraph.agents.news_summarizer_agent.agent:graph"
+    "news_summarizer_agent": "template_langgraph.agents.news_summarizer_agent.agent:graph",
+    "image_classifier_agent": "template_langgraph.agents.image_classifier_agent.agent:graph"
   },
   "env": ".env"
 }

@@ -8,6 +8,16 @@ from template_langgraph.agents.news_summarizer_agent.models import (
     StructuredArticle,
     SummarizeWebContentState,
 )
+from template_langgraph.agents.news_summarizer_agent.scrapers import (
+    BaseScraper,
+    HttpxScraper,
+    MockScraper,
+)
+from template_langgraph.agents.news_summarizer_agent.summarizers import (
+    BaseSummarizer,
+    LlmSummarizer,
+    MockSummarizer,
+)
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
 
@@ -20,68 +30,18 @@ class MockNotifier:
         logger.info(f"Notification sent for request {id}: {body}")
 
 
-class MockScraper:
-    def scrape(self, url: str) -> str:
-        """Simulate scraping a web page."""
-        return "<html><body><h1>Mocked web content</h1></body></html>"
-
-
-class HttpxScraper:
-    def scrape(self, url: str) -> str:
-        """Retrieve the HTML content of a web page."""
-        with httpx.Client() as client:
-            response = client.get(url)
-            response.raise_for_status()
-            return response.text
-
-
-class MockSummarizer:
-    def summarize(
-        self,
-        prompt: str,
-        content: str,
-    ) -> StructuredArticle:
-        """Simulate summarizing the input."""
-        return StructuredArticle(
-            title="Mocked Title",
-            date="2023-01-01",
-            summary=f"Mocked summary of the content: {content}, prompt: {prompt}",
-            keywords=["mock", "summary"],
-            score=75,
-        )
-
-
-class LlmSummarizer:
-    def __init__(self, llm=AzureOpenAiWrapper().chat_model):
-        self.llm = llm
-
-    def summarize(
-        self,
-        prompt: str,
-        content: str,
-    ) -> StructuredArticle:
-        """Use the LLM to summarize the input."""
-        logger.info(f"Summarizing input with LLM: {prompt}")
-        return self.llm.with_structured_output(StructuredArticle).invoke(
-            input=[
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": content},
-            ]
-        )
-
-
 class NewsSummarizerAgent:
     def __init__(
         self,
         llm=AzureOpenAiWrapper().chat_model,
         notifier=MockNotifier(),
-        scraper=MockScraper(),
-        summarizer=MockSummarizer(),
+        scraper: BaseScraper = MockScraper(),
+        summarizer: BaseSummarizer = MockSummarizer(),
     ):
         self.llm = llm
         self.notifier = notifier
-        self.scraper = scraper
-        self.summarizer = summarizer
+        self.scraper: BaseScraper = scraper
+        self.summarizer: BaseSummarizer = summarizer
 
     def create_graph(self):
         """Create the main graph for the agent."""
