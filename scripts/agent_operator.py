@@ -1,4 +1,5 @@
 import logging
+from uuid import uuid4
 
 import typer
 from dotenv import load_dotenv
@@ -6,6 +7,9 @@ from dotenv import load_dotenv
 from template_langgraph.agents.chat_with_tools_agent.agent import graph as chat_with_tools_agent_graph
 from template_langgraph.agents.issue_formatter_agent.agent import graph as issue_formatter_agent_graph
 from template_langgraph.agents.kabuto_helpdesk_agent.agent import graph as kabuto_helpdesk_agent_graph
+from template_langgraph.agents.news_summarizer_agent.agent import (
+    graph as news_summarizer_agent_graph,
+)
 from template_langgraph.agents.task_decomposer_agent.agent import graph as task_decomposer_agent_graph
 from template_langgraph.loggers import get_logger
 
@@ -28,6 +32,8 @@ def get_agent_graph(name: str):
         return task_decomposer_agent_graph
     elif name == "kabuto_helpdesk_agent":
         return kabuto_helpdesk_agent_graph
+    elif name == "news_summarizer_agent":
+        return news_summarizer_agent_graph
     else:
         raise ValueError(f"Unknown agent name: {name}")
 
@@ -90,6 +96,10 @@ def run(
     if verbose:
         logger.setLevel(logging.DEBUG)
 
+    assert name not in [
+        "news_summarizer_agent",
+    ], f"{name} is not supported. Please use another agent."
+
     graph = get_agent_graph(name)
     for event in graph.stream(
         input={
@@ -103,6 +113,62 @@ def run(
     ):
         logger.info("-" * 20)
         logger.info(f"Event: {event}")
+
+
+@app.command()
+def news_summarizer_agent(
+    request: str = typer.Option(
+        "Please summarize the latest news articles in Japanese briefly in 3 sentences.",
+        "--request",
+        "-r",
+        help="Request to the agent",
+    ),
+    urls: str = typer.Option(
+        "https://example.com/article1,https://example.com/article2",
+        "--urls",
+        "-u",
+        help="Comma-separated list of URLs to summarize",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    from template_langgraph.agents.news_summarizer_agent.models import (
+        AgentInputState,
+        AgentOutputState,
+        AgentState,
+    )
+
+    # Set up logging
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    graph = news_summarizer_agent_graph
+    for event in graph.stream(
+        input=AgentState(
+            input=AgentInputState(
+                request=request,
+                request_id=str(uuid4()),
+                urls=urls.split(",") if urls else [],
+            ),
+            output=AgentOutputState(
+                result="N/A",
+                articles=[],
+            ),
+            target_url_index=None,
+        )
+    ):
+        logger.info("-" * 20)
+        logger.info(f"Event: {event}")
+
+    output: AgentOutputState = event["notify"]["output"]
+    for article in output.articles:
+        logger.info(article.url)
+        logger.info(f"is_valid_url: {article.is_valid_url}, is_valid_content: {article.is_valid_content}")
+        logger.info(article.structured_article.model_dump_json(indent=2))
 
 
 if __name__ == "__main__":
