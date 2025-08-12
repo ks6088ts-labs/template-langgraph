@@ -10,6 +10,7 @@ from template_langgraph.agents.kabuto_helpdesk_agent.agent import graph as kabut
 from template_langgraph.agents.news_summarizer_agent.agent import (
     graph as news_summarizer_agent_graph,
 )
+from template_langgraph.agents.news_summarizer_agent.models import Article
 from template_langgraph.agents.task_decomposer_agent.agent import graph as task_decomposer_agent_graph
 from template_langgraph.loggers import get_logger
 
@@ -117,11 +118,11 @@ def run(
 
 @app.command()
 def news_summarizer_agent(
-    request: str = typer.Option(
-        "Please summarize the latest news articles in Japanese briefly in 3 sentences.",
-        "--request",
-        "-r",
-        help="Request to the agent",
+    prompt: str = typer.Option(
+        "Please summarize the articles in Japanese briefly in 3 sentences.",
+        "--prompt",
+        "-p",
+        help="Prompt for the agent",
     ),
     urls: str = typer.Option(
         "https://example.com/article1,https://example.com/article2",
@@ -138,7 +139,6 @@ def news_summarizer_agent(
 ):
     from template_langgraph.agents.news_summarizer_agent.models import (
         AgentInputState,
-        AgentOutputState,
         AgentState,
     )
 
@@ -150,25 +150,19 @@ def news_summarizer_agent(
     for event in graph.stream(
         input=AgentState(
             input=AgentInputState(
-                request=request,
-                request_id=str(uuid4()),
+                prompt=prompt,
+                id=str(uuid4()),
                 urls=urls.split(",") if urls else [],
             ),
-            output=AgentOutputState(
-                result="N/A",
-                articles=[],
-            ),
-            target_url_index=None,
+            articles=[],
         )
     ):
         logger.info("-" * 20)
         logger.info(f"Event: {event}")
 
-    output: AgentOutputState = event["notify"]["output"]
-    for article in output.articles:
-        logger.info(article.url)
-        logger.info(f"is_valid_url: {article.is_valid_url}, is_valid_content: {article.is_valid_content}")
-        logger.info(article.structured_article.model_dump_json(indent=2))
+    articles: list[Article] = event["notify"]["articles"]
+    for article in articles:
+        logger.info(f"{article.structured_article.model_dump_json(indent=2)}")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,12 @@
+import operator
+from typing import Annotated
+
 from pydantic import BaseModel, Field
+
+
+class SummarizeWebContentState(BaseModel):
+    prompt: str = Field(..., description="Prompt for summarization")
+    url: str = Field(..., description="URL of the article to summarize")
 
 
 class StructuredArticle(BaseModel):
@@ -18,16 +26,11 @@ class Article(BaseModel):
 
 
 class AgentInputState(BaseModel):
-    request: str = Field(..., description="Request from the user")
-    request_id: str = Field(..., description="Unique identifier for the request")
+    prompt: str = Field(..., description="Prompt for the agent")
+    id: str = Field(..., description="Unique identifier for the request")
     urls: list[str] = Field(..., description="List of article URLs")
-
-
-class AgentOutputState(BaseModel):
-    articles: list[Article] = Field(..., description="List of articles processed by the agent")
 
 
 class AgentState(BaseModel):
     input: AgentInputState = Field(..., description="Input state for the agent")
-    output: AgentOutputState = Field(..., description="Output state for the agent")
-    target_url_index: int | None = Field(..., description="Index of the target URL being processed")
+    articles: Annotated[list[Article], operator.add]
