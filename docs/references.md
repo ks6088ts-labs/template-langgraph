@@ -26,3 +26,12 @@
 ### Services
 
 - [FastAPI](https://fastapi.tiangolo.com/)
+
+### Observability
+
+- [OpenTelemetry](https://opentelemetry.io/)
+  - [Python / Getting Started](https://opentelemetry.io/docs/languages/python/getting-started/)
+  - [Python / Cookbook](https://opentelemetry.io/docs/languages/python/cookbook/)
+  - [OpenTelemetry Collector](https://opentelemetry.io//docs/collector/)
+- [Jaeger](https://www.jaegertracing.io/)
+  - [Jaeger / Minimal deployment example (Elasticsearch backend)](https://www.jaegertracing.io/docs/1.72/deployment/#minimal-deployment-example-elasticsearch-backend)

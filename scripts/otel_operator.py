@@ -48,6 +48,34 @@ def run(
         logger.info(f"Response: {response['content']}")
 
 
+@app.command()
+def cookbook(
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    # Set up logging
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    otel_wrapper = OtelWrapper()
+    otel_wrapper.initialize()
+    tracer = otel_wrapper.get_tracer(name=__name__)
+
+    with tracer.start_as_current_span("otel_operator_cookbook"):
+        logger.info("Running cookbook example...")
+        time.sleep(1)
+
+        with tracer.start_as_current_span("child"):
+            logger.info("Running child span...")
+            time.sleep(2)
+
+        time.sleep(1)
+
+
 if __name__ == "__main__":
     load_dotenv(
         override=True,
