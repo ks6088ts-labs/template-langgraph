@@ -1,12 +1,18 @@
 docs:
-  - docs/**/*
+  - changed-files:
+    - any-glob-to-any-file: docs/**/*
 github:
-  - .github/**/*
+  - changed-files:
+    - any-glob-to-any-file: .github/**/*
 agents:
-  - template_langgraph/agents/**/*
+  - changed-files:
+    - any-glob-to-any-file: template_langgraph/agents/**/*
 llms:
-  - template_langgraph/llms/**/*
+  - changed-files:
+    - any-glob-to-any-file: template_langgraph/llms/**/*
 services:
-  - template_langgraph/services/**/*
+  - changed-files:
+    - any-glob-to-any-file: template_langgraph/services/**/*
 tools:
-  - template_langgraph/tools/**/*
+  - changed-files:
+    - any-glob-to-any-file: template_langgraph/tools/**/*
