@@ -5,10 +5,14 @@ import httpx
 from langgraph.graph import StateGraph
 from langgraph.types import Send
 
+from template_langgraph.agents.image_classifier_agent.classifiers import (
+    BaseClassifier,
+    LlmClassifier,
+    MockClassifier,
+)
 from template_langgraph.agents.image_classifier_agent.models import (
     AgentState,
     ClassifyImageState,
-    Result,
     Results,
 )
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
@@ -28,62 +32,16 @@ class MockNotifier:
         logger.info(f"Notification sent for request {id}: {body}")
 
 
-class MockClassifier:
-    def predict(
-        self,
-        prompt: str,
-        image: str,
-        llm=AzureOpenAiWrapper().chat_model,
-    ) -> Result:
-        """Simulate image classification."""
-        return Result(
-            title="Mocked Image Title",
-            summary=f"Mocked summary of the prompt: {prompt}",
-            labels=["mocked_label_1", "mocked_label_2"],
-            reliability=0.95,
-        )
-
-
-class LlmClassifier:
-    def predict(
-        self,
-        prompt: str,
-        image: str,
-        llm=AzureOpenAiWrapper().chat_model,
-    ) -> Result:
-        """Use the LLM to classify the image."""
-        logger.info(f"Classifying image with LLM: {prompt}")
-        return llm.with_structured_output(Result).invoke(
-            input=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": prompt,
-                        },
-                        {
-                            "type": "image",
-                            "source_type": "base64",
-                            "data": image,
-                            "mime_type": "image/png",
-                        },
-                    ],
-                },
-            ]
-        )
-
-
 class ImageClassifierAgent:
     def __init__(
         self,
         llm=AzureOpenAiWrapper().chat_model,
         notifier=MockNotifier(),
-        classifier=MockClassifier(),
+        classifier: BaseClassifier = MockClassifier(),
     ):
         self.llm = llm
         self.notifier = notifier
-        self.classifier = classifier
+        self.classifier: BaseClassifier = classifier
 
     def create_graph(self):
         """Create the main graph for the agent."""
