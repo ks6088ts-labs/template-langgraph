@@ -1,0 +1,62 @@
+name: post_summary_to_slack
+
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        type: string
+        default: "https://example.com,https://www.youtube.com/watch?v=xxx"
+        required: true
+        description: "Comma-separated list of URLs to summarize"
+      scraper_type:
+        type: choice
+        options:
+          - mock
+          - httpx
+          - youtube_transcript
+        default: mock
+        required: true
+        description: "Scraper implementation"
+      summarizer_type:
+        type: choice
+        options:
+          - mock
+          - llm
+        default: mock
+        required: true
+        description: "Summarizer implementation"
+      notifier_type:
+        type: choice
+        options:
+          - mock
+          - slack
+        default: mock
+        required: true
+        description: "Notifier implementation"
+
+env:
+  SCRAPER_TYPE: ${{ inputs.scraper_type }}
+  SUMMARIZER_TYPE: ${{ inputs.summarizer_type }}
+  NOTIFIER_TYPE: ${{ inputs.notifier_type }}
+  AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+  AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+jobs:
+  post_summary_to_slack:
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up uv
+        shell: bash
+        run: pipx install uv
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+      - name: Running NewsSummarizerAgent with scraper ${{ env.SCRAPER_TYPE }}, summarizer ${{ env.SUMMARIZER_TYPE }}, notifier ${{ env.NOTIFIER_TYPE }}
+        shell: bash
+        run: |
+          make install-deps
+          uv run python scripts/agent_operator.py news-summarizer-agent --urls "${{ inputs.text }}"
