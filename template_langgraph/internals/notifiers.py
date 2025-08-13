@@ -71,12 +71,17 @@ class SlackNotifier(BaseNotifier):
     def notify(self, text: str):
         logger.info(f"Slack notify with text: {text}")
         with httpx.Client() as client:
-            client.post(
+            response = client.post(
                 self.webhook_url,
                 json={
                     "text": text,
                 },
             )
+            if response.status_code != 200:
+                logger.error(
+                    f"Failed to send Slack notification: {response.text}, actual status code: {response.status_code}"
+                )
+                raise httpx.HTTPStatusError(f"Failed to send Slack notification: {response.json()}")
 
 
 def get_notifier(settings: Settings = None) -> BaseNotifier:

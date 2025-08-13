@@ -1,4 +1,4 @@
-name: post_summary_to_slack
+name: news_summarizer_agent
 
 on:
   workflow_dispatch:
@@ -43,7 +43,7 @@ env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
 jobs:
-  post_summary_to_slack:
+  news_summarizer_agent:
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
     steps:
@@ -55,7 +55,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.13
-      - name: Running NewsSummarizerAgent with scraper ${{ env.SCRAPER_TYPE }}, summarizer ${{ env.SUMMARIZER_TYPE }}, notifier ${{ env.NOTIFIER_TYPE }}
+      - name: Running NewsSummarizerAgent with scraper=${{ env.SCRAPER_TYPE }}, summarizer=${{ env.SUMMARIZER_TYPE }}, notifier=${{ env.NOTIFIER_TYPE }}
         shell: bash
         run: |
           make install-deps
