@@ -114,11 +114,12 @@ class NewsSummarizerAgent:
     def notify(self, state: AgentState) -> AgentState:
         """Send notifications to the user."""
         logger.info(f"Sending notifications with state: {state}")
-        # Simulate sending notifications
-        # convert list of articles to a dictionary for notification
         summary = {}
         for i, article in enumerate(state.articles):
-            summary[i] = article.model_dump()
+            summary[i] = {
+                "url": article.url,
+                "structured_article": article.structured_article.model_dump(),
+            }
         self.notifier.notify(
             text=summary.__str__(),
         )
