@@ -9,20 +9,13 @@ from template_langgraph.agents.image_classifier_agent.agent import graph as imag
 from template_langgraph.agents.image_classifier_agent.models import Results
 from template_langgraph.agents.issue_formatter_agent.agent import graph as issue_formatter_agent_graph
 from template_langgraph.agents.kabuto_helpdesk_agent.agent import graph as kabuto_helpdesk_agent_graph
-from template_langgraph.agents.news_summarizer_agent.agent import MockNotifier, NewsSummarizerAgent
-from template_langgraph.agents.news_summarizer_agent.agent import (
-    graph as news_summarizer_agent_graph,
-)
+from template_langgraph.agents.news_summarizer_agent.agent import graph as news_summarizer_agent_graph
 from template_langgraph.agents.news_summarizer_agent.models import (
     AgentInputState,
     AgentState,
     Article,
 )
 from template_langgraph.agents.task_decomposer_agent.agent import graph as task_decomposer_agent_graph
-from template_langgraph.internals.scrapers import get_scraper
-from template_langgraph.internals.summarizers import (
-    get_summarizer,
-)
 from template_langgraph.loggers import get_logger
 
 # Initialize the Typer application
@@ -154,11 +147,7 @@ def news_summarizer_agent(
     if verbose:
         logger.setLevel(logging.DEBUG)
 
-    graph = NewsSummarizerAgent(
-        notifier=MockNotifier(),
-        scraper=get_scraper(),
-        summarizer=get_summarizer(),
-    ).create_graph()
+    graph = news_summarizer_agent_graph
     for event in graph.stream(
         input=AgentState(
             input=AgentInputState(
