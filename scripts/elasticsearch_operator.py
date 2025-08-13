@@ -3,9 +3,9 @@ import logging
 import typer
 from dotenv import load_dotenv
 
+from template_langgraph.internals.pdf_loaders import PdfLoaderWrapper
 from template_langgraph.loggers import get_logger
 from template_langgraph.tools.elasticsearch_tool import ElasticsearchClientWrapper
-from template_langgraph.utilities.pdf_loaders import PdfLoaderWrapper
 
 # Initialize the Typer application
 app = typer.Typer(

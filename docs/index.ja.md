@@ -130,7 +130,7 @@ Pydantic モデルを使用して AI 応答から構造化データを取得す�
 
 - **`template_langgraph/llms/`** - LLM API ラッパー（Azure OpenAI など）
 - **`template_langgraph/tools/`** - 検索、データ取得用ツール実装
-- **`template_langgraph/utilities/`** - ドキュメント読み込みと処理用ヘルパー関数
+- **`template_langgraph/internals/`** - 内部ユーティリティとヘルパー関数（CSV/PDF ローダー、Otel ラッパーなど）
 
 ## サンプルコードの実行
 

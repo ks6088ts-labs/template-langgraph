@@ -4,8 +4,8 @@ import time
 import typer
 from dotenv import load_dotenv
 
+from template_langgraph.internals.otel_helpers import OtelWrapper
 from template_langgraph.loggers import get_logger
-from template_langgraph.utilities.otel_helpers import OtelWrapper
 
 # Initialize the Typer application
 app = typer.Typer(

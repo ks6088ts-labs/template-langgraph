@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 
 from langchain_core.documents import Document
 
-from template_langgraph.utilities.pdf_loaders import (
+from template_langgraph.internals.pdf_loaders import (
     PdfLoaderWrapper,
     Settings,
     get_pdf_loader_settings,
@@ -54,8 +54,8 @@ class TestPdfLoaderWrapper:
         wrapper = PdfLoaderWrapper(settings=custom_settings)
         assert wrapper.settings.pdf_loader_data_dir_path == "/custom/path"
 
-    @patch("template_langgraph.utilities.pdf_loaders.glob")
-    @patch("template_langgraph.utilities.pdf_loaders.PyPDFLoader")
+    @patch("template_langgraph.internals.pdf_loaders.glob")
+    @patch("template_langgraph.internals.pdf_loaders.PyPDFLoader")
     def test_load_pdf_docs_no_files(self, mock_pdf_loader, mock_glob):
         """Test load_pdf_docs when no PDF files are found."""
         mock_glob.return_value = []
@@ -69,8 +69,8 @@ class TestPdfLoaderWrapper:
             recursive=True,
         )
 
-    @patch("template_langgraph.utilities.pdf_loaders.glob")
-    @patch("template_langgraph.utilities.pdf_loaders.PyPDFLoader")
+    @patch("template_langgraph.internals.pdf_loaders.glob")
+    @patch("template_langgraph.internals.pdf_loaders.PyPDFLoader")
     def test_load_pdf_docs_with_files(self, mock_pdf_loader, mock_glob):
         """Test load_pdf_docs when PDF files are found."""
         # Setup mock data
@@ -106,8 +106,8 @@ class TestPdfLoaderWrapper:
         mock_loader_instance1.load_and_split.assert_called_once()
         mock_loader_instance2.load_and_split.assert_called_once()
 
-    @patch("template_langgraph.utilities.pdf_loaders.glob")
-    @patch("template_langgraph.utilities.pdf_loaders.PyPDFLoader")
+    @patch("template_langgraph.internals.pdf_loaders.glob")
+    @patch("template_langgraph.internals.pdf_loaders.PyPDFLoader")
     def test_load_pdf_docs_with_custom_data_dir(self, mock_pdf_loader, mock_glob):
         """Test load_pdf_docs with custom data directory."""
         custom_settings = Settings(pdf_loader_data_dir_path="/custom/data")
@@ -121,8 +121,8 @@ class TestPdfLoaderWrapper:
             recursive=True,
         )
 
-    @patch("template_langgraph.utilities.pdf_loaders.glob")
-    @patch("template_langgraph.utilities.pdf_loaders.PyPDFLoader")
+    @patch("template_langgraph.internals.pdf_loaders.glob")
+    @patch("template_langgraph.internals.pdf_loaders.PyPDFLoader")
     def test_load_pdf_docs_text_splitter_configuration(self, mock_pdf_loader, mock_glob):
         """Test that text splitter is configured correctly."""
         mock_glob.return_value = ["./data/test.pdf"]
