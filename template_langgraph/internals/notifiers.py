@@ -81,7 +81,11 @@ class SlackNotifier(BaseNotifier):
                 logger.error(
                     f"Failed to send Slack notification: {response.text}, actual status code: {response.status_code}"
                 )
-                raise httpx.HTTPStatusError(f"Failed to send Slack notification: {response.json()}")
+                raise httpx.HTTPStatusError(
+                    f"Failed to send Slack notification: {response.text}",
+                    request=response.request,
+                    response=response,
+                )
 
 
 def get_notifier(settings: Settings = None) -> BaseNotifier:

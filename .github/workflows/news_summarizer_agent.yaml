@@ -40,7 +40,7 @@ env:
   NOTIFIER_TYPE: ${{ inputs.notifier_type }}
   AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
   AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  NOTIFIER_SLACK_WEBHOOK_URL: ${{ secrets.NOTIFIER_SLACK_WEBHOOK_URL }}
 
 jobs:
   news_summarizer_agent:
