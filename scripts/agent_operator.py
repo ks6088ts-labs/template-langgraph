@@ -18,15 +18,11 @@ from template_langgraph.agents.news_summarizer_agent.models import (
     AgentState,
     Article,
 )
-from template_langgraph.agents.news_summarizer_agent.scrapers import (
-    BaseScraper,
-    HttpxScraper,
-    YouTubeTranscriptScraper,
-)
 from template_langgraph.agents.news_summarizer_agent.summarizers import (
     LlmSummarizer,
 )
 from template_langgraph.agents.task_decomposer_agent.agent import graph as task_decomposer_agent_graph
+from template_langgraph.internals.scrapers import get_scraper
 from template_langgraph.loggers import get_logger
 
 # Initialize the Typer application
@@ -54,18 +50,6 @@ def get_agent_graph(name: str):
         return image_classifier_agent_graph
     else:
         raise ValueError(f"Unknown agent name: {name}")
-
-
-def get_scraper(scraper_type: str) -> BaseScraper:
-    scraper = None
-    if scraper_type == "Httpx":
-        scraper = HttpxScraper()
-    elif scraper_type == "YouTubeTranscript":
-        scraper = YouTubeTranscriptScraper()
-
-    if not scraper:
-        raise ValueError(f"Unknown scraper type: {scraper_type}")
-    return scraper
 
 
 @app.command()
@@ -159,12 +143,6 @@ def news_summarizer_agent(
         "-u",
         help="Comma-separated list of URLs to summarize",
     ),
-    scraper: str = typer.Option(
-        "Httpx",  # YouTubeTranscript
-        "--scraper",
-        "-s",
-        help="Scraper to use for fetching content",
-    ),
     verbose: bool = typer.Option(
         False,
         "--verbose",
@@ -178,7 +156,7 @@ def news_summarizer_agent(
 
     graph = NewsSummarizerAgent(
         notifier=MockNotifier(),
-        scraper=get_scraper(scraper),
+        scraper=get_scraper(),
         summarizer=LlmSummarizer(),
     ).create_graph()
     for event in graph.stream(

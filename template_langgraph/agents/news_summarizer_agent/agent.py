@@ -8,15 +8,15 @@ from template_langgraph.agents.news_summarizer_agent.models import (
     StructuredArticle,
     SummarizeWebContentState,
 )
-from template_langgraph.agents.news_summarizer_agent.scrapers import (
-    BaseScraper,
-    HttpxScraper,
-    MockScraper,
-)
 from template_langgraph.agents.news_summarizer_agent.summarizers import (
     BaseSummarizer,
     LlmSummarizer,
     MockSummarizer,
+)
+from template_langgraph.internals.scrapers import (
+    BaseScraper,
+    HttpxScraper,
+    MockScraper,
 )
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
