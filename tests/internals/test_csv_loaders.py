@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from langchain_core.documents import Document
 
-from template_langgraph.utilities.csv_loaders import (
+from template_langgraph.internals.csv_loaders import (
     CsvLoaderWrapper,
     Settings,
     get_csv_loader_settings,

@@ -4,10 +4,10 @@ import typer
 from dotenv import load_dotenv
 from qdrant_client.models import PointStruct
 
+from template_langgraph.internals.csv_loaders import CsvLoaderWrapper
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
 from template_langgraph.tools.qdrant_tool import QdrantClientWrapper
-from template_langgraph.utilities.csv_loaders import CsvLoaderWrapper
 
 # Initialize the Typer application
 app = typer.Typer(

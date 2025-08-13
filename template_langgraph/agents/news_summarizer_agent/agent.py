@@ -8,40 +8,27 @@ from template_langgraph.agents.news_summarizer_agent.models import (
     StructuredArticle,
     SummarizeWebContentState,
 )
-from template_langgraph.agents.news_summarizer_agent.scrapers import (
-    BaseScraper,
-    HttpxScraper,
-    MockScraper,
-)
-from template_langgraph.agents.news_summarizer_agent.summarizers import (
-    BaseSummarizer,
-    LlmSummarizer,
-    MockSummarizer,
-)
+from template_langgraph.internals.notifiers import get_notifier
+from template_langgraph.internals.scrapers import get_scraper
+from template_langgraph.internals.summarizers import get_summarizer
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
 
 logger = get_logger(__name__)
 
 
-class MockNotifier:
-    def notify(self, id: str, body: dict) -> None:
-        """Simulate sending a notification to the user."""
-        logger.info(f"Notification sent for request {id}: {body}")
-
-
 class NewsSummarizerAgent:
     def __init__(
         self,
         llm=AzureOpenAiWrapper().chat_model,
-        notifier=MockNotifier(),
-        scraper: BaseScraper = MockScraper(),
-        summarizer: BaseSummarizer = MockSummarizer(),
+        notifier=get_notifier(),
+        scraper=get_scraper(),
+        summarizer=get_summarizer(),
     ):
         self.llm = llm
         self.notifier = notifier
-        self.scraper: BaseScraper = scraper
-        self.summarizer: BaseSummarizer = summarizer
+        self.scraper = scraper
+        self.summarizer = summarizer
 
     def create_graph(self):
         """Create the main graph for the agent."""
@@ -127,23 +114,20 @@ class NewsSummarizerAgent:
     def notify(self, state: AgentState) -> AgentState:
         """Send notifications to the user."""
         logger.info(f"Sending notifications with state: {state}")
-        # Simulate sending notifications
-        # convert list of articles to a dictionary for notification
         summary = {}
         for i, article in enumerate(state.articles):
-            summary[i] = article.model_dump()
+            summary[i] = {
+                "url": article.url,
+                "structured_article": article.structured_article.model_dump(),
+            }
         self.notifier.notify(
-            id=state.input.id,
-            body=summary,
+            text=summary.__str__(),
         )
         return state
 
 
-# For testing
-# graph = NewsSummarizerAgent().create_graph()
-
 graph = NewsSummarizerAgent(
-    notifier=MockNotifier(),
-    scraper=HttpxScraper(),
-    summarizer=LlmSummarizer(),
+    notifier=get_notifier(),
+    scraper=get_scraper(),
+    summarizer=get_summarizer(),
 ).create_graph()

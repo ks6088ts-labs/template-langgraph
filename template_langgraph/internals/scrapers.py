@@ -8,13 +8,38 @@ without changing orchestration logic.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from enum import Enum
+from functools import lru_cache
 
 import httpx
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from youtube_transcript_api import YouTubeTranscriptApi
 
 from template_langgraph.loggers import get_logger
 
 logger = get_logger(__name__)
+
+
+class ScraperType(str, Enum):
+    MOCK = "mock"
+    HTTPX = "httpx"
+    YOUTUBE_TRANSCRIPT = "youtube_transcript"
+
+
+class Settings(BaseSettings):
+    scraper_type: ScraperType = ScraperType.MOCK
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_ignore_empty=True,
+        extra="ignore",
+    )
+
+
+@lru_cache
+def get_scraper_settings() -> Settings:
+    """Get scraper settings."""
+    return Settings()
 
 
 class BaseScraper(ABC):
@@ -60,6 +85,7 @@ class YouTubeTranscriptScraper(BaseScraper):
     """YouTube transcript scraper."""
 
     def scrape(self, url: str) -> str:
+        logger.info(f"Fetching YouTube transcript for URL: {url}")
         video_id = url.split("v=")[-1].split("&")[0]
         transcript = YouTubeTranscriptApi().fetch(
             video_id=video_id,
@@ -69,9 +95,15 @@ class YouTubeTranscriptScraper(BaseScraper):
         return " ".join(text_list)
 
 
-__all__ = [
-    "BaseScraper",
-    "MockScraper",
-    "HttpxScraper",
-    "YouTubeTranscriptScraper",
-]
+def get_scraper(settings: Settings = None) -> BaseScraper:
+    if settings is None:
+        settings = get_scraper_settings()
+
+    if settings.scraper_type == ScraperType.MOCK:
+        return MockScraper()
+    elif settings.scraper_type == ScraperType.HTTPX:
+        return HttpxScraper()
+    elif settings.scraper_type == ScraperType.YOUTUBE_TRANSCRIPT:
+        return YouTubeTranscriptScraper()
+    else:
+        raise ValueError(f"Unknown scraper type: {settings.scraper_type}")

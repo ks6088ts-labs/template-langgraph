@@ -130,7 +130,7 @@ Implements the supervisor pattern where one agent coordinates multiple specializ
 
 - **`template_langgraph/llms/`** - LLM API wrappers (Azure OpenAI, etc.)
 - **`template_langgraph/tools/`** - Tool implementations for search, data retrieval
-- **`template_langgraph/utilities/`** - Helper functions for document loading and processing
+- **`template_langgraph/internals/`** - Internal utilities and helper functions (CSV/PDF loaders, Otel wrappers, etc.)
 
 ## Running the Examples
 
