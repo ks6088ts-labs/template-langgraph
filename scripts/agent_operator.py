@@ -18,11 +18,11 @@ from template_langgraph.agents.news_summarizer_agent.models import (
     AgentState,
     Article,
 )
-from template_langgraph.agents.news_summarizer_agent.summarizers import (
-    LlmSummarizer,
-)
 from template_langgraph.agents.task_decomposer_agent.agent import graph as task_decomposer_agent_graph
 from template_langgraph.internals.scrapers import get_scraper
+from template_langgraph.internals.summarizers import (
+    get_summarizer,
+)
 from template_langgraph.loggers import get_logger
 
 # Initialize the Typer application
@@ -157,7 +157,7 @@ def news_summarizer_agent(
     graph = NewsSummarizerAgent(
         notifier=MockNotifier(),
         scraper=get_scraper(),
-        summarizer=LlmSummarizer(),
+        summarizer=get_summarizer(),
     ).create_graph()
     for event in graph.stream(
         input=AgentState(
