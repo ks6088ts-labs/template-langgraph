@@ -33,4 +33,4 @@ class SupervisorAgent:
         )
 
 
-graph = SupervisorAgent().agent
+graph = SupervisorAgent().agent.compile()
