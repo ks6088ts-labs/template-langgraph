@@ -3,13 +3,14 @@ import logging
 import typer
 from dotenv import load_dotenv
 
-from template_langgraph.agents.simple_multi_agent.multi_agent import app as multi_agent_app
-from template_langgraph.agents.simple_multi_agent.weather_agent import app as weather_agent_app
+from template_langgraph.agents.demo_agents.multi_agent import app as multi_agent_app
+from template_langgraph.agents.demo_agents.parallel_processor_agent import app as parallel_agent_app
+from template_langgraph.agents.demo_agents.weather_agent import app as weather_agent_app
 from template_langgraph.loggers import get_logger
 
 app = typer.Typer(
     add_completion=False,
-    help="SimpleMultiAgent CLI",
+    help="Demo Agents CLI",
 )
 logger = get_logger(__name__)
 
@@ -70,6 +71,33 @@ def multi_agent(
         debug=True,
     )
     logger.info(response["messages"][-1].content)
+
+
+@app.command()
+def parallel_agent(
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    parallel_agent_app.invoke(
+        {
+            "messages": [
+                {"role": "user", "content": "Simulate multiple tasks in parallel"},
+            ],
+            "tasks": [
+                "Task 1",
+                "Task 2",
+                "Task 3",
+            ],
+        },
+        debug=True,
+    )
 
 
 if __name__ == "__main__":
