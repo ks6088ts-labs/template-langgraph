@@ -25,3 +25,14 @@ def get_default_tools():
         )
         + McpClientWrapper().get_tools()
     )
+
+
+def is_async_call_required(tool_name: str) -> bool:
+    # FIXME: adhoc impl
+    if tool_name.startswith("browser_"):
+        return True
+    return tool_name in [
+        "echo",
+        "add",
+        # add async tool names here
+    ]

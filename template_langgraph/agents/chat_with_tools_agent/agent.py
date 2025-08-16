@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 from langchain_core.messages import ToolMessage
@@ -6,7 +7,7 @@ from langgraph.graph import END, StateGraph
 from template_langgraph.agents.chat_with_tools_agent.models import AgentState
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
-from template_langgraph.tools.common import get_default_tools
+from template_langgraph.tools.common import get_default_tools, is_async_call_required
 
 logger = get_logger(__name__)
 
@@ -25,10 +26,13 @@ class BasicToolNode:
         outputs = []
         for tool_call in message.tool_calls:
             try:
-                tool_result = self.tools_by_name[tool_call["name"]].invoke(tool_call["args"])
+                if is_async_call_required(tool_call["name"]):
+                    observation = asyncio.run(self.tools_by_name[tool_call["name"]].ainvoke(tool_call["args"]))
+                else:
+                    observation = self.tools_by_name[tool_call["name"]].invoke(tool_call["args"])
                 outputs.append(
                     ToolMessage(
-                        content=json.dumps(tool_result.__str__(), ensure_ascii=False),
+                        content=json.dumps(observation.__str__(), ensure_ascii=False),
                         name=tool_call["name"],
                         tool_call_id=tool_call["id"],
                     )
