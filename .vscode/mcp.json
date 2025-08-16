@@ -2,7 +2,7 @@
   "servers": {
     "playwright": {
       "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest", "--vision"]
+      "args": ["-y", "@playwright/mcp@latest", "--caps=vision"]
     },
     "filesystem": {
       "command": "npx",
