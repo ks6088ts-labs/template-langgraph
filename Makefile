@@ -133,6 +133,10 @@ streamlit: ## run Streamlit
 	uv run streamlit run \
 		template_langgraph/services/streamlits/main.py
 
+.PHONY: mcp-insppector
+mcp-inspector: ## run MCP Inspector server
+	npx -y @modelcontextprotocol/inspector
+
 # ---
 # Project / Create indices
 # ---
