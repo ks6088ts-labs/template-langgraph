@@ -9,6 +9,7 @@ from template_langgraph.tools.qdrant_tool import search_qdrant
 from template_langgraph.tools.sql_database_tool import SqlDatabaseClientWrapper
 
 logger = get_logger(__name__)
+mcp_tools = McpClientWrapper().get_tools()
 
 
 def get_default_tools():
@@ -23,16 +24,12 @@ def get_default_tools():
         + SqlDatabaseClientWrapper().get_tools(
             llm=AzureOpenAiWrapper().chat_model,
         )
-        + McpClientWrapper().get_tools()
+        + mcp_tools
     )
 
 
 def is_async_call_required(tool_name: str) -> bool:
-    # FIXME: adhoc impl
-    if tool_name.startswith("browser_"):
-        return True
+    mcp_tool_names = [tool.name for tool in mcp_tools]
     return tool_name in [
-        "echo",
-        "add",
-        # add async tool names here
+        *mcp_tool_names,
     ]
