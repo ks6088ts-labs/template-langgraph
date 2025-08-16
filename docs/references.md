@@ -9,6 +9,9 @@
 - [Streamlit](https://python.langchain.com/docs/integrations/callbacks/streamlit/)
 - [LangChain MCP Adapters](https://github.com/langchain-ai/langchain-mcp-adapters)
   - [Research Agent with MCP Integration.](https://github.com/langchain-ai/deep_research_from_scratch/blob/main/src/deep_research_from_scratch/research_agent_mcp.py)
+- [Command: A new tool for building multi-agent architectures in LangGraph](https://blog.langchain.com/command-a-new-tool-for-multi-agent-architectures-in-langgraph/)
+- [Combine control flow and state updates with Command](https://langchain-ai.github.io/langgraph/how-tos/graph-api/#combine-control-flow-and-state-updates-with-command)
+- [Command: a new tool for building multi-agent architectures in LangGraph](https://www.youtube.com/watch?v=6BJDKf90L9A)
 
 ### Sample Codes
 
