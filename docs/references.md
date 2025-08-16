@@ -7,6 +7,8 @@
 - [🤖 LangGraph Multi-Agent Supervisor](https://github.com/langchain-ai/langgraph-supervisor-py)
 - [Software Design 誌「実践 LLM アプリケーション開発」第 24 回サンプルコード](https://github.com/mahm/softwaredesign-llm-application/tree/main/24)
 - [Streamlit](https://python.langchain.com/docs/integrations/callbacks/streamlit/)
+- [LangChain MCP Adapters](https://github.com/langchain-ai/langchain-mcp-adapters)
+  - [Research Agent with MCP Integration.](https://github.com/langchain-ai/deep_research_from_scratch/blob/main/src/deep_research_from_scratch/research_agent_mcp.py)
 
 ### Sample Codes
 

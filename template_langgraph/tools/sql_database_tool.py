@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    sql_database_uri: str = "sqlite:///template_langgraph.db"
+    sql_database_uri: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -30,15 +30,19 @@ class SqlDatabaseClientWrapper:
     ):
         if settings is None:
             settings = get_sql_database_settings()
-        self.db = SQLDatabase.from_uri(
-            database_uri=settings.sql_database_uri,
-        )
+        self.settings = settings
 
     def get_tools(
         self,
         llm: BaseLanguageModel,
     ) -> list[BaseTool]:
         """Get SQL Database tools."""
+        if self.settings.sql_database_uri == "":
+            return []
+
+        self.db = SQLDatabase.from_uri(
+            database_uri=self.settings.sql_database_uri,
+        )
         return SQLDatabaseToolkit(
             db=self.db,
             llm=llm,
