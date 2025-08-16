@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    ollama_model_chat: str = "phi3:latest"
+    ollama_model_chat: str = "gemma3:270m"
 
     model_config = SettingsConfigDict(
         env_file=".env",
