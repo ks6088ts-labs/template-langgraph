@@ -69,7 +69,7 @@ def chat(
                 end="",
                 flush=True,
             )
-            response += chunk.content
+            response += str(chunk.content)
         logger.info(f"Output: {response}")
     else:
         response = chat_model.invoke(
