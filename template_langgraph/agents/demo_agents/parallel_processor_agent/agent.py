@@ -36,4 +36,4 @@ class ParallelProcessorAgent:
         return workflow.compile()
 
 
-app = ParallelProcessorAgent(AzureOpenAiWrapper().chat_model).create_graph()
+graph = ParallelProcessorAgent(AzureOpenAiWrapper().chat_model).create_graph()

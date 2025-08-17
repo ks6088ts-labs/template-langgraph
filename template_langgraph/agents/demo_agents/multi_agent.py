@@ -3,7 +3,7 @@ from typing import Literal
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.types import Command
 
-from template_langgraph.agents.demo_agents.weather_agent import app
+from template_langgraph.agents.demo_agents.weather_agent import graph
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
 
@@ -37,6 +37,6 @@ def call_model(state: MessagesState) -> Command[Literal["weather_agent", END]]:
 workflow = StateGraph(MessagesState)
 
 workflow.add_node("agent", call_model)
-workflow.add_node("weather_agent", app)
+workflow.add_node("weather_agent", graph)
 workflow.add_edge(START, "agent")
-app = workflow.compile()
+graph = workflow.compile()

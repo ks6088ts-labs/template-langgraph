@@ -3,9 +3,9 @@ import logging
 import typer
 from dotenv import load_dotenv
 
-from template_langgraph.agents.demo_agents.multi_agent import app as multi_agent_app
-from template_langgraph.agents.demo_agents.parallel_processor_agent.agent import app as parallel_processor_agent_app
-from template_langgraph.agents.demo_agents.weather_agent import app as weather_agent_app
+from template_langgraph.agents.demo_agents.multi_agent import graph as multi_agent_graph
+from template_langgraph.agents.demo_agents.parallel_processor_agent.agent import graph as parallel_processor_agent_graph
+from template_langgraph.agents.demo_agents.weather_agent import graph as weather_agent_graph
 from template_langgraph.loggers import get_logger
 
 app = typer.Typer(
@@ -33,7 +33,7 @@ def weather_agent(
     if verbose:
         logger.setLevel(logging.DEBUG)
 
-    response = weather_agent_app.invoke(
+    response = weather_agent_graph.invoke(
         {
             "messages": [
                 {"role": "user", "content": query},
@@ -62,7 +62,7 @@ def multi_agent(
     if verbose:
         logger.setLevel(logging.DEBUG)
 
-    response = multi_agent_app.invoke(
+    response = multi_agent_graph.invoke(
         {
             "messages": [
                 {"role": "user", "content": query},
@@ -91,7 +91,7 @@ def parallel_processor_agent(
     if verbose:
         logger.setLevel(logging.DEBUG)
 
-    for event in parallel_processor_agent_app.stream(
+    for event in parallel_processor_agent_graph.stream(
         input={
             "goal": goal,
         },
