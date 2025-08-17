@@ -3,13 +3,14 @@ import logging
 import typer
 from dotenv import load_dotenv
 
-from template_langgraph.agents.simple_multi_agent.multi_agent import app as multi_agent_app
-from template_langgraph.agents.simple_multi_agent.weather_agent import app as weather_agent_app
+from template_langgraph.agents.demo_agents.multi_agent import app as multi_agent_app
+from template_langgraph.agents.demo_agents.parallel_processor_agent.agent import app as parallel_processor_agent_app
+from template_langgraph.agents.demo_agents.weather_agent import app as weather_agent_app
 from template_langgraph.loggers import get_logger
 
 app = typer.Typer(
     add_completion=False,
-    help="SimpleMultiAgent CLI",
+    help="Demo Agents CLI",
 )
 logger = get_logger(__name__)
 
@@ -70,6 +71,34 @@ def multi_agent(
         debug=True,
     )
     logger.info(response["messages"][-1].content)
+
+
+@app.command()
+def parallel_processor_agent(
+    goal: str = typer.Option(
+        "ソフトウェアシステム開発会社を立ち上げる戦略を立てるための情報収集をしたい",
+        "--goal",
+        "-g",
+        help="The goal to decompose into tasks",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    for event in parallel_processor_agent_app.stream(
+        input={
+            "goal": goal,
+        },
+        debug=True,
+    ):
+        logger.info("-" * 20)
+        logger.info(f"Event: {event}")
 
 
 if __name__ == "__main__":
