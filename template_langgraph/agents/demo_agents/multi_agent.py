@@ -3,7 +3,7 @@ from typing import Literal
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.types import Command
 
-from template_langgraph.agents.demo_agent.weather_agent import app
+from template_langgraph.agents.demo_agents.weather_agent import app
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
 
