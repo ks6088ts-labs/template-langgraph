@@ -1,6 +1,6 @@
-## Deployment instructions
+# Deployment instructions
 
-### Azure resources
+## Azure resources
 
 To deploy Azure resources for this project, you can use the provided [Bicep template](https://github.com/ks6088ts-labs/baseline-environment-on-azure-bicep/tree/main/infra/scenarios/template-langgraph). This template sets up the necessary resources for running the LangGraph application.
 
@@ -8,9 +8,9 @@ To quickly deploy the application, [Deploy to Azure button](https://learn.micros
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fks6088ts-labs%2Fbaseline-environment-on-azure-bicep%2Frefs%2Fheads%2Fmain%2Finfra%2Fscenarios%2Ftemplate-langgraph%2Fazuredeploy.json)
 
-### Create index
+## Create index
 
-#### On Azure
+### On Azure
 
 ```shell
 # Cosmos DB
@@ -20,7 +20,7 @@ make create-cosmosdb-index
 make create-ai-search-index
 ```
 
-#### On Docker
+### On Docker
 
 ```shell
 rm -rf assets/
@@ -33,11 +33,14 @@ make create-qdrant-index
 
 # Elasticsearch
 make create-elasticsearch-index
+
+# (Optional) Azure services
+# Cosmos DB / Azure AI Search are also supported via Make targets above.
 ```
 
-### Agents
+## Agents
 
-#### Create agent graph in png format
+### Create agent graph in png format
 
 ```shell
 ## Draw agent graph
@@ -56,7 +59,7 @@ done
 wait
 ```
 
-#### Run agents
+### Run agents
 
 ```shell
 NAME_QUESTION_ARRAY=(
@@ -70,6 +73,12 @@ for NAME_QUESTION in "${NAME_QUESTION_ARRAY[@]}"; do
     echo "Running agent: $AGENT_NAME with question: $QUESTION"
     uv run python scripts/agent_operator.py run --name "$AGENT_NAME" --verbose --question "$QUESTION"
 done
+
+# Or use Make targets:
+# make run-chat-with-tools-agent
+# make run-issue-formatter-agent
+# make run-kabuto-helpdesk-agent
+# make run-task-decomposer-agent
 ```
 
 ### Docker Hub

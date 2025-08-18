@@ -94,43 +94,32 @@ uv run python scripts/elasticsearch_operator.py create-index \
 
 ### Agent Examples (`template_langgraph/agents/`)
 
-This project includes several agent implementations, each demonstrating different LangGraph patterns:
+This project includes several agent implementations, each demonstrating different LangGraph patterns. You can render their graphs to PNG via the CLI (see Deployment) and run them from the terminal or Makefile targets.
 
-#### 1. `kabuto_helpdesk_agent/` - **Start Here!**
-
-A simple agent using LangGraph's prebuilt `create_react_agent` function. This is the best starting point for understanding the basics.
-
-**Key concepts:** ReAct pattern, tool calling, prebuilt agents
-
-#### 2. `chat_with_tools_agent/` - **Core Implementation**
-
-A manual implementation of the same logic as the helpdesk agent, showing how LangGraph workflows are built from scratch.
-
-**Key concepts:** Graph construction, state management, node functions, edges
-
-#### 3. `issue_formatter_agent/` - **Structured Output**
-
-Demonstrates how to get structured data from AI responses using Pydantic models.
-
-**Key concepts:** Structured output, data validation, response formatting
-
-#### 4. `task_decomposer_agent/` - **Planning & Decomposition**
-
-Shows how to break down complex tasks into smaller, manageable steps.
-
-**Key concepts:** Task planning, multi-step reasoning, conditional workflows
-
-#### 5. `supervisor_agent/` - **Multi-Agent Coordination**
-
-Implements the supervisor pattern where one agent coordinates multiple specialized agents.
-
-**Key concepts:** Multi-agent systems, agent coordination, supervisor patterns
+- `kabuto_helpdesk_agent/` — Start here. Prebuilt ReAct agent via `create_react_agent`. Key: ReAct, tool calling, prebuilt agents.
+- `chat_with_tools_agent/` — Core implementation. Manual graph building equivalent to the helpdesk agent. Key: graph construction, state, nodes/edges.
+- `issue_formatter_agent/` — Structured output. Extracts structured data via Pydantic. Key: structured output, validation, formatting.
+- `task_decomposer_agent/` — Planning & decomposition. Breaks down complex tasks into steps. Key: planning, multi-step reasoning, conditional flows.
+- `supervisor_agent/` — Multi-agent coordination. Supervisor orchestrates multiple specialists. Key: multi-agent coordination.
+- `news_summarizer_agent/` — Web/YouTube summarization. Scrapes content, summarizes to `StructuredArticle`, and notifies. Key: fan-out subtasks, notifier/scraper/summarizer plugins.
+- `image_classifier_agent/` — Vision classification. Classifies local images and notifies results. Key: LLM-based image classification, parallel subtasks.
 
 ### Supporting Modules
 
-- **`template_langgraph/llms/`** - LLM API wrappers (Azure OpenAI, etc.)
-- **`template_langgraph/tools/`** - Tool implementations for search, data retrieval
-- **`template_langgraph/internals/`** - Internal utilities and helper functions (CSV/PDF loaders, Otel wrappers, etc.)
+- `template_langgraph/llms/`: LLM wrappers (Azure OpenAI, etc.)
+- `template_langgraph/tools/`: Tool implementations used by agents
+  - Azure AI Search (`ai_search_tool.py`)
+  - Azure Cosmos DB Vector Search (`cosmosdb_tool.py`)
+  - Dify Workflow (`dify_tool.py`)
+  - Elasticsearch full-text search (`elasticsearch_tool.py`)
+  - MCP client (Model Context Protocol) (`mcp_tool.py`)
+  - Qdrant vector search (`qdrant_tool.py`)
+  - SQL Database toolkit (conditional; enabled when DSN provided) (`sql_database_tool.py`)
+- `template_langgraph/internals/`: Internal utilities
+  - Notifiers (Mock/Slack)
+  - Scrapers (Mock/HTTPX/YouTube transcript)
+  - Summarizers (Mock/LLM structured output)
+  - Loaders (CSV/PDF), OTEL helpers
 
 ## Running the Examples
 
@@ -224,6 +213,37 @@ Demonstration of the Streamlit app:
 
 [![streamlit.png](./images/streamlit.png)](https://youtu.be/undxBwyJ3Sc)
 
+### More agent runs
+
+- Issue formatter (structured output):
+
+```shell
+uv run python scripts/agent_operator.py run \
+  --name issue_formatter_agent \
+  --question "KABUTO login fails...（省略）" \
+  --verbose
+```
+
+- News summarizer (fan-out over URLs):
+
+```shell
+uv run python scripts/agent_operator.py news-summarizer-agent \
+  --prompt "日本語で3行に要約してください" \
+  --urls "https://example.com/a,https://example.com/b" \
+  --verbose
+```
+
+- Image classifier (classify local images):
+
+```shell
+uv run python scripts/agent_operator.py image-classifier-agent \
+  --prompt "画像の内容を3行で説明してください" \
+  --file-paths "docs/images/fastapi.png,docs/images/streamlit.png" \
+  --verbose
+```
+
+Makefile shortcuts are also available (e.g., `make run-chat-with-tools-agent`, `make run-issue-formatter-agent`, `make run-news-summarizer-agent`, `make run-image-classifier-agent`).
+
 ## Key Concepts Demonstrated
 
 ### 1. **ReAct Pattern** (Reasoning + Acting)
@@ -261,12 +281,57 @@ The project uses fictional data about a system called "KABUTO" to demonstrate re
 
 This fictional data serves a purpose: it proves that the AI agents can work with information that isn't in the LLM's training data, demonstrating the value of retrieval-augmented generation (RAG).
 
+## Tools and configuration
+
+The default toolset is configured in `template_langgraph/tools/common.py` and includes search, vector, workflow, SQL (optional), and MCP tools. Tools are enabled/configured via environment variables in `.env`:
+
+- Azure OpenAI
+  - `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_API_VERSION`
+  - `AZURE_OPENAI_MODEL_CHAT`, `AZURE_OPENAI_MODEL_EMBEDDING`, `AZURE_OPENAI_MODEL_REASONING`
+  - Optional Entra ID auth: `AZURE_OPENAI_USE_MICROSOFT_ENTRA_ID=true`
+- Azure AI Search
+  - `AI_SEARCH_ENDPOINT`, `AI_SEARCH_KEY`, `AI_SEARCH_INDEX_NAME`
+- Azure Cosmos DB (vector)
+  - `COSMOSDB_HOST`, `COSMOSDB_KEY`, `COSMOSDB_DATABASE_NAME`, `COSMOSDB_CONTAINER_NAME`, `COSMOSDB_PARTITION_KEY`
+- Elasticsearch
+  - `ELASTICSEARCH_URL` (default `http://localhost:9200`)
+- Qdrant
+  - `QDRANT_URL` (default `http://localhost:6333`)
+- SQL Database (optional)
+  - `SQL_DATABASE_URI` (if empty, SQL tools are disabled)
+- Dify
+  - `DIFY_BASE_URL`, `DIFY_API_KEY`
+- MCP (Model Context Protocol)
+  - `MCP_CONFIG_PATH` (JSON config; tools loaded dynamically)
+- Notifier/Scraper/Summarizer switches
+  - `NOTIFIER_TYPE` (`mock`/`slack`), `NOTIFIER_SLACK_WEBHOOK_URL`
+  - `SCRAPER_TYPE` (`mock`/`httpx`/`youtube_transcript`)
+  - `SUMMARIZER_TYPE` (`mock`/`llm`)
+
+See `.env.template` for a complete list. Most values have sensible local defaults for Docker-based development.
+
+### MCP tools quickstart
+
+If `MCP_CONFIG_PATH` is set to a config file, the agent will automatically load MCP server tools. You can inspect/test MCP servers locally:
+
+```shell
+make mcp-inspector
+```
+
 ## Next Steps
 
 1. **Start with the basics**: Run the `kabuto_helpdesk_agent` example
 2. **Understand the implementation**: Compare it with `chat_with_tools_agent`
 3. **Explore advanced patterns**: Try the task decomposer and supervisor agents
 4. **Build your own**: Use this template as a starting point for your use case
+
+## Observability (optional)
+
+OpenTelemetry helpers are available (`template_langgraph/internals/otel_helpers.py`). Try a quick span flow:
+
+```shell
+uv run python scripts/otel_operator.py run -q "health check" -v
+```
 
 ## Learning Resources
 

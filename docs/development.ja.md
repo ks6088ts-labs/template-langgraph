@@ -16,6 +16,11 @@ make test
 
 # CIテストを実行
 make ci-test
+
+# 任意: LangGraph Studio / FastAPI / Streamlit を起動
+make langgraph-studio
+make fastapi-dev
+make streamlit
 ```
 
 ## テスト
@@ -36,4 +41,18 @@ make docker-run
 
 # DockerコンテナでCIテストを実行
 make ci-test-docker
+
+```
+
+## ドキュメント
+
+ローカルでドキュメントをビルド/起動:
+
+```shell
+make install-deps-docs
+make docs-serve
+```
+
+```
+
 ```

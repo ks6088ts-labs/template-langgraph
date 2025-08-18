@@ -94,43 +94,32 @@ uv run python scripts/elasticsearch_operator.py create-index \
 
 ### エージェントの例（`template_langgraph/agents/`）
 
-このプロジェクトには、それぞれ異なる LangGraph パターンを実演する複数のエージェント実装が含まれています：
+本プロジェクトには、各種 LangGraph パターンを示すエージェント実装が含まれます。CLI でグラフを PNG 出力（Deployment 参照）したり、ターミナル/Makefile から実行できます。
 
-#### 1. `kabuto_helpdesk_agent/` - **ここから始めよう！**
-
-LangGraph の事前構築された`create_react_agent`関数を使用したシンプルなエージェント。基本を理解するのに最適な出発点です。
-
-**主要概念:** ReAct パターン、ツール呼び出し、事前構築エージェント
-
-#### 2. `chat_with_tools_agent/` - **コア実装**
-
-ヘルプデスクエージェントと同じロジックの手動実装で、LangGraph ワークフローがゼロから構築される方法を示しています。
-
-**主要概念:** グラフ構築、状態管理、ノード関数、エッジ
-
-#### 3. `issue_formatter_agent/` - **構造化出力**
-
-Pydantic モデルを使用して AI 応答から構造化データを取得する方法を実演しています。
-
-**主要概念:** 構造化出力、データ検証、レスポンス形式設定
-
-#### 4. `task_decomposer_agent/` - **計画と分解**
-
-複雑なタスクを小さく管理可能なステップに分解する方法を示しています。
-
-**主要概念:** タスク計画、マルチステップ推論、条件付きワークフロー
-
-#### 5. `supervisor_agent/` - **マルチエージェント協調**
-
-1 つのエージェントが複数の専門エージェントを協調させるスーパーバイザーパターンを実装しています。
-
-**主要概念:** マルチエージェントシステム、エージェント協調、スーパーバイザーパターン
+- `kabuto_helpdesk_agent/` — 入門に最適。`create_react_agent` による ReAct エージェント。主要概念: ReAct、ツール呼び出し、プリビルト。
+- `chat_with_tools_agent/` — コア実装。ヘルプデスク相当の手組みグラフ。主要概念: グラフ構築、状態管理、ノード/エッジ。
+- `issue_formatter_agent/` — 構造化出力。Pydantic で構造化データ抽出。主要概念: 構造化出力、検証、整形。
+- `task_decomposer_agent/` — 計画と分解。複雑タスクを段階的に分解。主要概念: 計画、マルチステップ推論、条件分岐。
+- `supervisor_agent/` — マルチエージェント協調。スーパーバイザーが複数の専門エージェントを調整。主要概念: 協調。
+- `news_summarizer_agent/` — Web/YouTube 要約。取得 → 要約 → 通知。主要概念: 扇形サブタスク、Notifier/Scraper/Summarizer を差し替え。
+- `image_classifier_agent/` — 画像分類。ローカル画像を分類し通知。主要概念: 画像 ×LLM、並列サブタスク。
 
 ### サポートモジュール
 
-- **`template_langgraph/llms/`** - LLM API ラッパー（Azure OpenAI など）
-- **`template_langgraph/tools/`** - 検索、データ取得用ツール実装
-- **`template_langgraph/internals/`** - 内部ユーティリティとヘルパー関数（CSV/PDF ローダー、Otel ラッパーなど）
+- `template_langgraph/llms/`: LLM ラッパー（Azure OpenAI など）
+- `template_langgraph/tools/`: ツール実装
+  - Azure AI Search（`ai_search_tool.py`）
+  - Azure Cosmos DB Vector Search（`cosmosdb_tool.py`）
+  - Dify Workflow（`dify_tool.py`）
+  - Elasticsearch 全文検索（`elasticsearch_tool.py`）
+  - MCP クライアント（`mcp_tool.py`）
+  - Qdrant ベクター検索（`qdrant_tool.py`）
+  - SQL Database ツールキット（DSN 指定時のみ有効、`sql_database_tool.py`）
+- `template_langgraph/internals/`: 内部ユーティリティ
+  - Notifier（Mock/Slack）
+  - Scraper（Mock/HTTPX/YouTube transcript）
+  - Summarizer（Mock/LLM 構造化出力）
+  - Loader（CSV/PDF）、OTEL ヘルパー
 
 ## サンプルコードの実行
 
@@ -224,6 +213,37 @@ Streamlit アプリのデモ：
 
 [![streamlit.png](./images/streamlit.png)](https://youtu.be/undxBwyJ3Sc)
 
+### 追加の実行例
+
+- Issue formatter（構造化出力）:
+
+```shell
+uv run python scripts/agent_operator.py run \
+  --name issue_formatter_agent \
+  --question "KABUTO にログインできない…（省略）" \
+  --verbose
+```
+
+- News summarizer（URL 扇形展開）:
+
+```shell
+uv run python scripts/agent_operator.py news-summarizer-agent \
+  --prompt "日本語で3行に要約してください" \
+  --urls "https://example.com/a,https://example.com/b" \
+  --verbose
+```
+
+- Image classifier（ローカル画像を分類）:
+
+```shell
+uv run python scripts/agent_operator.py image-classifier-agent \
+  --prompt "画像の内容を3行で説明してください" \
+  --file-paths "docs/images/fastapi.png,docs/images/streamlit.png" \
+  --verbose
+```
+
+Makefile のショートカット（例: `make run-chat-with-tools-agent`, `make run-issue-formatter-agent`, `make run-news-summarizer-agent`, `make run-image-classifier-agent`）も用意しています。
+
 ## 実演されている主要概念
 
 ### 1. **ReAct パターン**（推論 + 行動）
@@ -261,12 +281,55 @@ LangGraph が複数のインタラクションステップにわたってコン�
 
 この架空のデータには目的があります：AI エージェントが LLM の訓練データにない情報で動作できることを証明し、検索拡張生成（RAG）の価値を実演しています。
 
+## ツールと設定
+
+既定のツールセットは `template_langgraph/tools/common.py` で定義され、検索/ベクター/ワークフロー/SQL（任意）/MCP などを含みます。`.env` の環境変数で有効化・設定します（`.env.template` 参照）。
+
+- Azure OpenAI
+  - `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_API_VERSION`
+  - `AZURE_OPENAI_MODEL_CHAT`, `AZURE_OPENAI_MODEL_EMBEDDING`, `AZURE_OPENAI_MODEL_REASONING`
+  - Entra ID 認証の任意設定: `AZURE_OPENAI_USE_MICROSOFT_ENTRA_ID=true`
+- Azure AI Search
+  - `AI_SEARCH_ENDPOINT`, `AI_SEARCH_KEY`, `AI_SEARCH_INDEX_NAME`
+- Azure Cosmos DB（ベクター）
+  - `COSMOSDB_HOST`, `COSMOSDB_KEY`, `COSMOSDB_DATABASE_NAME`, `COSMOSDB_CONTAINER_NAME`, `COSMOSDB_PARTITION_KEY`
+- Elasticsearch
+  - `ELASTICSEARCH_URL`（既定 `http://localhost:9200`）
+- Qdrant
+  - `QDRANT_URL`（既定 `http://localhost:6333`）
+- SQL Database（任意）
+  - `SQL_DATABASE_URI`（未設定なら無効）
+- Dify
+  - `DIFY_BASE_URL`, `DIFY_API_KEY`
+- MCP（Model Context Protocol）
+  - `MCP_CONFIG_PATH`（JSON 設定。動的にツールをロード）
+- Notifier/Scraper/Summarizer 切替
+  - `NOTIFIER_TYPE`（`mock`/`slack`）、`NOTIFIER_SLACK_WEBHOOK_URL`
+  - `SCRAPER_TYPE`（`mock`/`httpx`/`youtube_transcript`）
+  - `SUMMARIZER_TYPE`（`mock`/`llm`）
+
+### MCP ツールのクイックスタート
+
+`MCP_CONFIG_PATH` を指定すると、MCP サーバーのツールが自動的にロードされます。ローカル検証:
+
+```shell
+make mcp-inspector
+```
+
 ## 次のステップ
 
 1. **基本から始める**: `kabuto_helpdesk_agent`の例を実行
 2. **実装を理解する**: `chat_with_tools_agent`と比較
 3. **高度なパターンを探索**: タスク分解器とスーパーバイザーエージェントを試す
 4. **独自のものを構築**: このテンプレートをあなたのユースケースの出発点として使用
+
+## 可観測性（任意）
+
+OpenTelemetry 用のヘルパーがあります（`template_langgraph/internals/otel_helpers.py`）。簡易スパン動作確認:
+
+```shell
+uv run python scripts/otel_operator.py run -q "health check" -v
+```
 
 ## 学習リソース
 
