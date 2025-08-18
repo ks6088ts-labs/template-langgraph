@@ -83,6 +83,20 @@ uv run python scripts/elasticsearch_operator.py create-index \
   --verbose
 ```
 
+**Optional: Set up additional data sources:**
+
+```shell
+# Azure AI Search
+make create-ai-search-index
+
+# Azure Cosmos DB  
+make create-cosmosdb-index
+
+# Or use the operator scripts directly:
+# uv run python scripts/ai_search_operator.py add-documents --verbose
+# uv run python scripts/cosmosdb_operator.py add-documents --verbose
+```
+
 ## Project Structure
 
 ### Core Components
@@ -93,7 +107,9 @@ uv run python scripts/elasticsearch_operator.py create-index \
 - **`scripts/`** - Command-line tools for running agents
   - `agent_operator.py` - Main agent runner for production agents
   - `demo_agents_operator.py` - Runner for simple demo agents
-  - Various operator scripts for data management (`qdrant_operator.py`, `elasticsearch_operator.py`, etc.)
+  - Database/search operators (`qdrant_operator.py`, `elasticsearch_operator.py`, `ai_search_operator.py`, `cosmosdb_operator.py`)
+  - LLM testing operators (`azure_openai_operator.py`, `azure_ai_foundry_operator.py`, `ollama_operator.py`)
+  - Other utilities (`dify_operator.py`, `otel_operator.py`)
 
 ### Agent Examples (`template_langgraph/agents/`)
 
@@ -117,7 +133,7 @@ Additional simple agents for learning and demonstration:
 
 ### Supporting Modules
 
-- `template_langgraph/llms/`: LLM wrappers (Azure OpenAI, etc.)
+- `template_langgraph/llms/`: LLM wrappers (Azure OpenAI, Azure AI Foundry, Ollama)
 - `template_langgraph/tools/`: Tool implementations used by agents
   - Azure AI Search (`ai_search_tool.py`)
   - Azure Cosmos DB Vector Search (`cosmosdb_tool.py`)
@@ -328,6 +344,11 @@ The default toolset is configured in `template_langgraph/tools/common.py` and in
   - `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_API_VERSION`
   - `AZURE_OPENAI_MODEL_CHAT`, `AZURE_OPENAI_MODEL_EMBEDDING`, `AZURE_OPENAI_MODEL_REASONING`
   - Optional Entra ID auth: `AZURE_OPENAI_USE_MICROSOFT_ENTRA_ID=true`
+- Azure AI Foundry
+  - `AZURE_AI_FOUNDRY_INFERENCE_ENDPOINT`, `AZURE_AI_FOUNDRY_INFERENCE_API_VERSION`
+  - `AZURE_AI_FOUNDRY_INFERENCE_MODEL_CHAT`
+- Ollama (local)
+  - `OLLAMA_MODEL_CHAT`
 - Azure AI Search
   - `AI_SEARCH_ENDPOINT`, `AI_SEARCH_KEY`, `AI_SEARCH_INDEX_NAME`
 - Azure Cosmos DB (vector)

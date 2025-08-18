@@ -83,6 +83,20 @@ uv run python scripts/elasticsearch_operator.py create-index \
   --verbose
 ```
 
+**任意: 追加データソースの設定:**
+
+```shell
+# Azure AI Search
+make create-ai-search-index
+
+# Azure Cosmos DB  
+make create-cosmosdb-index
+
+# またはオペレータースクリプトを直接使用:
+# uv run python scripts/ai_search_operator.py add-documents --verbose
+# uv run python scripts/cosmosdb_operator.py add-documents --verbose
+```
+
 ## プロジェクト構造
 
 ### コアコンポーネント
@@ -93,7 +107,9 @@ uv run python scripts/elasticsearch_operator.py create-index \
 - **`scripts/`** - エージェント実行用コマンドラインツール
   - `agent_operator.py` - プロダクションエージェント用メインランナー
   - `demo_agents_operator.py` - シンプルなデモエージェント用ランナー
-  - データ管理用各種オペレータースクリプト（`qdrant_operator.py`、`elasticsearch_operator.py` など）
+  - データベース/検索オペレーター（`qdrant_operator.py`、`elasticsearch_operator.py`、`ai_search_operator.py`、`cosmosdb_operator.py`）
+  - LLM テストオペレーター（`azure_openai_operator.py`、`azure_ai_foundry_operator.py`、`ollama_operator.py`）
+  - その他ユーティリティ（`dify_operator.py`、`otel_operator.py`）
 
 ### エージェントの例（`template_langgraph/agents/`）
 
@@ -117,7 +133,7 @@ uv run python scripts/elasticsearch_operator.py create-index \
 
 ### サポートモジュール
 
-- `template_langgraph/llms/`: LLM ラッパー（Azure OpenAI など）
+- `template_langgraph/llms/`: LLM ラッパー（Azure OpenAI、Azure AI Foundry、Ollama）
 - `template_langgraph/tools/`: ツール実装
   - Azure AI Search（`ai_search_tool.py`）
   - Azure Cosmos DB Vector Search（`cosmosdb_tool.py`）
@@ -328,6 +344,11 @@ LangGraph が複数のインタラクションステップにわたってコン�
   - `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_API_VERSION`
   - `AZURE_OPENAI_MODEL_CHAT`, `AZURE_OPENAI_MODEL_EMBEDDING`, `AZURE_OPENAI_MODEL_REASONING`
   - Entra ID 認証の任意設定: `AZURE_OPENAI_USE_MICROSOFT_ENTRA_ID=true`
+- Azure AI Foundry
+  - `AZURE_AI_FOUNDRY_INFERENCE_ENDPOINT`, `AZURE_AI_FOUNDRY_INFERENCE_API_VERSION`
+  - `AZURE_AI_FOUNDRY_INFERENCE_MODEL_CHAT`
+- Ollama（ローカル）
+  - `OLLAMA_MODEL_CHAT`
 - Azure AI Search
   - `AI_SEARCH_ENDPOINT`, `AI_SEARCH_KEY`, `AI_SEARCH_INDEX_NAME`
 - Azure Cosmos DB（ベクター）
