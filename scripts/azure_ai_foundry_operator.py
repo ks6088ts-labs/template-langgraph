@@ -268,6 +268,77 @@ def list_messages(
         logger.info(message.as_dict())
 
 
+@app.command()
+def run_thread(
+    agent_id: str = typer.Option(
+        "agent_xxx",
+        "--agent-id",
+        "-a",
+        help="The ID of the agent to run",
+    ),
+    thread_id: str = typer.Option(
+        "thread_xxx",
+        "--thread-id",
+        "-t",
+        help="The ID of the thread to run",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    # Set up logging
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    logger.info("Running thread...")
+
+    project_client = AzureAiFoundryWrapper().get_ai_project_client()
+    run = project_client.agents.runs.create(
+        thread_id=thread_id,
+        agent_id=agent_id,
+    )
+
+    logger.info(f"Run created: {run.as_dict()}")
+
+
+@app.command()
+def get_run(
+    thread_id: str = typer.Option(
+        "thread_xxx",
+        "--thread-id",
+        "-t",
+        help="The ID of the thread to run",
+    ),
+    run_id: str = typer.Option(
+        "run_xxx",
+        "--run-id",
+        "-r",
+        help="The ID of the run to retrieve",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    # Set up logging
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    logger.info("Getting run...")
+
+    project_client = AzureAiFoundryWrapper().get_ai_project_client()
+    run = project_client.agents.runs.get(
+        thread_id=thread_id,
+        run_id=run_id,
+    )
+    logger.info(run.as_dict())
+
+
 if __name__ == "__main__":
     load_dotenv(
         override=True,
