@@ -83,6 +83,20 @@ uv run python scripts/elasticsearch_operator.py create-index \
   --verbose
 ```
 
+**Optional: Set up additional data sources:**
+
+```shell
+# Azure AI Search
+make create-ai-search-index
+
+# Azure Cosmos DB  
+make create-cosmosdb-index
+
+# Or use the operator scripts directly:
+# uv run python scripts/ai_search_operator.py add-documents --verbose
+# uv run python scripts/cosmosdb_operator.py add-documents --verbose
+```
+
 ## Project Structure
 
 ### Core Components
@@ -91,6 +105,11 @@ uv run python scripts/elasticsearch_operator.py create-index \
 - **`template_langgraph/`** - Main Python package containing all agent implementations
 - **`notebooks/`** - Jupyter notebooks with interactive examples and explanations
 - **`scripts/`** - Command-line tools for running agents
+  - `agent_operator.py` - Main agent runner for production agents
+  - `demo_agents_operator.py` - Runner for simple demo agents
+  - Database/search operators (`qdrant_operator.py`, `elasticsearch_operator.py`, `ai_search_operator.py`, `cosmosdb_operator.py`)
+  - LLM testing operators (`azure_openai_operator.py`, `azure_ai_foundry_operator.py`, `ollama_operator.py`)
+  - Other utilities (`dify_operator.py`, `otel_operator.py`)
 
 ### Agent Examples (`template_langgraph/agents/`)
 
@@ -104,9 +123,17 @@ This project includes several agent implementations, each demonstrating differen
 - `news_summarizer_agent/` — Web/YouTube summarization. Scrapes content, summarizes to `StructuredArticle`, and notifies. Key: fan-out subtasks, notifier/scraper/summarizer plugins.
 - `image_classifier_agent/` — Vision classification. Classifies local images and notifies results. Key: LLM-based image classification, parallel subtasks.
 
+#### Demo Agents (`template_langgraph/agents/demo_agents/`)
+
+Additional simple agents for learning and demonstration:
+
+- `weather_agent.py` — Simple tool-calling agent. Basic ReAct pattern with mock weather search tool. Key: tool calling, basic agent pattern.
+- `multi_agent.py` — Multi-agent coordination. Demonstrates agent-to-agent handoff using transfer functions. Key: agent coordination, workflow transfer.
+- `parallel_processor_agent/` — Task decomposition with parallel execution. Breaks down goals into tasks and processes them in parallel. Key: parallel processing, task decomposition, Send operations.
+
 ### Supporting Modules
 
-- `template_langgraph/llms/`: LLM wrappers (Azure OpenAI, etc.)
+- `template_langgraph/llms/`: LLM wrappers (Azure OpenAI, Azure AI Foundry, Ollama)
 - `template_langgraph/tools/`: Tool implementations used by agents
   - Azure AI Search (`ai_search_tool.py`)
   - Azure Cosmos DB Vector Search (`cosmosdb_tool.py`)
@@ -242,6 +269,32 @@ uv run python scripts/agent_operator.py image-classifier-agent \
   --verbose
 ```
 
+### Demo agent runs
+
+- Weather agent (simple tool calling):
+
+```shell
+uv run python scripts/demo_agents_operator.py weather-agent \
+  --query "What's the weather in Japan?" \
+  --verbose
+```
+
+- Multi agent (agent coordination):
+
+```shell
+uv run python scripts/demo_agents_operator.py multi-agent \
+  --query "What's the weather in Tokyo?" \
+  --verbose
+```
+
+- Parallel processor agent (task decomposition):
+
+```shell
+uv run python scripts/demo_agents_operator.py parallel-processor-agent \
+  --goal "Plan information gathering strategy for launching a software company" \
+  --verbose
+```
+
 Makefile shortcuts are also available (e.g., `make run-chat-with-tools-agent`, `make run-issue-formatter-agent`, `make run-news-summarizer-agent`, `make run-image-classifier-agent`).
 
 ## Key Concepts Demonstrated
@@ -289,6 +342,11 @@ The default toolset is configured in `template_langgraph/tools/common.py` and in
   - `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_API_VERSION`
   - `AZURE_OPENAI_MODEL_CHAT`, `AZURE_OPENAI_MODEL_EMBEDDING`, `AZURE_OPENAI_MODEL_REASONING`
   - Optional Entra ID auth: `AZURE_OPENAI_USE_MICROSOFT_ENTRA_ID=true`
+- Azure AI Foundry
+  - `AZURE_AI_FOUNDRY_INFERENCE_ENDPOINT`, `AZURE_AI_FOUNDRY_INFERENCE_API_VERSION`
+  - `AZURE_AI_FOUNDRY_INFERENCE_MODEL_CHAT`
+- Ollama (local)
+  - `OLLAMA_MODEL_CHAT`
 - Azure AI Search
   - `AI_SEARCH_ENDPOINT`, `AI_SEARCH_KEY`, `AI_SEARCH_INDEX_NAME`
 - Azure Cosmos DB (vector)
@@ -321,9 +379,10 @@ make mcp-inspector
 ## Next Steps
 
 1. **Start with the basics**: Run the `kabuto_helpdesk_agent` example
-2. **Understand the implementation**: Compare it with `chat_with_tools_agent`
-3. **Explore advanced patterns**: Try the task decomposer and supervisor agents
-4. **Build your own**: Use this template as a starting point for your use case
+2. **Try demo agents**: Explore the simple patterns with `weather_agent`, `multi_agent`, and `parallel_processor_agent`
+3. **Understand the implementation**: Compare it with `chat_with_tools_agent`
+4. **Explore advanced patterns**: Try the task decomposer and supervisor agents
+5. **Build your own**: Use this template as a starting point for your use case
 
 ## Observability (optional)
 
@@ -342,10 +401,11 @@ uv run python scripts/otel_operator.py run -q "health check" -v
 
 This template demonstrates several proven agent architectures:
 
-1. **Single Agent with Tools** - Basic tool-calling pattern
-2. **ReAct Agent** - Reasoning and acting in loops
-3. **Structured Output Agent** - Returning formatted data
-4. **Planning Agent** - Breaking down complex tasks
-5. **Supervisor Agent** - Coordinating multiple agents
+1. **Single Agent with Tools** - Basic tool-calling pattern (`weather_agent`)
+2. **ReAct Agent** - Reasoning and acting in loops (`kabuto_helpdesk_agent`)
+3. **Structured Output Agent** - Returning formatted data (`issue_formatter_agent`)
+4. **Planning Agent** - Breaking down complex tasks (`task_decomposer_agent`)
+5. **Multi-Agent Systems** - Coordinating multiple agents (`supervisor_agent`, `multi_agent`)
+6. **Parallel Processing** - Concurrent task execution (`parallel_processor_agent`)
 
 Each pattern is implemented with clear examples and documentation to help you understand when and how to use them.
