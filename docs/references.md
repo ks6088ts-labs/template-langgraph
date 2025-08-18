@@ -29,6 +29,11 @@
 - [Azure Cosmos DB No SQL](https://python.langchain.com/docs/integrations/vectorstores/azure_cosmos_db_no_sql/)
 - [Azure AI Search](https://python.langchain.com/docs/integrations/vectorstores/azuresearch/)
 
+### Azure AI Foundry
+
+- [Quickstart: Get started with Azure AI Foundry](https://learn.microsoft.com/azure/ai-foundry/quickstarts/get-started-code?tabs=python&pivots=fdp-project)
+- [azure-rest-api-specs/specification/ai/data-plane/Azure.AI.Agents](https://github.com/Azure/azure-rest-api-specs/tree/main/specification/ai/data-plane/Azure.AI.Agents)
+
 ### Services
 
 - [FastAPI](https://fastapi.tiangolo.com/)

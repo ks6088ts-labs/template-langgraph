@@ -1,5 +1,7 @@
 from functools import lru_cache
 
+from azure.ai.projects import AIProjectClient
+from azure.identity import DefaultAzureCredential
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -26,3 +28,16 @@ class AzureAiFoundryWrapper:
         if settings is None:
             settings = get_azure_ai_foundry_settings()
         self.settings = settings
+        self.project_client = AIProjectClient(
+            endpoint=self.settings.azure_ai_foundry_inference_endpoint,
+            credential=DefaultAzureCredential(),
+        )
+        self.openai_client = self.project_client.get_openai_client(
+            api_version=self.settings.azure_ai_foundry_inference_api_version
+        )
+
+    def get_ai_project_client(self):
+        return self.project_client
+
+    def get_openai_client(self):
+        return self.openai_client

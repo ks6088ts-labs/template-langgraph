@@ -36,19 +36,13 @@ def chat(
         logger.setLevel(logging.DEBUG)
 
     logger.info("Running Azure AI Foundry chat...")
-    # https://learn.microsoft.com/azure/ai-foundry/quickstarts/get-started-code?tabs=python&pivots=fdp-project
-    from azure.ai.projects import AIProjectClient
-    from azure.identity import DefaultAzureCredential
 
-    settings = AzureAiFoundryWrapper().settings
+    wrapper = AzureAiFoundryWrapper()
 
-    project = AIProjectClient(
-        endpoint=settings.azure_ai_foundry_inference_endpoint,
-        credential=DefaultAzureCredential(),
-    )
-    models = project.get_openai_client(api_version=settings.azure_ai_foundry_inference_api_version)
-    response = models.chat.completions.create(
-        model=settings.azure_ai_foundry_inference_model_chat,
+    openai_client = wrapper.get_openai_client()
+
+    response = openai_client.chat.completions.create(
+        model=wrapper.settings.azure_ai_foundry_inference_model_chat,
         messages=[
             {"role": "user", "content": query},
         ],
@@ -57,12 +51,18 @@ def chat(
 
 
 @app.command()
-def chat_langchain(
-    query: str = typer.Option(
-        "Hello",
-        "--query",
-        "-q",
-        help="The query to send to the AI",
+def create_agent(
+    name: str = typer.Option(
+        "MyAgent",
+        "--name",
+        "-n",
+        help="The name of the agent",
+    ),
+    instructions: str = typer.Option(
+        "This is my agent",
+        "--instructions",
+        "-i",
+        help="The instructions for the agent",
     ),
     verbose: bool = typer.Option(
         False,
@@ -75,8 +75,63 @@ def chat_langchain(
     if verbose:
         logger.setLevel(logging.DEBUG)
 
-    logger.info("Running Azure AI Foundry chat...")
-    # FIXME: impl
+    logger.info("Creating agent...")
+    project_client = AzureAiFoundryWrapper().get_ai_project_client()
+    with project_client.agents as agents_client:
+        # Create a new agent
+        agent = agents_client.create_agent(
+            name=name,
+            instructions=instructions,
+            model=AzureAiFoundryWrapper().settings.azure_ai_foundry_inference_model_chat,
+        )
+        logger.info(f"Created agent: {agent.as_dict()}")
+
+
+@app.command()
+def delete_agent(
+    agent_id: str = typer.Option(
+        "asst_xxx",
+        "--agent-id",
+        "-a",
+        help="The ID of the agent to delete",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    # Set up logging
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    logger.info("Deleting agent...")
+    project_client = AzureAiFoundryWrapper().get_ai_project_client()
+    with project_client.agents as agents_client:
+        agents_client.delete_agent(agent_id=agent_id)
+
+
+@app.command()
+def list_agents(
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    # Set up logging
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    logger.info("Listing agents...")
+
+    project_client = AzureAiFoundryWrapper().get_ai_project_client()
+    with project_client.agents as agents_client:
+        agents = agents_client.list_agents()
+        for agent in agents:
+            logger.info(f"Agent ID: {agent.id}, Name: {agent.name}")
 
 
 if __name__ == "__main__":
