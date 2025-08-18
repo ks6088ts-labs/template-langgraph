@@ -7,7 +7,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     azure_ai_foundry_inference_endpoint: str = "https://xxx.services.ai.azure.com/api/projects/xxx"
-    azure_ai_foundry_inference_credential: str = "<YOUR_CREDENTIAL>"
     azure_ai_foundry_inference_api_version: str = "2025-04-01-preview"
     azure_ai_foundry_inference_model_chat: str = "gpt-5"
 
