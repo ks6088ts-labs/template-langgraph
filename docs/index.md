@@ -297,8 +297,6 @@ uv run python scripts/demo_agents_operator.py parallel-processor-agent \
 
 Makefile shortcuts are also available (e.g., `make run-chat-with-tools-agent`, `make run-issue-formatter-agent`, `make run-news-summarizer-agent`, `make run-image-classifier-agent`).
 
-Demo agent shortcuts: `make run-weather-agent`, `make run-multi-agent`, `make run-parallel-processor-agent`.
-
 ## Key Concepts Demonstrated
 
 ### 1. **ReAct Pattern** (Reasoning + Acting)

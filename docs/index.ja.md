@@ -297,8 +297,6 @@ uv run python scripts/demo_agents_operator.py parallel-processor-agent \
 
 Makefile のショートカット（例: `make run-chat-with-tools-agent`, `make run-issue-formatter-agent`, `make run-news-summarizer-agent`, `make run-image-classifier-agent`）も用意しています。
 
-デモエージェントのショートカット: `make run-weather-agent`, `make run-multi-agent`, `make run-parallel-processor-agent`
-
 ## 実演されている主要概念
 
 ### 1. **ReAct パターン**（推論 + 行動）
