@@ -33,6 +33,7 @@
 
 - [Quickstart: Get started with Azure AI Foundry](https://learn.microsoft.com/azure/ai-foundry/quickstarts/get-started-code?tabs=python&pivots=fdp-project)
 - [azure-rest-api-specs/specification/ai/data-plane/Azure.AI.Agents](https://github.com/Azure/azure-rest-api-specs/tree/main/specification/ai/data-plane/Azure.AI.Agents)
+- [How to use the Deep Research tool](https://learn.microsoft.com/azure/ai-foundry/agents/how-to/tools/deep-research-samples?pivots=python)
 
 ### Services
 
