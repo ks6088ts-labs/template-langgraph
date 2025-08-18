@@ -91,6 +91,9 @@ uv run python scripts/elasticsearch_operator.py create-index \
 - **`template_langgraph/`** - すべてのエージェント実装を含むメイン Python パッケージ
 - **`notebooks/`** - インタラクティブな例と説明付き Jupyter ノートブック
 - **`scripts/`** - エージェント実行用コマンドラインツール
+  - `agent_operator.py` - プロダクションエージェント用メインランナー
+  - `demo_agents_operator.py` - シンプルなデモエージェント用ランナー
+  - データ管理用各種オペレータースクリプト（`qdrant_operator.py`、`elasticsearch_operator.py` など）
 
 ### エージェントの例（`template_langgraph/agents/`）
 
@@ -103,6 +106,14 @@ uv run python scripts/elasticsearch_operator.py create-index \
 - `supervisor_agent/` — マルチエージェント協調。スーパーバイザーが複数の専門エージェントを調整。主要概念: 協調。
 - `news_summarizer_agent/` — Web/YouTube 要約。取得 → 要約 → 通知。主要概念: 扇形サブタスク、Notifier/Scraper/Summarizer を差し替え。
 - `image_classifier_agent/` — 画像分類。ローカル画像を分類し通知。主要概念: 画像 ×LLM、並列サブタスク。
+
+#### デモエージェント（`template_langgraph/agents/demo_agents/`）
+
+学習と実演用の追加シンプルエージェント：
+
+- `weather_agent.py` — シンプルなツール呼び出しエージェント。モック天気検索ツールを使った基本的な ReAct パターン。主要概念: ツール呼び出し、基本エージェントパターン。
+- `multi_agent.py` — マルチエージェント協調。転送機能を使ったエージェント間の引き渡しを実演。主要概念: エージェント協調、ワークフロー転送。
+- `parallel_processor_agent/` — 並列実行タスク分解。目標をタスクに分解し並列処理。主要概念: 並列処理、タスク分解、Send 操作。
 
 ### サポートモジュール
 
@@ -242,7 +253,35 @@ uv run python scripts/agent_operator.py image-classifier-agent \
   --verbose
 ```
 
+### デモエージェント実行例
+
+- Weather agent（シンプルなツール呼び出し）:
+
+```shell
+uv run python scripts/demo_agents_operator.py weather-agent \
+  --query "日本の天気はどうですか？" \
+  --verbose
+```
+
+- Multi agent（エージェント協調）:
+
+```shell
+uv run python scripts/demo_agents_operator.py multi-agent \
+  --query "東京の天気はどうですか？" \
+  --verbose
+```
+
+- Parallel processor agent（タスク分解）:
+
+```shell
+uv run python scripts/demo_agents_operator.py parallel-processor-agent \
+  --goal "ソフトウェア会社立ち上げのための情報収集戦略を計画する" \
+  --verbose
+```
+
 Makefile のショートカット（例: `make run-chat-with-tools-agent`, `make run-issue-formatter-agent`, `make run-news-summarizer-agent`, `make run-image-classifier-agent`）も用意しています。
+
+デモエージェントのショートカット: `make run-weather-agent`, `make run-multi-agent`, `make run-parallel-processor-agent`
 
 ## 実演されている主要概念
 
@@ -319,9 +358,10 @@ make mcp-inspector
 ## 次のステップ
 
 1. **基本から始める**: `kabuto_helpdesk_agent`の例を実行
-2. **実装を理解する**: `chat_with_tools_agent`と比較
-3. **高度なパターンを探索**: タスク分解器とスーパーバイザーエージェントを試す
-4. **独自のものを構築**: このテンプレートをあなたのユースケースの出発点として使用
+2. **デモエージェントを試す**: `weather_agent`、`multi_agent`、`parallel_processor_agent`でシンプルなパターンを探索
+3. **実装を理解する**: `chat_with_tools_agent`と比較
+4. **高度なパターンを探索**: タスク分解器とスーパーバイザーエージェントを試す
+5. **独自のものを構築**: このテンプレートをあなたのユースケースの出発点として使用
 
 ## 可観測性（任意）
 
@@ -340,10 +380,11 @@ uv run python scripts/otel_operator.py run -q "health check" -v
 
 このテンプレートは複数の実証済みエージェントアーキテクチャを実演しています：
 
-1. **ツール付きシングルエージェント** - 基本的なツール呼び出しパターン
-2. **ReAct エージェント** - ループでの推論と行動
-3. **構造化出力エージェント** - フォーマットされたデータの返却
-4. **計画エージェント** - 複雑なタスクの分解
-5. **スーパーバイザーエージェント** - 複数エージェントの協調
+1. **ツール付きシングルエージェント** - 基本的なツール呼び出しパターン（`weather_agent`）
+2. **ReAct エージェント** - ループでの推論と行動（`kabuto_helpdesk_agent`）
+3. **構造化出力エージェント** - フォーマットされたデータの返却（`issue_formatter_agent`）
+4. **計画エージェント** - 複雑なタスクの分解（`task_decomposer_agent`）
+5. **マルチエージェントシステム** - 複数エージェントの協調（`supervisor_agent`、`multi_agent`）
+6. **並列処理** - 同時タスク実行（`parallel_processor_agent`）
 
 各パターンは、いつどのように使用するかを理解するのに役立つ明確な例と文書で実装されています。
