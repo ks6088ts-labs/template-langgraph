@@ -199,6 +199,75 @@ def list_threads(
         logger.info(thread.as_dict())
 
 
+@app.command()
+def create_message(
+    role: str = typer.Option(
+        "user",
+        "--role",
+        "-r",
+        help="The role of the message sender",
+    ),
+    content: str = typer.Option(
+        "Hello, world!",
+        "--content",
+        "-c",
+        help="The content of the message",
+    ),
+    thread_id: str = typer.Option(
+        "thread_xxx",
+        "--thread-id",
+        "-t",
+        help="The ID of the thread to list messages from",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    # Set up logging
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    logger.info("Creating message...")
+
+    project_client = AzureAiFoundryWrapper().get_ai_project_client()
+    message = project_client.agents.messages.create(
+        thread_id=thread_id,
+        role=role,
+        content=content,
+    )
+    logger.info(message.as_dict())
+
+
+@app.command()
+def list_messages(
+    thread_id: str = typer.Option(
+        "thread_xxx",
+        "--thread-id",
+        "-t",
+        help="The ID of the thread to list messages from",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    # Set up logging
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    logger.info("Listing messages...")
+
+    project_client = AzureAiFoundryWrapper().get_ai_project_client()
+    messages = project_client.agents.messages.list(thread_id=thread_id)
+    for message in messages:
+        logger.info(message.as_dict())
+
+
 if __name__ == "__main__":
     load_dotenv(
         override=True,
