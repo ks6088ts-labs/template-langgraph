@@ -134,6 +134,71 @@ def list_agents(
             logger.info(f"Agent ID: {agent.id}, Name: {agent.name}")
 
 
+@app.command()
+def create_thread(
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    # Set up logging
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    logger.info("Creating thread...")
+
+    project_client = AzureAiFoundryWrapper().get_ai_project_client()
+    thread = project_client.agents.threads.create()
+    logger.info(thread.as_dict())
+
+
+@app.command()
+def delete_thread(
+    thread_id: str = typer.Option(
+        "thread_xxx",
+        "--thread-id",
+        "-t",
+        help="The ID of the thread to delete",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    # Set up logging
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    logger.info("Deleting thread...")
+    project_client = AzureAiFoundryWrapper().get_ai_project_client()
+    project_client.agents.threads.delete(thread_id=thread_id)
+
+
+@app.command()
+def list_threads(
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    # Set up logging
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    logger.info("Listing threads...")
+
+    project_client = AzureAiFoundryWrapper().get_ai_project_client()
+    threads = project_client.agents.threads.list()
+    for thread in threads:
+        logger.info(thread.as_dict())
+
+
 if __name__ == "__main__":
     load_dotenv(
         override=True,
