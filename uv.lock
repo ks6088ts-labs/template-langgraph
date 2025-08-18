@@ -298,6 +298,20 @@ wheels = [
 ]
 
 [[package]]
+name = "azure-ai-agents"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "azure-core" },
+    { name = "isodate" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/39/98/bbe2e9e5b0a934be1930545025bf7018ebc4cc33b10134cc3314d6487076/azure_ai_agents-1.1.0.tar.gz", hash = "sha256:eb9d7226282d03206c3fab3f3ee0a2fc71e0ad38e52d2f4f19a92c56ed951aea", size = 303656, upload-time = "2025-08-05T19:02:26.7Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e6/31/43750555bf20d3d2d7589fcd775c96ce7c96e58e208b81c1ed6d4bad6c5f/azure_ai_agents-1.1.0-py3-none-any.whl", hash = "sha256:f660bb0d564aeb88e33140ebc1e4700d2e36e2e12ee60c3346915d702a9310a9", size = 191126, upload-time = "2025-08-05T19:02:28.178Z" },
+]
+
+[[package]]
 name = "azure-ai-inference"
 version = "1.0.0b9"
 source = { registry = "https://pypi.org/simple" }
@@ -314,6 +328,22 @@ wheels = [
 [package.optional-dependencies]
 opentelemetry = [
     { name = "azure-core-tracing-opentelemetry" },
+]
+
+[[package]]
+name = "azure-ai-projects"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "azure-ai-agents" },
+    { name = "azure-core" },
+    { name = "azure-storage-blob" },
+    { name = "isodate" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/dd/95/9c04cb5f658c7f856026aa18432e0f0fa254ead2983a3574a0f5558a7234/azure_ai_projects-1.0.0.tar.gz", hash = "sha256:b5f03024ccf0fd543fbe0f5abcc74e45b15eccc1c71ab87fc71c63061d9fd63c", size = 130798, upload-time = "2025-07-31T02:09:27.912Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b5/db/7149cdf71e12d9737f186656176efc94943ead4f205671768c1549593efe/azure_ai_projects-1.0.0-py3-none-any.whl", hash = "sha256:81369ed7a2f84a65864f57d3fa153e16c30f411a1504d334e184fb070165a3fa", size = 115188, upload-time = "2025-07-31T02:09:29.362Z" },
 ]
 
 [[package]]
@@ -394,6 +424,21 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/fd/11/9ecde2bd9e6c00cc0e3f312ab096a33d333f8ba40c847f01f94d524895fe/azure_search_documents-11.5.3.tar.gz", hash = "sha256:6931149ec0db90485d78648407f18ea4271420473c7cb646bf87790374439989", size = 300353, upload-time = "2025-06-25T16:48:58.924Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/4b/f5/0f6b52567cbb33f1efba13060514ed7088a86de84d74b77cda17d278bcd9/azure_search_documents-11.5.3-py3-none-any.whl", hash = "sha256:110617751c6c8bd50b1f0af2b00a478bd4fbaf4e2f0387e3454c26ec3eb433d6", size = 298772, upload-time = "2025-06-25T16:49:00.764Z" },
+]
+
+[[package]]
+name = "azure-storage-blob"
+version = "12.26.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "azure-core" },
+    { name = "cryptography" },
+    { name = "isodate" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/96/95/3e3414491ce45025a1cde107b6ae72bf72049e6021597c201cd6a3029b9a/azure_storage_blob-12.26.0.tar.gz", hash = "sha256:5dd7d7824224f7de00bfeb032753601c982655173061e242f13be6e26d78d71f", size = 583332, upload-time = "2025-07-16T21:34:07.644Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5b/64/63dbfdd83b31200ac58820a7951ddfdeed1fbee9285b0f3eae12d1357155/azure_storage_blob-12.26.0-py3-none-any.whl", hash = "sha256:8c5631b8b22b4f53ec5fff2f3bededf34cfef111e2af613ad42c9e6de00a77fe", size = 412907, upload-time = "2025-07-16T21:34:09.367Z" },
 ]
 
 [[package]]
@@ -4691,6 +4736,7 @@ name = "template-langgraph"
 version = "0.0.1"
 source = { editable = "." }
 dependencies = [
+    { name = "azure-ai-projects" },
     { name = "azure-cosmos" },
     { name = "azure-identity" },
     { name = "azure-search-documents" },
@@ -4737,6 +4783,7 @@ docs = [
 
 [package.metadata]
 requires-dist = [
+    { name = "azure-ai-projects", specifier = ">=1.0.0" },
     { name = "azure-cosmos", specifier = ">=4.9.0" },
     { name = "azure-identity", specifier = ">=1.23.1" },
     { name = "azure-search-documents", specifier = ">=11.5.3" },
