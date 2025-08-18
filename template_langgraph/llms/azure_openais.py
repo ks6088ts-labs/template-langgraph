@@ -1,10 +1,16 @@
 from functools import lru_cache
 
+from azure.identity import DefaultAzureCredential
 from langchain_openai import AzureChatOpenAI, AzureOpenAIEmbeddings
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from template_langgraph.loggers import get_logger
+
+logger = get_logger(__name__)
+
 
 class Settings(BaseSettings):
+    azure_openai_use_microsoft_entra_id: str = "False"
     azure_openai_endpoint: str = "https://<YOUR_AOAI_NAME>.openai.azure.com/"
     azure_openai_api_key: str = "<YOUR_API_KEY>"
     azure_openai_api_version: str = "2024-10-21"
@@ -29,25 +35,53 @@ class AzureOpenAiWrapper:
         if settings is None:
             settings = get_azure_openai_settings()
 
-        self.chat_model = AzureChatOpenAI(
-            azure_endpoint=settings.azure_openai_endpoint,
-            api_key=settings.azure_openai_api_key,
-            api_version=settings.azure_openai_api_version,
-            azure_deployment=settings.azure_openai_model_chat,
-            streaming=True,
-        )
-        self.embedding_model = AzureOpenAIEmbeddings(
-            azure_endpoint=settings.azure_openai_endpoint,
-            api_key=settings.azure_openai_api_key,
-            api_version=settings.azure_openai_api_version,
-            azure_deployment=settings.azure_openai_model_embedding,
-        )
-        self.reasoning_model = AzureChatOpenAI(
-            azure_endpoint=settings.azure_openai_endpoint,
-            api_key=settings.azure_openai_api_key,
-            api_version=settings.azure_openai_api_version,
-            azure_deployment=settings.azure_openai_model_reasoning,
-        )
+        if settings.azure_openai_use_microsoft_entra_id.lower() == "true":
+            logger.info("Using Microsoft Entra ID for authentication")
+            credential = DefaultAzureCredential()
+            token = credential.get_token("https://cognitiveservices.azure.com/.default").token
+
+            self.chat_model = AzureChatOpenAI(
+                azure_ad_token=token,
+                azure_endpoint=settings.azure_openai_endpoint,
+                api_version=settings.azure_openai_api_version,
+                azure_deployment=settings.azure_openai_model_chat,
+                streaming=True,
+            )
+            self.reasoning_model = AzureChatOpenAI(
+                azure_ad_token=token,
+                azure_endpoint=settings.azure_openai_endpoint,
+                api_version=settings.azure_openai_api_version,
+                azure_deployment=settings.azure_openai_model_reasoning,
+                streaming=True,
+            )
+            self.embedding_model = AzureOpenAIEmbeddings(
+                azure_ad_token=token,
+                azure_endpoint=settings.azure_openai_endpoint,
+                api_version=settings.azure_openai_api_version,
+                azure_deployment=settings.azure_openai_model_embedding,
+            )
+        else:
+            logger.info("Using API key for authentication")
+            self.chat_model = AzureChatOpenAI(
+                api_key=settings.azure_openai_api_key,
+                azure_endpoint=settings.azure_openai_endpoint,
+                api_version=settings.azure_openai_api_version,
+                azure_deployment=settings.azure_openai_model_chat,
+                streaming=True,
+            )
+            self.reasoning_model = AzureChatOpenAI(
+                api_key=settings.azure_openai_api_key,
+                azure_endpoint=settings.azure_openai_endpoint,
+                api_version=settings.azure_openai_api_version,
+                azure_deployment=settings.azure_openai_model_reasoning,
+                streaming=True,
+            )
+            self.embedding_model = AzureOpenAIEmbeddings(
+                api_key=settings.azure_openai_api_key,
+                azure_endpoint=settings.azure_openai_endpoint,
+                api_version=settings.azure_openai_api_version,
+                azure_deployment=settings.azure_openai_model_embedding,
+            )
 
     def create_embedding(self, text: str):
         """Create an embedding for the given text."""

@@ -1,8 +1,10 @@
 import logging
 from base64 import b64encode
+from logging import basicConfig
 
 import typer
 from dotenv import load_dotenv
+from langchain_core.messages import HumanMessage
 
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
@@ -22,6 +24,12 @@ def load_image_to_base64(image_path: str) -> str:
         return b64encode(image_file.read()).decode("utf-8")
 
 
+def set_verbose_logging(verbose: bool):
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+        basicConfig(level=logging.DEBUG)
+
+
 @app.command()
 def chat(
     query: str = typer.Option(
@@ -30,6 +38,12 @@ def chat(
         "-q",
         help="Query to run with the Azure OpenAI chat model",
     ),
+    stream: bool = typer.Option(
+        False,
+        "--stream",
+        "-s",
+        help="Enable streaming output",
+    ),
     verbose: bool = typer.Option(
         False,
         "--verbose",
@@ -37,21 +51,36 @@ def chat(
         help="Enable verbose output",
     ),
 ):
-    # Set up logging
-    if verbose:
-        logger.setLevel(logging.DEBUG)
+    set_verbose_logging(verbose)
 
     logger.info("Running...")
-    response = AzureOpenAiWrapper().chat_model.invoke(
-        input=query,
-    )
-    logger.debug(
-        response.model_dump_json(
-            indent=2,
-            exclude_none=True,
+    llm = AzureOpenAiWrapper().chat_model
+
+    if stream:
+        response = ""
+        for chunk in llm.stream(
+            input=[
+                HumanMessage(content=query),
+            ],
+        ):
+            print(
+                chunk.content,
+                end="|",
+                flush=True,
+            )
+            response += str(chunk.content)
+        logger.info(f"Output: {response}")
+    else:
+        response = llm.invoke(
+            input=query,
         )
-    )
-    logger.info(f"Output: {response.content}")
+        logger.debug(
+            response.model_dump_json(
+                indent=2,
+                exclude_none=True,
+            )
+        )
+        logger.info(f"Output: {response.content}")
 
 
 @app.command()
@@ -62,6 +91,12 @@ def reasoning(
         "-q",
         help="Query to run with the Azure OpenAI reasoning model",
     ),
+    stream: bool = typer.Option(
+        False,
+        "--stream",
+        "-s",
+        help="Enable streaming output",
+    ),
     verbose: bool = typer.Option(
         False,
         "--verbose",
@@ -69,21 +104,57 @@ def reasoning(
         help="Enable verbose output",
     ),
 ):
-    # Set up logging
-    if verbose:
-        logger.setLevel(logging.DEBUG)
+    set_verbose_logging(verbose)
 
-    logger.info("Running...")
-    response = AzureOpenAiWrapper().reasoning_model.invoke(
-        input=query,
-    )
-    logger.debug(
-        response.model_dump_json(
-            indent=2,
-            exclude_none=True,
+    llm = AzureOpenAiWrapper().reasoning_model
+    if stream:
+        response = ""
+        for chunk in llm.stream(
+            input=[
+                HumanMessage(content=query),
+            ],
+        ):
+            print(
+                chunk.content,
+                end="|",
+                flush=True,
+            )
+            response += str(chunk.content)
+        logger.info(f"Output: {response}")
+    else:
+        response = llm.invoke(
+            input=query,
         )
-    )
-    logger.info(f"Output: {response.content}")
+        logger.debug(
+            response.model_dump_json(
+                indent=2,
+                exclude_none=True,
+            )
+        )
+        logger.info(f"Output: {response.content}")
+
+
+@app.command()
+def embedding(
+    query: str = typer.Option(
+        "患者のデータから考えられる病名を診断してください。年齢： 55歳, 性別： 男性, 主訴： 激しい胸の痛み、息切れ, 検査データ： 心電図異常、トロポニン値上昇, 病歴： 高血圧、喫煙歴あり",  # noqa: E501
+        "--query",
+        "-q",
+        help="Query to run with the Azure OpenAI embedding model",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    set_verbose_logging(verbose)
+
+    llm = AzureOpenAiWrapper().embedding_model
+
+    vector = llm.embed_query(text=query)
+    logger.info(f"Dimension: {len(vector)}, Vector: {vector[:5]}")
 
 
 @app.command()
@@ -107,9 +178,7 @@ def image(
         help="Enable verbose output",
     ),
 ):
-    # Set up logging
-    if verbose:
-        logger.setLevel(logging.DEBUG)
+    set_verbose_logging(verbose)
 
     base64_image = load_image_to_base64(file_path)
     messages = {
