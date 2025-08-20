@@ -4,7 +4,7 @@ import typer
 from dotenv import load_dotenv
 
 from template_langgraph.agents.demo_agents.multi_agent import graph as multi_agent_graph
-from template_langgraph.agents.demo_agents.parallel_processor_agent.agent import graph as parallel_processor_agent_graph
+from template_langgraph.agents.demo_agents.parallel_rag_agent.agent import graph as parallel_rag_agent_graph
 from template_langgraph.agents.demo_agents.weather_agent import graph as weather_agent_graph
 from template_langgraph.loggers import get_logger
 
@@ -74,12 +74,12 @@ def multi_agent(
 
 
 @app.command()
-def parallel_processor_agent(
-    goal: str = typer.Option(
-        "ソフトウェアシステム開発会社を立ち上げる戦略を立てるための情報収集をしたい",
-        "--goal",
-        "-g",
-        help="The goal to decompose into tasks",
+def parallel_rag_agent(
+    query: str = typer.Option(
+        "KABUTO のシステム概要やトラブルシュート事例を多種多様な情報ソースから回答して",
+        "--query",
+        "-q",
+        help="The query to decompose into tasks",
     ),
     verbose: bool = typer.Option(
         False,
@@ -91,9 +91,9 @@ def parallel_processor_agent(
     if verbose:
         logger.setLevel(logging.DEBUG)
 
-    for event in parallel_processor_agent_graph.stream(
+    for event in parallel_rag_agent_graph.stream(
         input={
-            "goal": goal,
+            "query": query,
         },
         debug=True,
     ):

@@ -9,8 +9,8 @@ from pydantic import BaseModel, Field
 
 class Task(BaseModel):
     id: str = Field(description="タスクのID")
-    description: str = Field(description="タスクの説明")
-    state: str = Field(description="タスクの状態")
+    tool_name: str = Field(description="タスクのツール名")
+    tool_args: dict = Field(description="タスクのツール引数")
 
 
 class Tasks(BaseModel):
@@ -23,22 +23,22 @@ class TaskResult(TypedDict):
     message: str = Field(description="タスクの実行結果メッセージ")
 
 
-class ParallelProcessorAgentInputState(TypedDict):
-    goal: str
+class ParallelRagAgentInputState(TypedDict):
+    query: str
 
 
-class ParallelProcessorAgentProcessingState(TypedDict):
+class ParallelRagAgentProcessingState(TypedDict):
     tasks: Tasks
 
 
-class ParallelProcessorAgentOutputState(TypedDict):
+class ParallelRagAgentOutputState(TypedDict):
     task_results: Annotated[list[TaskResult], operator.add]
     summary: str
 
 
-class ParallelProcessorAgentState(
-    ParallelProcessorAgentInputState,
-    ParallelProcessorAgentProcessingState,
-    ParallelProcessorAgentOutputState,
+class ParallelRagAgentState(
+    ParallelRagAgentInputState,
+    ParallelRagAgentProcessingState,
+    ParallelRagAgentOutputState,
 ):
     pass

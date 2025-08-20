@@ -89,7 +89,7 @@ uv run python scripts/elasticsearch_operator.py create-index \
 # Azure AI Search
 make create-ai-search-index
 
-# Azure Cosmos DB  
+# Azure Cosmos DB
 make create-cosmosdb-index
 
 # またはオペレータースクリプトを直接使用:
@@ -129,7 +129,7 @@ make create-cosmosdb-index
 
 - `weather_agent.py` — シンプルなツール呼び出しエージェント。モック天気検索ツールを使った基本的な ReAct パターン。主要概念: ツール呼び出し、基本エージェントパターン。
 - `multi_agent.py` — マルチエージェント協調。転送機能を使ったエージェント間の引き渡しを実演。主要概念: エージェント協調、ワークフロー転送。
-- `parallel_processor_agent/` — 並列実行タスク分解。目標をタスクに分解し並列処理。主要概念: 並列処理、タスク分解、Send 操作。
+- `parallel_rag_agent/` — 並列実行タスク分解。目標をタスクに分解し並列処理。主要概念: 並列処理、タスク分解、Send 操作。
 
 ### サポートモジュール
 
@@ -287,11 +287,11 @@ uv run python scripts/demo_agents_operator.py multi-agent \
   --verbose
 ```
 
-- Parallel processor agent（タスク分解）:
+- Parallel rag agent（タスク分解）:
 
 ```shell
-uv run python scripts/demo_agents_operator.py parallel-processor-agent \
-  --goal "ソフトウェア会社立ち上げのための情報収集戦略を計画する" \
+uv run python scripts/demo_agents_operator.py parallel-rag-agent \
+  --query "ソフトウェア会社立ち上げのための情報収集戦略を計画する" \
   --verbose
 ```
 
@@ -377,7 +377,7 @@ make mcp-inspector
 ## 次のステップ
 
 1. **基本から始める**: `kabuto_helpdesk_agent`の例を実行
-2. **デモエージェントを試す**: `weather_agent`、`multi_agent`、`parallel_processor_agent`でシンプルなパターンを探索
+2. **デモエージェントを試す**: `weather_agent`、`multi_agent`、`parallel_rag_agent`でシンプルなパターンを探索
 3. **実装を理解する**: `chat_with_tools_agent`と比較
 4. **高度なパターンを探索**: タスク分解器とスーパーバイザーエージェントを試す
 5. **独自のものを構築**: このテンプレートをあなたのユースケースの出発点として使用
@@ -404,6 +404,6 @@ uv run python scripts/otel_operator.py run -q "health check" -v
 3. **構造化出力エージェント** - フォーマットされたデータの返却（`issue_formatter_agent`）
 4. **計画エージェント** - 複雑なタスクの分解（`task_decomposer_agent`）
 5. **マルチエージェントシステム** - 複数エージェントの協調（`supervisor_agent`、`multi_agent`）
-6. **並列処理** - 同時タスク実行（`parallel_processor_agent`）
+6. **並列処理** - 同時タスク実行（`parallel_rag_agent`）
 
 各パターンは、いつどのように使用するかを理解するのに役立つ明確な例と文書で実装されています。
