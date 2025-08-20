@@ -10,34 +10,33 @@ from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.tools.common import get_default_tools
 
 
-# 追加: 各エージェントのグラフ生成ファクトリと tool call 対応フラグ
 def _make_parallel_rag_graph(tools):
-    graph = ParallelRagAgent(
-        llm=AzureOpenAiWrapper().chat_model,
-        tools=tools,
-    ).create_graph()
+    def build_input(prompt):
+        return {
+            "query": prompt,
+        }
 
-    # 追加: このエージェント用の入力ビルダー
-    def build_input(prompt, callbacks):
-        return {"query": prompt, "callbacks": callbacks}
-
-    return {"graph": graph, "build_input": build_input}
+    return {
+        "graph": ParallelRagAgent(
+            llm=AzureOpenAiWrapper().chat_model,
+            tools=tools,
+        ).create_graph(),
+        "build_input": build_input,
+    }
 
 
 def _make_weather_graph(_tools=None):
-    # weather_agent_graph が CompiledStateGraph を指している前提
-    graph = weather_agent_graph
-
-    # 追加: このエージェント用の入力ビルダー（必要に応じてキー名を調整）
-    def build_input(prompt, callbacks):
+    def build_input(prompt):
         return {
             "messages": [
                 prompt,
             ],
-            "callbacks": callbacks,
         }
 
-    return {"graph": graph, "build_input": build_input}
+    return {
+        "graph": weather_agent_graph,
+        "build_input": build_input,
+    }
 
 
 agent_options = {
@@ -54,15 +53,12 @@ agent_options = {
 
 
 def create_graph() -> CompiledStateGraph:
-    # ...existing code...
     cfg = agent_options.get(selected_agent_key) or next(iter(agent_options.values()))
     supports_tools = cfg.get("supports_tools", True)
     factory = cfg["factory"]
     result = factory(selected_tools if supports_tools else None)
-    # 追加: 入力ビルダーを保存（無ければデフォルトにフォールバック）
-    st.session_state["input_builder"] = result.get("build_input") or (lambda p, cbs: {"query": p, "callbacks": cbs})
+    st.session_state["input_builder"] = result.get("build_input") or (lambda p: {"query": p})
     return result["graph"]
-    # ...existing code...
 
 
 # Sidebar: ツール選択とエージェントの構築
@@ -124,8 +120,11 @@ if prompt := st.chat_input():
     st.chat_message("user").write(prompt)
     with st.chat_message("assistant"):
         with st.spinner("処理中..."):
-            # 変更: エージェントごとの入力ビルダーを使用
+            # 変更: callbacks は config に渡す。input は入力のみ。
             callbacks = [StreamlitCallbackHandler(st.container())]
-            input_builder = st.session_state.get("input_builder") or (lambda p, cbs: {"query": p, "callbacks": cbs})
-            response = st.session_state["graph"].invoke(input=input_builder(prompt, callbacks))
+            input_builder = st.session_state.get("input_builder") or (lambda p: {"query": p})
+            response = st.session_state["graph"].invoke(
+                input=input_builder(prompt),
+                config={"callbacks": callbacks},
+            )
         st.write(response)
