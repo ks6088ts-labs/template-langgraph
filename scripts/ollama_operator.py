@@ -289,6 +289,49 @@ def ocr(
     )
 
 
+@app.command()
+def tool(
+    query: str = typer.Option(
+        "Please investigate troubleshooting cases for KABUTO.",
+        "--query",
+        "-q",
+        help="Query for chat",
+    ),
+    model: str = typer.Option(
+        "phi3:3.8b-mini-4k-instruct-q2_K",
+        "--model",
+        "-m",
+        help="Model to use for Ollama",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    set_verbose_logging(verbose)
+
+    from template_langgraph.tools.common import get_default_tools
+
+    chat_model = OllamaWrapper(
+        settings=Settings(
+            ollama_model_chat=model,
+        )
+    ).chat_model
+    response = chat_model.bind_tools(tools=get_default_tools()).invoke(
+        input=[
+            query,
+        ],
+    )
+    logger.info(
+        response.model_dump_json(
+            indent=2,
+            exclude_none=True,
+        )
+    )
+
+
 if __name__ == "__main__":
     load_dotenv(
         override=True,
