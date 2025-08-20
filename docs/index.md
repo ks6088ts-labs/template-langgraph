@@ -89,7 +89,7 @@ uv run python scripts/elasticsearch_operator.py create-index \
 # Azure AI Search
 make create-ai-search-index
 
-# Azure Cosmos DB  
+# Azure Cosmos DB
 make create-cosmosdb-index
 
 # Or use the operator scripts directly:
@@ -129,7 +129,7 @@ Additional simple agents for learning and demonstration:
 
 - `weather_agent.py` — Simple tool-calling agent. Basic ReAct pattern with mock weather search tool. Key: tool calling, basic agent pattern.
 - `multi_agent.py` — Multi-agent coordination. Demonstrates agent-to-agent handoff using transfer functions. Key: agent coordination, workflow transfer.
-- `parallel_processor_agent/` — Task decomposition with parallel execution. Breaks down goals into tasks and processes them in parallel. Key: parallel processing, task decomposition, Send operations.
+- `parallel_rag_agent/` — Task decomposition with parallel execution. Breaks down querys into tasks and processes them in parallel. Key: parallel processing, task decomposition, Send operations.
 
 ### Supporting Modules
 
@@ -287,11 +287,11 @@ uv run python scripts/demo_agents_operator.py multi-agent \
   --verbose
 ```
 
-- Parallel processor agent (task decomposition):
+- Parallel rag agent (task decomposition):
 
 ```shell
-uv run python scripts/demo_agents_operator.py parallel-processor-agent \
-  --goal "Plan information gathering strategy for launching a software company" \
+uv run python scripts/demo_agents_operator.py parallel-rag-agent \
+  --query "Plan information gathering strategy for launching a software company" \
   --verbose
 ```
 
@@ -379,7 +379,7 @@ make mcp-inspector
 ## Next Steps
 
 1. **Start with the basics**: Run the `kabuto_helpdesk_agent` example
-2. **Try demo agents**: Explore the simple patterns with `weather_agent`, `multi_agent`, and `parallel_processor_agent`
+2. **Try demo agents**: Explore the simple patterns with `weather_agent`, `multi_agent`, and `parallel_rag_agent`
 3. **Understand the implementation**: Compare it with `chat_with_tools_agent`
 4. **Explore advanced patterns**: Try the task decomposer and supervisor agents
 5. **Build your own**: Use this template as a starting point for your use case
@@ -406,6 +406,6 @@ This template demonstrates several proven agent architectures:
 3. **Structured Output Agent** - Returning formatted data (`issue_formatter_agent`)
 4. **Planning Agent** - Breaking down complex tasks (`task_decomposer_agent`)
 5. **Multi-Agent Systems** - Coordinating multiple agents (`supervisor_agent`, `multi_agent`)
-6. **Parallel Processing** - Concurrent task execution (`parallel_processor_agent`)
+6. **Parallel Processing** - Concurrent task execution (`parallel_rag_agent`)
 
 Each pattern is implemented with clear examples and documentation to help you understand when and how to use them.
