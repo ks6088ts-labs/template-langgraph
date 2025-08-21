@@ -20,9 +20,11 @@ class DecomposeTasks:
         self,
         llm: BaseChatModel,
         tools: list[BaseTool],
+        system_prompts_by_name: dict[str, str],
     ):
         self.llm = llm
         self.tools = tools
+        self.system_prompts_by_name = system_prompts_by_name
 
     def __call__(self, state: dict) -> Command[Literal["run_task"]]:
         query = state.get("query", "")
@@ -43,6 +45,7 @@ class DecomposeTasks:
                 id=tool_call["id"],
                 tool_name=tool_call["name"],
                 tool_args=args,
+                system_prompt=self.system_prompts_by_name.get(tool_call["name"], ""),
             )
             tasks_list.append(task)
             gotos.append(

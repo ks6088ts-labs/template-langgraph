@@ -11,6 +11,7 @@ class Task(BaseModel):
     id: str = Field(description="タスクのID")
     tool_name: str = Field(description="タスクのツール名")
     tool_args: dict = Field(description="タスクのツール引数")
+    system_prompt: str = Field(description="タスクのシステムプロンプト")
 
 
 class Tasks(BaseModel):

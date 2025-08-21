@@ -20,11 +20,13 @@ class ParallelRagAgent:
         self,
         llm: BaseChatModel,
         tools: list[BaseTool],
+        system_prompts_by_name: dict[str, str],
     ):
         self.llm = llm
         self.decompose_tasks = DecomposeTasks(
             llm=llm,
             tools=tools,
+            system_prompts_by_name=system_prompts_by_name,
         )
         self.run_task = RunTask(
             llm=llm,
@@ -48,7 +50,11 @@ class ParallelRagAgent:
         return workflow.compile()
 
 
+# FIXME: Update system prompts for each tool
+SYSTEM_PROMPT_BY_NAME = {tool.name: f"THIS IS DEFAULT SYSTEM PROMPT FOR {tool.name}" for tool in get_default_tools()}
+
 graph = ParallelRagAgent(
     llm=AzureOpenAiWrapper().chat_model,
     tools=get_default_tools(),
+    system_prompts_by_name=SYSTEM_PROMPT_BY_NAME,
 ).create_graph()

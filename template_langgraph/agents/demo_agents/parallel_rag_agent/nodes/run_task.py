@@ -1,7 +1,7 @@
 import json
 
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools.base import BaseTool
 
 from template_langgraph.agents.demo_agents.parallel_rag_agent.models import (
@@ -37,6 +37,7 @@ class RunTask:
 
         result = self.llm.invoke(
             input=[
+                SystemMessage(content=task.system_prompt),
                 HumanMessage(content=query),
                 HumanMessage(
                     content=json.dumps(observation.__str__(), ensure_ascii=False),
