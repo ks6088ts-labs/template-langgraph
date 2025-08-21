@@ -13,6 +13,8 @@
 - [Combine control flow and state updates with Command](https://langchain-ai.github.io/langgraph/how-tos/graph-api/#combine-control-flow-and-state-updates-with-command)
 - [Command: a new tool for building multi-agent architectures in LangGraph](https://www.youtube.com/watch?v=6BJDKf90L9A)
 - [masamasa59/genai-agent-advanced-book > chapter6](https://github.com/masamasa59/genai-agent-advanced-book/blob/main/chapter6/arxiv_researcher/agent/paper_search_agent.py)
+- [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents)
+- [Custom UI for Deep Agents](https://github.com/langchain-ai/deep-agents-ui)
 
 ### Sample Codes
 
