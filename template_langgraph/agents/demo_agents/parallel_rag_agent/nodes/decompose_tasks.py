@@ -57,6 +57,8 @@ class DecomposeTasks:
                     },
                 )
             )
+            # ADHOC: Only one task can be run at a time
+            break
 
         return Command(
             goto=gotos,
