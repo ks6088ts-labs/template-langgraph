@@ -1,11 +1,11 @@
-from typing import Annotated, Any, NotRequired
+from typing import Annotated, Any
 
 from langchain.chat_models import init_chat_model
 from langchain_core.messages import ToolMessage
 from langchain_core.tools import BaseTool, InjectedToolCallId, tool
 from langgraph.prebuilt import InjectedState, create_react_agent
 from langgraph.types import Command
-from typing_extensions import TypedDict
+from typing_extensions import NotRequired, TypedDict
 
 from template_langgraph.agents.demo_agents.deep_agent_core.prompts import (
     TASK_DESCRIPTION_PREFIX,

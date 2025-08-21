@@ -1,7 +1,7 @@
-from typing import Annotated, Literal, NotRequired
+from typing import Annotated, Literal
 
 from langgraph.prebuilt.chat_agent_executor import AgentState
-from typing_extensions import TypedDict
+from typing_extensions import NotRequired, TypedDict
 
 
 class Todo(TypedDict):

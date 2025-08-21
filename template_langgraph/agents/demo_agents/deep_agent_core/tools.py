@@ -105,22 +105,53 @@ def edit_file(
     mock_filesystem = state.get("files", {})
     # Check if file exists in mock filesystem
     if file_path not in mock_filesystem:
-        return f"Error: File '{file_path}' not found"
+        return Command(
+            update={
+                "messages": [ToolMessage(f"Error: File '{file_path}' not found", tool_call_id=tool_call_id)],
+            }
+        )
 
     # Get current file content
     content = mock_filesystem[file_path]
 
     # Check if old_string exists in the file
     if old_string not in content:
-        return f"Error: String not found in file: '{old_string}'"
+        return Command(
+            update={
+                "messages": [
+                    ToolMessage(
+                        f"Error: String not found in file: '{old_string}'",
+                        tool_call_id=tool_call_id,
+                    )
+                ],
+            }
+        )
 
     # If not replace_all, check for uniqueness
     if not replace_all:
         occurrences = content.count(old_string)
         if occurrences > 1:
-            return f"Error: String '{old_string}' appears {occurrences} times in file. Use replace_all=True to replace all instances, or provide a more specific string with surrounding context."
+            return Command(
+                update={
+                    "messages": [
+                        ToolMessage(
+                            f"Error: String '{old_string}' appears {occurrences} times in file. Use replace_all=True to replace all instances, or provide a more specific string with surrounding context.",
+                            tool_call_id=tool_call_id,
+                        )
+                    ]
+                }
+            )
         elif occurrences == 0:
-            return f"Error: String not found in file: '{old_string}'"
+            return Command(
+                update={
+                    "messages": [
+                        ToolMessage(
+                            f"Error: String not found in file: '{old_string}'",
+                            tool_call_id=tool_call_id,
+                        )
+                    ],
+                }
+            )
 
     # Perform the replacement
     if replace_all:
