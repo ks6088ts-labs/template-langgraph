@@ -1,14 +1,22 @@
+# ruff: noqa: E501
 from collections.abc import Callable, Sequence
 from typing import Any, TypeVar
 
-from deepagents.model import get_default_model
-from deepagents.state import DeepAgentState
-from deepagents.sub_agent import SubAgent, _create_task_tool
-from deepagents.tools import edit_file, ls, read_file, write_file, write_todos
 from langchain_core.language_models import LanguageModelLike
 from langchain_core.tools import BaseTool
 from langgraph.prebuilt import create_react_agent
 from langgraph.types import Checkpointer
+
+from template_langgraph.agents.demo_agents.deep_agent_core.state import DeepAgentState
+from template_langgraph.agents.demo_agents.deep_agent_core.sub_agent import SubAgent, _create_task_tool
+from template_langgraph.agents.demo_agents.deep_agent_core.tools import (
+    edit_file,
+    ls,
+    read_file,
+    write_file,
+    write_todos,
+)
+from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 
 StateSchema = TypeVar("StateSchema", bound=DeepAgentState)
 StateSchemaType = type[StateSchema]
@@ -51,14 +59,14 @@ def create_deep_agent(
                 - `description` (used by the main agent to decide whether to call the sub agent)
                 - `prompt` (used as the system prompt in the subagent)
                 - (optional) `tools`
-        state_schema: The schema of the deep agent. Should subclass from DeepAgentState
+        state_schema: The schema of the deep agent. Should subclass from template_langgraph.agents.demo_agents.deep_agent_coretate
         config_schema: The schema of the deep agent.
         checkpointer: Optional checkpointer for persisting agent state between runs.
     """
     prompt = instructions + base_prompt
     built_in_tools = [write_todos, write_file, read_file, ls, edit_file]
     if model is None:
-        model = get_default_model()
+        model = AzureOpenAiWrapper().chat_model
     state_schema = state_schema or DeepAgentState
     task_tool = _create_task_tool(list(tools) + built_in_tools, instructions, subagents or [], model, state_schema)
     all_tools = built_in_tools + list(tools) + [task_tool]

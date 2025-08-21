@@ -1,4 +1,4 @@
-from deepagents.graph import create_deep_agent
-from deepagents.model import get_default_model
-from deepagents.state import DeepAgentState
-from deepagents.sub_agent import SubAgent
+# ruff: noqa
+from template_langgraph.agents.demo_agents.deep_agent_core.graph import create_deep_agent
+from template_langgraph.agents.demo_agents.deep_agent_core.state import DeepAgentState
+from template_langgraph.agents.demo_agents.deep_agent_core.sub_agent import SubAgent

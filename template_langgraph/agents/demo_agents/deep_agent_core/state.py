@@ -11,7 +11,7 @@ class Todo(TypedDict):
     status: Literal["pending", "in_progress", "completed"]
 
 
-def file_reducer(l, r):
+def file_reducer(l, r):  # noqa
     if l is None:
         return r
     elif r is None:

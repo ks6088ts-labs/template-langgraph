@@ -1,15 +1,17 @@
+# ruff: noqa: E501
 from typing import Annotated
 
-from deepagents.prompts import (
-    EDIT_DESCRIPTION,
-    TOOL_DESCRIPTION,
-    WRITE_TODOS_DESCRIPTION,
-)
-from deepagents.state import DeepAgentState, Todo
 from langchain_core.messages import ToolMessage
 from langchain_core.tools import InjectedToolCallId, tool
 from langgraph.prebuilt import InjectedState
 from langgraph.types import Command
+
+from template_langgraph.agents.demo_agents.deep_agent_core.prompts import (
+    EDIT_DESCRIPTION,
+    TOOL_DESCRIPTION,
+    WRITE_TODOS_DESCRIPTION,
+)
+from template_langgraph.agents.demo_agents.deep_agent_core.state import DeepAgentState, Todo
 
 
 @tool(description=WRITE_TODOS_DESCRIPTION)

@@ -1,29 +1,6 @@
-import os
-from typing import Literal
-
-from deepagents import create_deep_agent
-from tavily import TavilyClient
-
-# It's best practice to initialize the client once and reuse it.
-tavily_client = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
-
-
-# Search tool to use to do research
-def internet_search(
-    query: str,
-    max_results: int = 5,
-    topic: Literal["general", "news", "finance"] = "general",
-    include_raw_content: bool = False,
-):
-    """Run a web search"""
-    search_docs = tavily_client.search(
-        query,
-        max_results=max_results,
-        include_raw_content=include_raw_content,
-        topic=topic,
-    )
-    return search_docs
-
+# ruff: noqa: E501
+from template_langgraph.agents.demo_agents.deep_agent_core import create_deep_agent
+from template_langgraph.tools.common import get_default_tools
 
 sub_research_prompt = """You are a dedicated researcher. Your job is to conduct research based on the users questions.
 
@@ -35,7 +12,6 @@ research_sub_agent = {
     "name": "research-agent",
     "description": "Used to research more in depth questions. Only give this researcher one topic at a time. Do not pass multiple sub questions to this researcher. Instead, you should break down a large topic into the necessary components, and then call multiple research agents in parallel, one for each sub question.",
     "prompt": sub_research_prompt,
-    "tools": ["internet_search"],
 }
 
 sub_critique_prompt = """You are a dedicated editor. You are being tasked to critique a report.
@@ -152,14 +128,14 @@ Format the report in clear markdown with proper structure and include source ref
 
 You have access to a few tools.
 
-## `internet_search`
+## `search_ai_search`
 
-Use this to run an internet search for a given query. You can specify the number of results, the topic, and whether raw content should be included.
+Use this to run an Azure AI Search for getting KABUTO related information. You can specify the number of results, the topic, and whether raw content should be included.
 """
 
 # Create the agent
-agent = create_deep_agent(
-    [internet_search],
-    research_instructions,
+graph = create_deep_agent(
+    tools=get_default_tools(),
+    instructions=research_instructions,
     subagents=[critique_sub_agent, research_sub_agent],
 ).with_config({"recursion_limit": 1000})

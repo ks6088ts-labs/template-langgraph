@@ -4,6 +4,7 @@
     "chat_with_tools_agent": "template_langgraph.agents.chat_with_tools_agent.agent:graph",
     "demo_agents_parallel_rag_agent": "template_langgraph.agents.demo_agents.parallel_rag_agent.agent:graph",
     "demo_agents_multi_agent": "template_langgraph.agents.demo_agents.multi_agent:graph",
+    "demo_agents_research_deep_agent": "template_langgraph.agents.demo_agents.research_deep_agent:graph",
     "demo_agents_weather_agent": "template_langgraph.agents.demo_agents.weather_agent:graph",
     "image_classifier_agent": "template_langgraph.agents.image_classifier_agent.agent:graph",
     "issue_formatter_agent": "template_langgraph.agents.issue_formatter_agent.agent:graph",
