@@ -215,3 +215,9 @@ run-task-decomposer-agent: ## run task decomposer agent
 		--name task_decomposer_agent \
 		--question "KABUTOにログインできない。パスワードは合ってるはずなのに…若手社員である山田太郎は、Windows 11 を立ち上げ、日課のように自社の業務システムKABUTOのログイン画面を開きます。しかし、そこには、意味をなさない「虚無」という文字だけがただひっそりと表示されていたのです。これは質問でもあり不具合の報告でもあります。岡本太郎さんに本件調査依頼します。" \
 		--verbose
+
+.PHONY: n8n
+n8n: ## run n8n
+	docker compose \
+		--env-file n8n.env \
+		--file n8n.docker-compose.yml up
