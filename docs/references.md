@@ -49,3 +49,4 @@
   - [OpenTelemetry Collector](https://opentelemetry.io//docs/collector/)
 - [Jaeger](https://www.jaegertracing.io/)
   - [Jaeger / Minimal deployment example (Elasticsearch backend)](https://www.jaegertracing.io/docs/1.72/deployment/#minimal-deployment-example-elasticsearch-backend)
+- [OpenTelemetry Collector / Quick Start](https://opentelemetry.io/docs/collector/quick-start/)
