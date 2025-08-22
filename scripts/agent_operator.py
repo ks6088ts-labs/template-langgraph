@@ -136,6 +136,12 @@ def news_summarizer_agent(
         "-u",
         help="Comma-separated list of URLs to summarize",
     ),
+    output_file: str = typer.Option(
+        "output.md",
+        "--output-file",
+        "-o",
+        help="Path to the output Markdown file",
+    ),
     verbose: bool = typer.Option(
         False,
         "--verbose",
@@ -161,9 +167,12 @@ def news_summarizer_agent(
         logger.info("-" * 20)
         logger.info(f"Event: {event}")
 
-    articles: list[Article] = event["notify"]["articles"]
-    for article in articles:
-        logger.info(f"{article.structured_article.model_dump_json(indent=2)}")
+    with open(output_file, "w", encoding="utf-8") as f:
+        articles: list[Article] = event["notify"]["articles"]
+        for article in articles:
+            logger.info(f"{article.model_dump_json(indent=2)}")
+            f.write(f"{article.model_dump_json(indent=2)}\n")
+            f.write("\n---\n\n")
 
 
 @app.command()
