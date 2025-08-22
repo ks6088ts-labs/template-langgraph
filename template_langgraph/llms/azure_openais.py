@@ -1,3 +1,4 @@
+import threading
 from functools import lru_cache
 
 from azure.identity import DefaultAzureCredential
@@ -31,57 +32,111 @@ def get_azure_openai_settings() -> Settings:
 
 
 class AzureOpenAiWrapper:
+    # Class-level variables for singleton-like behavior
+    _credentials: dict = {}
+    _tokens: dict = {}
+    _token_lock = threading.Lock()
+
     def __init__(self, settings: Settings = None):
         if settings is None:
             settings = get_azure_openai_settings()
 
-        if settings.azure_openai_use_microsoft_entra_id.lower() == "true":
-            logger.info("Using Microsoft Entra ID for authentication")
-            credential = DefaultAzureCredential()
-            token = credential.get_token("https://cognitiveservices.azure.com/.default").token
+        self.settings = settings
+        self._chat_model: AzureChatOpenAI | None = None
+        self._reasoning_model: AzureChatOpenAI | None = None
+        self._embedding_model: AzureOpenAIEmbeddings | None = None
 
-            self.chat_model = AzureChatOpenAI(
-                azure_ad_token=token,
-                azure_endpoint=settings.azure_openai_endpoint,
-                api_version=settings.azure_openai_api_version,
-                azure_deployment=settings.azure_openai_model_chat,
-                streaming=True,
-            )
-            self.reasoning_model = AzureChatOpenAI(
-                azure_ad_token=token,
-                azure_endpoint=settings.azure_openai_endpoint,
-                api_version=settings.azure_openai_api_version,
-                azure_deployment=settings.azure_openai_model_reasoning,
-                streaming=True,
-            )
-            self.embedding_model = AzureOpenAIEmbeddings(
-                azure_ad_token=token,
-                azure_endpoint=settings.azure_openai_endpoint,
-                api_version=settings.azure_openai_api_version,
-                azure_deployment=settings.azure_openai_model_embedding,
-            )
-        else:
-            logger.info("Using API key for authentication")
-            self.chat_model = AzureChatOpenAI(
-                api_key=settings.azure_openai_api_key,
-                azure_endpoint=settings.azure_openai_endpoint,
-                api_version=settings.azure_openai_api_version,
-                azure_deployment=settings.azure_openai_model_chat,
-                streaming=True,
-            )
-            self.reasoning_model = AzureChatOpenAI(
-                api_key=settings.azure_openai_api_key,
-                azure_endpoint=settings.azure_openai_endpoint,
-                api_version=settings.azure_openai_api_version,
-                azure_deployment=settings.azure_openai_model_reasoning,
-                streaming=True,
-            )
-            self.embedding_model = AzureOpenAIEmbeddings(
-                api_key=settings.azure_openai_api_key,
-                azure_endpoint=settings.azure_openai_endpoint,
-                api_version=settings.azure_openai_api_version,
-                azure_deployment=settings.azure_openai_model_embedding,
-            )
+    def _get_auth_key(self) -> str:
+        """Generate a key for authentication caching based on settings."""
+        return f"{self.settings.azure_openai_endpoint}_{self.settings.azure_openai_use_microsoft_entra_id}"
+
+    def _get_auth_token(self) -> str | None:
+        """Get authentication token with lazy initialization and caching."""
+        if self.settings.azure_openai_use_microsoft_entra_id.lower() != "true":
+            return None
+
+        auth_key = self._get_auth_key()
+
+        with self._token_lock:
+            if auth_key not in self._credentials:
+                logger.info("Initializing Microsoft Entra ID authentication")
+                self._credentials[auth_key] = DefaultAzureCredential()
+
+            if auth_key not in self._tokens:
+                logger.info("Getting authentication token")
+                self._tokens[auth_key] = (
+                    self._credentials[auth_key].get_token("https://cognitiveservices.azure.com/.default").token
+                )
+
+            return self._tokens[auth_key]
+
+    @property
+    def chat_model(self) -> AzureChatOpenAI:
+        """Lazily initialize and return chat model."""
+        if self._chat_model is None:
+            if self.settings.azure_openai_use_microsoft_entra_id.lower() == "true":
+                token = self._get_auth_token()
+                self._chat_model = AzureChatOpenAI(
+                    azure_ad_token=token,
+                    azure_endpoint=self.settings.azure_openai_endpoint,
+                    api_version=self.settings.azure_openai_api_version,
+                    azure_deployment=self.settings.azure_openai_model_chat,
+                    streaming=True,
+                )
+            else:
+                logger.info("Using API key for authentication")
+                self._chat_model = AzureChatOpenAI(
+                    api_key=self.settings.azure_openai_api_key,
+                    azure_endpoint=self.settings.azure_openai_endpoint,
+                    api_version=self.settings.azure_openai_api_version,
+                    azure_deployment=self.settings.azure_openai_model_chat,
+                    streaming=True,
+                )
+        return self._chat_model
+
+    @property
+    def reasoning_model(self) -> AzureChatOpenAI:
+        """Lazily initialize and return reasoning model."""
+        if self._reasoning_model is None:
+            if self.settings.azure_openai_use_microsoft_entra_id.lower() == "true":
+                token = self._get_auth_token()
+                self._reasoning_model = AzureChatOpenAI(
+                    azure_ad_token=token,
+                    azure_endpoint=self.settings.azure_openai_endpoint,
+                    api_version=self.settings.azure_openai_api_version,
+                    azure_deployment=self.settings.azure_openai_model_reasoning,
+                    streaming=True,
+                )
+            else:
+                self._reasoning_model = AzureChatOpenAI(
+                    api_key=self.settings.azure_openai_api_key,
+                    azure_endpoint=self.settings.azure_openai_endpoint,
+                    api_version=self.settings.azure_openai_api_version,
+                    azure_deployment=self.settings.azure_openai_model_reasoning,
+                    streaming=True,
+                )
+        return self._reasoning_model
+
+    @property
+    def embedding_model(self) -> AzureOpenAIEmbeddings:
+        """Lazily initialize and return embedding model."""
+        if self._embedding_model is None:
+            if self.settings.azure_openai_use_microsoft_entra_id.lower() == "true":
+                token = self._get_auth_token()
+                self._embedding_model = AzureOpenAIEmbeddings(
+                    azure_ad_token=token,
+                    azure_endpoint=self.settings.azure_openai_endpoint,
+                    api_version=self.settings.azure_openai_api_version,
+                    azure_deployment=self.settings.azure_openai_model_embedding,
+                )
+            else:
+                self._embedding_model = AzureOpenAIEmbeddings(
+                    api_key=self.settings.azure_openai_api_key,
+                    azure_endpoint=self.settings.azure_openai_endpoint,
+                    api_version=self.settings.azure_openai_api_version,
+                    azure_deployment=self.settings.azure_openai_model_embedding,
+                )
+        return self._embedding_model
 
     def create_embedding(self, text: str):
         """Create an embedding for the given text."""
