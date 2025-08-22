@@ -1,6 +1,5 @@
-from functools import lru_cache
 import threading
-from typing import Optional
+from functools import lru_cache
 
 from azure.identity import DefaultAzureCredential
 from langchain_openai import AzureChatOpenAI, AzureOpenAIEmbeddings
@@ -37,38 +36,40 @@ class AzureOpenAiWrapper:
     _credentials: dict = {}
     _tokens: dict = {}
     _token_lock = threading.Lock()
-    
+
     def __init__(self, settings: Settings = None):
         if settings is None:
             settings = get_azure_openai_settings()
-        
+
         self.settings = settings
-        self._chat_model: Optional[AzureChatOpenAI] = None
-        self._reasoning_model: Optional[AzureChatOpenAI] = None
-        self._embedding_model: Optional[AzureOpenAIEmbeddings] = None
+        self._chat_model: AzureChatOpenAI | None = None
+        self._reasoning_model: AzureChatOpenAI | None = None
+        self._embedding_model: AzureOpenAIEmbeddings | None = None
 
     def _get_auth_key(self) -> str:
         """Generate a key for authentication caching based on settings."""
         return f"{self.settings.azure_openai_endpoint}_{self.settings.azure_openai_use_microsoft_entra_id}"
 
-    def _get_auth_token(self) -> Optional[str]:
+    def _get_auth_token(self) -> str | None:
         """Get authentication token with lazy initialization and caching."""
         if self.settings.azure_openai_use_microsoft_entra_id.lower() != "true":
             return None
-            
+
         auth_key = self._get_auth_key()
-        
+
         with self._token_lock:
             if auth_key not in self._credentials:
                 logger.info("Initializing Microsoft Entra ID authentication")
                 self._credentials[auth_key] = DefaultAzureCredential()
-            
+
             if auth_key not in self._tokens:
                 logger.info("Getting authentication token")
-                self._tokens[auth_key] = self._credentials[auth_key].get_token("https://cognitiveservices.azure.com/.default").token
-            
+                self._tokens[auth_key] = (
+                    self._credentials[auth_key].get_token("https://cognitiveservices.azure.com/.default").token
+                )
+
             return self._tokens[auth_key]
-    
+
     @property
     def chat_model(self) -> AzureChatOpenAI:
         """Lazily initialize and return chat model."""
@@ -92,7 +93,7 @@ class AzureOpenAiWrapper:
                     streaming=True,
                 )
         return self._chat_model
-    
+
     @property
     def reasoning_model(self) -> AzureChatOpenAI:
         """Lazily initialize and return reasoning model."""
@@ -115,7 +116,7 @@ class AzureOpenAiWrapper:
                     streaming=True,
                 )
         return self._reasoning_model
-    
+
     @property
     def embedding_model(self) -> AzureOpenAIEmbeddings:
         """Lazily initialize and return embedding model."""

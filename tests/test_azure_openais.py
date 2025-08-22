@@ -1,8 +1,6 @@
 import logging
 import threading
-import time
 from unittest.mock import Mock, patch
-import pytest
 
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper, Settings
 
@@ -26,8 +24,7 @@ class TestAzureOpenAiWrapper:
         with caplog.at_level(logging.INFO):
             # Creating instances should not trigger authentication
             wrapper1 = AzureOpenAiWrapper(settings)
-            wrapper2 = AzureOpenAiWrapper(settings)
-            
+
             # No authentication logs yet
             assert "Using API key for authentication" not in caplog.text
 
@@ -49,7 +46,7 @@ class TestAzureOpenAiWrapper:
             # Should still be only one authentication log per model type
             assert caplog.text.count("Using API key for authentication") >= 1
 
-    @patch('template_langgraph.llms.azure_openais.DefaultAzureCredential')
+    @patch("template_langgraph.llms.azure_openais.DefaultAzureCredential")
     def test_singleton_credential_entra_id(self, mock_credential_class, caplog):
         """Test that Microsoft Entra ID credentials are reused across instances."""
         # Mock the credential and token
@@ -85,7 +82,7 @@ class TestAzureOpenAiWrapper:
             assert caplog.text.count("Initializing Microsoft Entra ID authentication") == 1
             assert caplog.text.count("Getting authentication token") == 1
 
-    @patch('template_langgraph.llms.azure_openais.DefaultAzureCredential')
+    @patch("template_langgraph.llms.azure_openais.DefaultAzureCredential")
     def test_thread_safety(self, mock_credential_class):
         """Test that authentication is thread-safe."""
         mock_credential = Mock()
@@ -174,10 +171,10 @@ class TestAzureOpenAiWrapper:
             pass  # Expected due to dummy credentials
 
         # Verify the method exists and is callable
-        assert hasattr(wrapper, 'create_embedding')
-        assert callable(getattr(wrapper, 'create_embedding'))
+        assert hasattr(wrapper, "create_embedding")
+        assert callable(getattr(wrapper, "create_embedding"))
 
-    @patch('template_langgraph.llms.azure_openais.DefaultAzureCredential')
+    @patch("template_langgraph.llms.azure_openais.DefaultAzureCredential")
     def test_mixed_authentication_methods(self, mock_credential_class, caplog):
         """Test using both authentication methods in different instances."""
         mock_credential = Mock()
