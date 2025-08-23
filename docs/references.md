@@ -15,6 +15,7 @@
 - [masamasa59/genai-agent-advanced-book > chapter6](https://github.com/masamasa59/genai-agent-advanced-book/blob/main/chapter6/arxiv_researcher/agent/paper_search_agent.py)
 - [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents)
 - [Custom UI for Deep Agents](https://github.com/langchain-ai/deep-agents-ui)
+- [How to deploy self-hosted standalone server](https://docs.langchain.com/langgraph-platform/deploy-standalone-server)
 
 ### Sample Codes
 
