@@ -45,24 +45,25 @@ processors:
 exporters:
   debug:
     verbosity: detailed
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+  prometheusremotewrite:
+    endpoint: prometheus:8889
 
 service:
-
   pipelines:
-
     traces:
       receivers: [otlp, jaeger, zipkin]
       processors: [batch]
-      exporters: [debug]
-
+      exporters: [debug, otlp/jaeger]
     metrics:
       receivers: [otlp, prometheus]
       processors: [batch]
-      exporters: [debug]
-
+      exporters: [debug, prometheusremotewrite]
     logs:
       receivers: [otlp]
       processors: [batch]
       exporters: [debug]
-
   extensions: [health_check, pprof, zpages]

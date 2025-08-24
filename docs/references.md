@@ -47,10 +47,13 @@
 - [OpenTelemetry](https://opentelemetry.io/)
   - [Python / Getting Started](https://opentelemetry.io/docs/languages/python/getting-started/)
   - [Python / Cookbook](https://opentelemetry.io/docs/languages/python/cookbook/)
-  - [OpenTelemetry Collector](https://opentelemetry.io//docs/collector/)
+- [OpenTelemetry Collector](https://opentelemetry.io//docs/collector/)
+  - [OpenTelemetry Collector / Quick Start](https://opentelemetry.io/docs/collector/quick-start/)
+  - [zPages / Exposed zPages routes](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.132.0/extension/zpagesextension/README.md#exposed-zpages-routes)
 - [Jaeger](https://www.jaegertracing.io/)
   - [Jaeger / Minimal deployment example (Elasticsearch backend)](https://www.jaegertracing.io/docs/1.72/deployment/#minimal-deployment-example-elasticsearch-backend)
-- [OpenTelemetry Collector / Quick Start](https://opentelemetry.io/docs/collector/quick-start/)
+- [Prometheus](https://prometheus.io/)
+  - [Prometheus / Getting Started](https://prometheus.io/docs/prometheus/latest/getting_started/)
 
 ### n8n
 
