@@ -166,3 +166,4 @@ assets/
 .langgraph_api
 generated/
 *.db
+*.wav

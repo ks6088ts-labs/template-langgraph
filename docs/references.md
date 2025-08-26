@@ -58,3 +58,10 @@
 ### n8n
 
 - [Hosting n8n / Installation / Server setups / Docker-Compose](https://docs.n8n.io/hosting/installation/server-setups/docker-compose/)
+
+### Audio
+
+- [Python の sounddevice を改めて試す](https://zenn.dev/kun432/scraps/f56760d41fc5aa)
+- [How To Install libportaudio2 on Ubuntu 22.04](https://www.installati.one/install-libportaudio2-ubuntu-22-04/): `sudo apt-get -y install libportaudio2`
+- [python-sounddevice](https://github.com/spatialaudio/python-sounddevice)
+- [python-soundfile](https://github.com/bastibe/python-soundfile)
