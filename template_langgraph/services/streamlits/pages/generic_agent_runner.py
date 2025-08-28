@@ -13,7 +13,7 @@ from template_langgraph.tools.common import get_default_tools
 def _make_parallel_rag_graph(tools):
     def build_input(prompt):
         return {
-            "query": prompt,
+            "messages": [{"role": "user", "content": prompt}],
         }
 
     return {

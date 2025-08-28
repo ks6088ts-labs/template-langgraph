@@ -93,7 +93,7 @@ def parallel_rag_agent(
 
     for event in parallel_rag_agent_graph.stream(
         input={
-            "query": query,
+            "messages": [{"role": "user", "content": query}],
         },
         debug=True,
     ):

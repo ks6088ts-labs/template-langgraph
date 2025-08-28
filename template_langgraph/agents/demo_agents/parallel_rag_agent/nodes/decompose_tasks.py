@@ -25,8 +25,15 @@ class DecomposeTasks:
         self.tools = tools
 
     def __call__(self, state: dict) -> Command[Literal["run_task"]]:
-        query = state.get("query", "")
-        response: AIMessage = self.llm.bind_tools(tools=self.tools).invoke(query)
+        messages = state.get("messages", [])
+        if not messages:
+            raise ValueError("No messages found in state")
+        
+        # Get the latest user message to use as query
+        latest_message = messages[-1]
+        query = latest_message.content if hasattr(latest_message, 'content') else str(latest_message)
+        
+        response: AIMessage = self.llm.bind_tools(tools=self.tools).invoke(messages)
 
         logger.info(f"{response}, {type(response)}")
         gotos = []
@@ -50,6 +57,7 @@ class DecomposeTasks:
                     "run_task",
                     {
                         "task": task,
+                        "messages": messages,
                         "query": query,
                     },
                 )
@@ -57,5 +65,8 @@ class DecomposeTasks:
 
         return Command(
             goto=gotos,
-            update={"tasks": Tasks(tasks=tasks_list)},
+            update={
+                "tasks": Tasks(tasks=tasks_list),
+                "messages": [response],
+            },
         )

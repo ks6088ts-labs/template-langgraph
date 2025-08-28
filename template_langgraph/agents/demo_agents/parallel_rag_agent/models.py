@@ -1,9 +1,12 @@
 import operator
+from collections.abc import Sequence
 from typing import (
     Annotated,
     TypedDict,
 )
 
+from langchain_core.messages import BaseMessage
+from langgraph.graph.message import add_messages
 from pydantic import BaseModel, Field
 
 
@@ -24,7 +27,7 @@ class TaskResult(TypedDict):
 
 
 class ParallelRagAgentInputState(TypedDict):
-    query: str
+    messages: Annotated[Sequence[BaseMessage], add_messages]
 
 
 class ParallelRagAgentProcessingState(TypedDict):
@@ -34,6 +37,7 @@ class ParallelRagAgentProcessingState(TypedDict):
 class ParallelRagAgentOutputState(TypedDict):
     task_results: Annotated[list[TaskResult], operator.add]
     summary: str
+    messages: Annotated[Sequence[BaseMessage], add_messages]
 
 
 class ParallelRagAgentState(

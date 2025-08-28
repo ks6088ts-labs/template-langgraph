@@ -1,7 +1,7 @@
 import json
 
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools.base import BaseTool
 
 from template_langgraph.agents.demo_agents.parallel_rag_agent.models import (
@@ -27,6 +27,7 @@ class RunTask:
         logger.info(f"Running state... {state}")
         task: Task = state.get("task", None)
         query: str = state.get("query", None)
+        messages = state.get("messages", [])
         logger.info(f"Task: {task.model_dump_json(indent=2)}")
 
         try:
@@ -35,14 +36,26 @@ class RunTask:
             logger.error(f"Error occurred while invoking tools: {e}")
             observation = {"error": str(e)}
 
-        result = self.llm.invoke(
-            input=[
-                HumanMessage(content=query),
-                HumanMessage(
-                    content=json.dumps(observation.__str__(), ensure_ascii=False),
-                ),
-            ],
+        # Build context for LLM using conversation history
+        context_messages = messages.copy() if messages else []
+        
+        # Add system message to explain the context
+        system_message = SystemMessage(
+            content=f"You are processing a task as part of a conversation. "
+            f"Task: {task.tool_name} with arguments {task.tool_args}. "
+            f"Based on the conversation history and the following observation from the tool, "
+            f"provide a helpful response that answers the user's question."
         )
+        context_messages.insert(0, system_message)
+        
+        # Add the tool observation
+        context_messages.append(
+            HumanMessage(
+                content=f"Tool observation: {json.dumps(observation.__str__(), ensure_ascii=False)}"
+            )
+        )
+
+        result = self.llm.invoke(input=context_messages)
 
         logger.info(f"LLM response: {result.model_dump_json(indent=2)}, type: {type(result)}")
 
