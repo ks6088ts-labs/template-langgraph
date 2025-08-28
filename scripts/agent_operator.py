@@ -3,6 +3,7 @@ from uuid import uuid4
 
 import typer
 from dotenv import load_dotenv
+from langchain_core.runnables.config import RunnableConfig
 
 from template_langgraph.agents.chat_with_tools_agent.agent import graph as chat_with_tools_agent_graph
 from template_langgraph.agents.image_classifier_agent.agent import graph as image_classifier_agent_graph
@@ -92,6 +93,12 @@ def run(
         "-q",
         help="Question to ask the agent",
     ),
+    recursion_limit: int = typer.Option(
+        10,
+        "--recursion-limit",
+        "-r",
+        help="Recursion limit for the agent",
+    ),
     verbose: bool = typer.Option(
         False,
         "--verbose",
@@ -116,7 +123,10 @@ def run(
                     "content": question,
                 }
             ],
-        }
+        },
+        config=RunnableConfig(
+            recursion_limit=recursion_limit,
+        ),
     ):
         logger.info("-" * 20)
         logger.info(f"Event: {event}")
@@ -142,6 +152,12 @@ def news_summarizer_agent(
         "-o",
         help="Path to the output Markdown file",
     ),
+    recursion_limit: int = typer.Option(
+        10,
+        "--recursion-limit",
+        "-r",
+        help="Recursion limit for the agent",
+    ),
     verbose: bool = typer.Option(
         False,
         "--verbose",
@@ -162,7 +178,10 @@ def news_summarizer_agent(
                 urls=urls.split(",") if urls else [],
             ),
             articles=[],
-        )
+        ),
+        config=RunnableConfig(
+            recursion_limit=recursion_limit,
+        ),
     ):
         logger.info("-" * 20)
         logger.info(f"Event: {event}")
@@ -189,6 +208,12 @@ def image_classifier_agent(
         "-f",
         help="Comma-separated list of file paths to classify",
     ),
+    recursion_limit: int = typer.Option(
+        10,
+        "--recursion-limit",
+        "-r",
+        help="Recursion limit for the agent",
+    ),
     verbose: bool = typer.Option(
         False,
         "--verbose",
@@ -214,7 +239,10 @@ def image_classifier_agent(
                 file_paths=file_paths.split(",") if file_paths else [],
             ),
             results=[],
-        )
+        ),
+        config=RunnableConfig(
+            recursion_limit=recursion_limit,
+        ),
     ):
         logger.info("-" * 20)
         logger.info(f"Event: {event}")
