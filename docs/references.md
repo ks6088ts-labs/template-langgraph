@@ -65,3 +65,11 @@
 - [How To Install libportaudio2 on Ubuntu 22.04](https://www.installati.one/install-libportaudio2-ubuntu-22-04/): `sudo apt-get -y install libportaudio2`
 - [python-sounddevice](https://github.com/spatialaudio/python-sounddevice)
 - [python-soundfile](https://github.com/bastibe/python-soundfile)
+
+### Realtime API
+
+- [August 2025 / Realtime API audio model GA](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/whats-new#realtime-api-audio-model-ga)
+- [Global Standard model availability](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/models?tabs=global-standard%2Cstandard-chat-completions#global-standard-model-availability)
+- [specification/cognitiveservices/data-plane/AzureOpenAI/inference/preview/2025-04-01-preview/inference.json](https://github.com/Azure/azure-rest-api-specs/blob/main/specification/cognitiveservices/data-plane/AzureOpenAI/inference/preview/2025-04-01-preview/inference.json)
+- [Realtime API with WebSocket](https://platform.openai.com/docs/guides/realtime-websocket)
+- [GPT-4o Realtime API for speech and audio](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/realtime-audio-quickstart?tabs=keyless%2Clinux&pivots=programming-language-python)
