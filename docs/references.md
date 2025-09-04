@@ -74,3 +74,4 @@
 - [Realtime API with WebSocket](https://platform.openai.com/docs/guides/realtime-websocket)
 - [GPT-4o Realtime API for speech and audio](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/realtime-audio-quickstart?tabs=keyless%2Clinux&pivots=programming-language-python)
 - [OpenAI Python API library > examples/realtime](https://github.com/openai/openai-python/tree/main/examples/realtime)
+- [How to use the GPT-4o Realtime API via WebRTC](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio-webrtc)

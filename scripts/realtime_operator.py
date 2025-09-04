@@ -1,6 +1,15 @@
 import asyncio
+import http.server
+import json
 import logging
+import os
+import socketserver
+import tempfile
+import webbrowser
+from pathlib import Path
 
+# New imports for template rendering and serving
+import jinja2
 import typer
 from azure.identity.aio import DefaultAzureCredential, get_bearer_token_provider
 from dotenv import load_dotenv
@@ -19,7 +28,7 @@ app = typer.Typer(
 logger = get_logger(__name__)
 
 
-async def main() -> None:
+async def chat_impl() -> None:
     """
     When prompted for user input, type a message and hit enter to send it to the model.
     Enter "q" to quit the conversation.
@@ -77,7 +86,7 @@ async def main() -> None:
 
 
 @app.command()
-def run(
+def chat(
     verbose: bool = typer.Option(
         False,
         "--verbose",
@@ -89,7 +98,76 @@ def run(
     if verbose:
         logger.setLevel(logging.DEBUG)
 
-    asyncio.run(main())
+    asyncio.run(chat_impl())
+
+
+@app.command()
+def webrtc(
+    template: str = typer.Option(
+        "scripts/realtime_webrtc.html", "--template", "-t", help="Path to the HTML Jinja2 template"
+    ),
+    host: str = typer.Option("0.0.0.0", "--host", "-h"),
+    port: int = typer.Option(8080, "--port", "-p"),
+    web_rtc_url: str = typer.Option(
+        "https://eastus2.realtimeapi-preview.ai.azure.com/v1/realtimertc", "--webrtc-url", help="WebRTC endpoint URL"
+    ),
+    sessions_url: str = typer.Option(
+        "https://YourAzureOpenAIResourceName.openai.azure.com/openai/realtimeapi/sessions?api-version=2025-04-01-preview",
+        "--sessions-url",
+        help="Sessions API URL",
+    ),
+    deployment: str = typer.Option("gpt-realtime", "--deployment", help="Deployment name"),
+    voice: str = typer.Option("verse", "--voice", help="Voice name"),
+):
+    """
+    Render the realtime_webrtc HTML template with provided parameters and serve it as a static site.
+
+    The template is a Jinja2 template and will receive the following variables:
+    - WEBRTC_URL, SESSIONS_URL, API_KEY, DEPLOYMENT, VOICE
+    """
+    settings = Settings()
+    api_key = settings.azure_openai_api_key
+    if not api_key:
+        typer.secho(
+            "Warning: no API key provided; the rendered page will contain an empty API key.", fg=typer.colors.YELLOW
+        )
+
+    tpl_path = Path(template)
+    if not tpl_path.exists():
+        typer.secho(f"Template not found: {tpl_path}", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    tpl_text = tpl_path.read_text(encoding="utf-8")
+
+    # Use json.dumps to safely embed JS string literals in the template
+    rendered = jinja2.Template(tpl_text).render(
+        WEBRTC_URL=json.dumps(web_rtc_url),
+        SESSIONS_URL=json.dumps(sessions_url),
+        API_KEY=json.dumps(api_key),
+        DEPLOYMENT=json.dumps(deployment),
+        VOICE=json.dumps(voice),
+    )
+
+    tempdir = tempfile.TemporaryDirectory()
+    out_path = Path(tempdir.name) / "index.html"
+    out_path.write_text(rendered, encoding="utf-8")
+
+    # Serve the temporary directory with the rendered HTML
+    os.chdir(tempdir.name)
+    handler = http.server.SimpleHTTPRequestHandler
+    with socketserver.TCPServer((host, port), handler) as httpd:
+        url = f"http://{host}:{port}/"
+        typer.secho(f"Serving rendered template at: {url}", fg=typer.colors.GREEN)
+        try:
+            webbrowser.open(url)
+        except Exception:
+            pass
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            typer.secho("Shutting down server...", fg=typer.colors.YELLOW)
+        finally:
+            tempdir.cleanup()
 
 
 if __name__ == "__main__":
