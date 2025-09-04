@@ -32,7 +32,7 @@ async def main() -> None:
         azure_ad_token_provider=token_provider,
         api_version=settings.azure_openai_api_version,
     )
-    async with client.beta.realtime.connect(
+    async with client.realtime.connect(
         model="gpt-realtime",  # name of your deployment
     ) as connection:
         await connection.session.update(
@@ -40,7 +40,9 @@ async def main() -> None:
                 "output_modalities": [
                     "text",
                     "audio",
-                ]
+                ],
+                "model": "gpt-realtime",
+                "type": "realtime",
             }
         )
         while True:
@@ -53,7 +55,10 @@ async def main() -> None:
                     "type": "message",
                     "role": "user",
                     "content": [
-                        {"type": "input_text", "text": user_input},
+                        {
+                            "type": "input_text",
+                            "text": user_input,
+                        },
                     ],
                 }
             )
@@ -66,6 +71,7 @@ async def main() -> None:
                     break
                 else:
                     logger.debug(f"event.type: {event.type}")
+                    # logger.debug(f"event: {event.model_dump_json(indent=2)}")
 
     await credential.close()
 

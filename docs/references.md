@@ -73,3 +73,4 @@
 - [specification/cognitiveservices/data-plane/AzureOpenAI/inference/preview/2025-04-01-preview/inference.json](https://github.com/Azure/azure-rest-api-specs/blob/main/specification/cognitiveservices/data-plane/AzureOpenAI/inference/preview/2025-04-01-preview/inference.json)
 - [Realtime API with WebSocket](https://platform.openai.com/docs/guides/realtime-websocket)
 - [GPT-4o Realtime API for speech and audio](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/realtime-audio-quickstart?tabs=keyless%2Clinux&pivots=programming-language-python)
+- [OpenAI Python API library > examples/realtime](https://github.com/openai/openai-python/tree/main/examples/realtime)
