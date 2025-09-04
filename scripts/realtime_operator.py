@@ -7,6 +7,7 @@ import socketserver
 import tempfile
 import webbrowser
 from pathlib import Path
+from urllib.parse import urljoin
 
 # New imports for template rendering and serving
 import jinja2
@@ -108,14 +109,7 @@ def webrtc(
     ),
     host: str = typer.Option("0.0.0.0", "--host", "-h"),
     port: int = typer.Option(8080, "--port", "-p"),
-    web_rtc_url: str = typer.Option(
-        "https://eastus2.realtimeapi-preview.ai.azure.com/v1/realtimertc", "--webrtc-url", help="WebRTC endpoint URL"
-    ),
-    sessions_url: str = typer.Option(
-        "https://YourAzureOpenAIResourceName.openai.azure.com/openai/realtimeapi/sessions?api-version=2025-04-01-preview",
-        "--sessions-url",
-        help="Sessions API URL",
-    ),
+    location: str = typer.Option("eastus2", "--location", help="location for Azure OpenAI"),
     deployment: str = typer.Option("gpt-realtime", "--deployment", help="Deployment name"),
     voice: str = typer.Option("verse", "--voice", help="Voice name"),
     instructions: str = typer.Option(
@@ -147,8 +141,10 @@ def webrtc(
 
     # Use json.dumps to safely embed JS string literals in the template
     rendered = jinja2.Template(tpl_text).render(
-        WEBRTC_URL=json.dumps(web_rtc_url),
-        SESSIONS_URL=json.dumps(sessions_url),
+        WEBRTC_URL=json.dumps(f"https://{location}.realtimeapi-preview.ai.azure.com/v1/realtimertc"),
+        SESSIONS_URL=json.dumps(
+            urljoin(settings.azure_openai_endpoint, "/openai/realtimeapi/sessions?api-version=2025-04-01-preview")
+        ),
         API_KEY=json.dumps(api_key),
         DEPLOYMENT=json.dumps(deployment),
         VOICE=json.dumps(voice),
