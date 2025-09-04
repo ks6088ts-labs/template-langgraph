@@ -118,12 +118,18 @@ def webrtc(
     ),
     deployment: str = typer.Option("gpt-realtime", "--deployment", help="Deployment name"),
     voice: str = typer.Option("verse", "--voice", help="Voice name"),
+    instructions: str = typer.Option(
+        "You are a helpful AI assistant responding in natural, engaging language.",
+        "--instructions",
+        "-i",
+        help="Initial assistant instructions for the realtime session",
+    ),
 ):
     """
     Render the realtime_webrtc HTML template with provided parameters and serve it as a static site.
 
     The template is a Jinja2 template and will receive the following variables:
-    - WEBRTC_URL, SESSIONS_URL, API_KEY, DEPLOYMENT, VOICE
+    - WEBRTC_URL, SESSIONS_URL, API_KEY, DEPLOYMENT, VOICE, INSTRUCTIONS
     """
     settings = Settings()
     api_key = settings.azure_openai_api_key
@@ -146,6 +152,7 @@ def webrtc(
         API_KEY=json.dumps(api_key),
         DEPLOYMENT=json.dumps(deployment),
         VOICE=json.dumps(voice),
+        INSTRUCTIONS=json.dumps(instructions),
     )
 
     tempdir = tempfile.TemporaryDirectory()

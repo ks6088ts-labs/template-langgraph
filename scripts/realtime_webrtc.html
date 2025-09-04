@@ -34,6 +34,8 @@
       // The deployment name might not be the same as the model name.
       const DEPLOYMENT = {{ DEPLOYMENT }};
       const VOICE = {{ VOICE }};
+      // Injected initial assistant instructions (JSON-encoded string)
+      const INSTRUCTIONS = {{ INSTRUCTIONS }};
 
       async function StartSession() {
         try {
@@ -151,8 +153,8 @@
           const event = {
             type: "session.update",
             session: {
-              instructions:
-                "You are a helpful AI assistant responding in natural, engaging language.",
+              // Use the injected INSTRUCTIONS value so the CLI can control the prompt
+              instructions: INSTRUCTIONS,
             },
           };
           dataChannel.send(JSON.stringify(event));
