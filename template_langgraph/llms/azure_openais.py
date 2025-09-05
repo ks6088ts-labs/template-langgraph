@@ -45,6 +45,7 @@ class AzureOpenAiWrapper:
         self._chat_model: AzureChatOpenAI | None = None
         self._reasoning_model: AzureChatOpenAI | None = None
         self._embedding_model: AzureOpenAIEmbeddings | None = None
+        self._responses_model: AzureChatOpenAI | None = None
 
     def _get_auth_key(self) -> str:
         """Generate a key for authentication caching based on settings."""
@@ -137,6 +138,34 @@ class AzureOpenAiWrapper:
                     azure_deployment=self.settings.azure_openai_model_embedding,
                 )
         return self._embedding_model
+
+    @property
+    def responses_model(self) -> AzureChatOpenAI:
+        """Lazily initialize and return responses API model."""
+        if self._responses_model is None:
+            if self.settings.azure_openai_use_microsoft_entra_id.lower() == "true":
+                token = self._get_auth_token()
+                self._responses_model = AzureChatOpenAI(
+                    azure_ad_token=token,
+                    azure_endpoint=self.settings.azure_openai_endpoint,
+                    api_version=self.settings.azure_openai_api_version,
+                    azure_deployment=self.settings.azure_openai_model_chat,
+                    streaming=True,
+                    model=self.settings.azure_openai_model_chat,
+                    output_version="responses/v1",
+                )
+            else:
+                logger.info("Using API key for authentication")
+                self._responses_model = AzureChatOpenAI(
+                    api_key=self.settings.azure_openai_api_key,
+                    azure_endpoint=self.settings.azure_openai_endpoint,
+                    api_version=self.settings.azure_openai_api_version,
+                    azure_deployment=self.settings.azure_openai_model_chat,
+                    streaming=True,
+                    model=self.settings.azure_openai_model_chat,
+                    output_version="responses/v1",
+                )
+        return self._responses_model
 
     def create_embedding(self, text: str):
         """Create an embedding for the given text."""
