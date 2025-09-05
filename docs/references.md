@@ -66,7 +66,9 @@
 - [python-sounddevice](https://github.com/spatialaudio/python-sounddevice)
 - [python-soundfile](https://github.com/bastibe/python-soundfile)
 
-### Realtime API
+### OpenAI
+
+#### Realtime API
 
 - [August 2025 / Realtime API audio model GA](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/whats-new#realtime-api-audio-model-ga)
 - [Global Standard model availability](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/models?tabs=global-standard%2Cstandard-chat-completions#global-standard-model-availability)
@@ -75,3 +77,10 @@
 - [GPT-4o Realtime API for speech and audio](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/realtime-audio-quickstart?tabs=keyless%2Clinux&pivots=programming-language-python)
 - [OpenAI Python API library > examples/realtime](https://github.com/openai/openai-python/tree/main/examples/realtime)
 - [How to use the GPT-4o Realtime API via WebRTC](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio-webrtc)
+
+#### Responses API
+
+- [OpenAI / New tools for building agents](https://openai.com/index/new-tools-for-building-agents/)
+- [OpenAI / Responses](https://platform.openai.com/docs/api-reference/responses)
+- [Azure OpenAI Responses API](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/responses?tabs=python-key)
+- [LangChain / Responses API](https://python.langchain.com/docs/integrations/chat/openai/#responses-api)

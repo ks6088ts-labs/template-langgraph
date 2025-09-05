@@ -212,6 +212,53 @@ def image(
     logger.info(f"Output: {response.content}")
 
 
+@app.command()
+def responses(
+    query: str = typer.Option(
+        "What is the weather like today?",
+        "--query",
+        "-q",
+        help="Query to run with the Azure OpenAI chat model",
+    ),
+    stream: bool = typer.Option(
+        False,
+        "--stream",
+        "-s",
+        help="Enable streaming output",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    set_verbose_logging(verbose)
+
+    logger.info("Running...")
+    llm = AzureOpenAiWrapper().responses_model
+
+    if stream:
+        for chunk in llm.stream(
+            input=[
+                HumanMessage(content=query),
+            ],
+        ):
+            # FIXME: Currently, just dump the whole chunk
+            print(chunk)
+    else:
+        response = llm.invoke(
+            input=query,
+        )
+        logger.debug(
+            response.model_dump_json(
+                indent=2,
+                exclude_none=True,
+            )
+        )
+        logger.info(f"Output: {response.content}")
+
+
 if __name__ == "__main__":
     load_dotenv(
         override=True,
