@@ -16,19 +16,13 @@
 - [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents)
 - [Custom UI for Deep Agents](https://github.com/langchain-ai/deep-agents-ui)
 - [How to deploy self-hosted standalone server](https://docs.langchain.com/langgraph-platform/deploy-standalone-server)
-
-### Sample Codes
-
 - [「現場で活用するための AI エージェント実践入門」リポジトリ](https://github.com/masamasa59/genai-agent-advanced-book)
 
-### Models
+### LangChain
 
 - [AzureOpenAIEmbeddings](https://python.langchain.com/docs/integrations/text_embedding/azureopenai/)
-
-### Tools
-
 - [CSVLoader](https://python.langchain.com/docs/how_to/document_loader_csv/)
-- [Qdrant](https://github.com/qdrant/qdrant)
+- [Qdrant](https://github.com/qdrant/qdrant), [LangChain / Qdrant](https://python.langchain.com/docs/integrations/vectorstores/qdrant/)
 - [Azure Cosmos DB No SQL](https://python.langchain.com/docs/integrations/vectorstores/azure_cosmos_db_no_sql/)
 - [Azure AI Search](https://python.langchain.com/docs/integrations/vectorstores/azuresearch/)
 
@@ -41,6 +35,7 @@
 ### Services
 
 - [FastAPI](https://fastapi.tiangolo.com/)
+- [Streamlit](https://python.langchain.com/docs/integrations/callbacks/streamlit/)
 
 ### Observability
 
@@ -84,3 +79,8 @@
 - [OpenAI / Responses](https://platform.openai.com/docs/api-reference/responses)
 - [Azure OpenAI Responses API](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/responses?tabs=python-key)
 - [LangChain / Responses API](https://python.langchain.com/docs/integrations/chat/openai/#responses-api)
+
+### Hugging Face
+
+- [LM Studio](https://lmstudio.ai/)
+- [Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/guides/cli)
