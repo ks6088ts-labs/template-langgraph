@@ -24,8 +24,9 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - name: Set up uv
-        shell: bash
-        run: pipx install uv
+      - name: Set up uv with caching enabled
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
       - run: make install-deps-docs
       - run: uv run mkdocs gh-deploy --force

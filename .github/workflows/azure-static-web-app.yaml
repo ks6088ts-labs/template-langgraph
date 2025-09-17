@@ -19,9 +19,10 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v5
-      - name: Set up uv
-        shell: bash
-        run: pipx install uv
+      - name: Set up uv with caching enabled
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
