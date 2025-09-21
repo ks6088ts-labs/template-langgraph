@@ -221,3 +221,10 @@ n8n: ## run n8n
 	docker compose \
 		--env-file n8n.env \
 		--file n8n.docker-compose.yml up
+
+.PHONY: mlflow
+mlflow: ## run MLflow
+	uv run mlflow server \
+		--backend-store-uri sqlite:///mlflow.db \
+		--host 0.0.0.0 \
+		--port 5001
