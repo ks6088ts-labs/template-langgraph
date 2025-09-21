@@ -3,10 +3,7 @@ from os import getenv
 
 import streamlit as st
 from dotenv import load_dotenv
-from langchain_community.callbacks.streamlit import (
-    StreamlitCallbackHandler,
-)
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_ollama import ChatOllama
 from langchain_openai import AzureChatOpenAI
 from openai import APIConnectionError, APIStatusError, APITimeoutError
@@ -33,11 +30,14 @@ with st.sidebar:
     "# Model"
     model_choice = st.radio(
         label="Active Model",
-        options=["azure", "ollama"],
+        options=[
+            "azure",
+            "ollama",
+        ],
         index=0,
         key="model_choice",
     )
-    "## Model Settings"
+    f"## Model Settings for {model_choice.capitalize()}"
     if model_choice == "azure":
         azure_openai_endpoint = st.text_input(
             label="AZURE_OPENAI_ENDPOINT",
@@ -63,18 +63,23 @@ with st.sidebar:
             key="AZURE_OPENAI_MODEL_CHAT",
             type="default",
         )
+        "### Documents"
         "[Azure Portal](https://portal.azure.com/)"
         "[Azure OpenAI Studio](https://oai.azure.com/resource/overview)"
         "[View the source code](https://github.com/ks6088ts-labs/template-streamlit)"
-    else:
+    elif model_choice == "ollama":
         ollama_model_chat = st.text_input(
             label="OLLAMA_MODEL_CHAT",
             value=getenv("OLLAMA_MODEL_CHAT"),
             key="OLLAMA_MODEL_CHAT",
             type="default",
         )
+        "### Documents"
         "[Ollama Docs](https://github.com/ollama/ollama)"
         "[View the source code](https://github.com/ks6088ts-labs/template-streamlit)"
+    else:
+        st.error("Invalid model choice. Please select either 'azure' or 'ollama'.")
+        raise ValueError("Invalid model choice. Please select either 'azure' or 'ollama'.")
 
 
 def is_azure_configured():
@@ -110,14 +115,18 @@ def get_model():
     raise ValueError("No model is configured. Please set up the Azure or Ollama model in the sidebar.")
 
 
-st.title("chat app with LangChain SDK")
+st.title("Chat Playground")
 
 if not is_configured():
     st.warning("Please fill in the required fields at the sidebar.")
 
 if "messages" not in st.session_state:
     st.session_state["messages"] = [
-        AIMessage(content="Hello! I'm a helpful assistant."),
+        SystemMessage(
+            content="You are a helpful assistant. Answer concisely. "
+            "If you don't know the answer, just say you don't know. "
+            "Do not make up an answer."
+        ),
     ]
 
 # Show chat messages
@@ -134,14 +143,35 @@ for message in st.session_state.messages:
 
 
 # Receive user input
-uploaded_file = st.file_uploader("画像をアップロード", type=["png", "jpg", "jpeg"], key="file_uploader")
-if prompt := st.chat_input(disabled=not is_configured()):
-    user_message_content = [{"type": "text", "text": prompt}]
-    if uploaded_file:
-        image_bytes = uploaded_file.getvalue()
-        base64_image = image_to_base64(image_bytes)
-        image_url = f"data:image/jpeg;base64,{base64_image}"
-        user_message_content.append({"type": "image_url", "image_url": {"url": image_url}})
+if prompt := st.chat_input(
+    disabled=not is_configured(),
+    accept_file="multiple",
+    file_type=[
+        "png",
+        "jpg",
+        "jpeg",
+        "gif",
+        "webp",
+    ],
+):
+    user_message_content = []
+    for file in prompt.files:
+        if file.type.startswith("image/"):
+            image_bytes = file.getvalue()
+            base64_image = image_to_base64(image_bytes)
+            image_url = f"data:{file.type};base64,{base64_image}"
+            user_message_content.append(
+                {
+                    "type": "image_url",
+                    "image_url": {"url": image_url},
+                }
+            )
+    user_message_content.append(
+        {
+            "type": "text",
+            "text": prompt.text,
+        }
+    )
 
     user_message = HumanMessage(content=user_message_content)
     st.session_state.messages.append(user_message)
@@ -158,8 +188,6 @@ if prompt := st.chat_input(disabled=not is_configured()):
             message_placeholder = st.empty()
             full_response = ""
             llm = get_model()
-            callbacks = [StreamlitCallbackHandler(st.container())]
-
             try:
                 if stream_mode:
                     for chunk in llm.stream(st.session_state.messages):
