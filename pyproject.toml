@@ -5,6 +5,7 @@ description = "A GitHub template repository for Python"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "audio-recorder-streamlit>=0.0.10",
     "azure-ai-projects>=1.0.0",
     "azure-cosmos>=4.9.0",
     "azure-identity>=1.23.1",
