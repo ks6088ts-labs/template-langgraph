@@ -167,3 +167,4 @@ assets/
 generated/
 *.db
 *.wav
+mlartifacts

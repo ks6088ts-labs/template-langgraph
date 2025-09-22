@@ -17,6 +17,17 @@ ARG GIT_TAG="x.x.x"
 
 WORKDIR /app
 
+# Install system build dependencies required to build some Python packages (e.g. madoka)
+# Keep layer small and remove apt lists afterwards
+# hadolint ignore=DL3008
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       build-essential \
+       python3-dev \
+       libssl-dev \
+       libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy requirements first for better cache efficiency
 COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 
