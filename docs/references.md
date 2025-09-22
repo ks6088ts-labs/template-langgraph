@@ -90,4 +90,14 @@
 - [DSPy (Declarative Self-improving Python)](https://dspy.ai/)
 - [Language Models](https://dspy.ai/learn/programming/language_models/)
 - [Language Models / v3.0.3](https://github.com/stanfordnlp/dspy/blob/3.0.3/docs/docs/learn/programming/language_models.md)
-- [Software Design誌「実践LLMアプリケーション開発」第25回サンプルコード](https://github.com/mahm/softwaredesign-llm-application/tree/main/25)
+- [Software Design 誌「実践 LLM アプリケーション開発」第 25 回サンプルコード](https://github.com/mahm/softwaredesign-llm-application/tree/main/25)
+
+### [MLflow](https://mlflow.org/docs/latest/genai/)
+
+- [LangChain / MLflow](https://docs.langchain.com/oss/python/integrations/providers/mlflow_tracking)
+- [MLflow / Tracing LangGraph🦜🕸️](https://mlflow.org/docs/latest/genai/tracing/integrations/listing/langgraph/)
+- [GenAI Evaluation Quickstart](https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/)
+
+### [LiteLLM](https://docs.litellm.ai/)
+
+- [Azure OpenAI](https://docs.litellm.ai/docs/providers/azure/)
