@@ -173,7 +173,10 @@ create-elasticsearch-index: ## create Elasticsearch index
 # ---
 # Project / Run agents
 # ---
+
 QUESTION ?= "KABUTOの起動時に、画面全体が紫色に点滅し、システムがフリーズします。KABUTO のマニュアルから、関連する情報を取得したり過去のシステムのトラブルシュート事例が蓄積されたデータベースから、関連する情報を取得して質問に答えてください"
+PORT ?= 5001
+
 .PHONY: run-chat-with-tools-agent
 run-chat-with-tools-agent: ## run chat with tools agent
 	uv run python scripts/agent_operator.py run \
@@ -227,4 +230,4 @@ mlflow: ## run MLflow
 	uv run mlflow server \
 		--backend-store-uri sqlite:///mlflow.db \
 		--host 0.0.0.0 \
-		--port 5000
+		--port $(PORT)

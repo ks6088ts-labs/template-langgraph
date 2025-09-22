@@ -76,7 +76,7 @@ def optimize_with_miprov2(trainset, eval_lm, chat_lm):
     """MIPROv2を使用してチャットボットを最適化"""
 
     # MLflowの設定
-    MLFLOW_PORT = os.getenv("MLFLOW_PORT", "5000")
+    MLFLOW_PORT = os.getenv("MLFLOW_PORT", "5001")
     MLFLOW_TRACKING_URI = f"http://localhost:{MLFLOW_PORT}"
     MLFLOW_EXPERIMENT_NAME = "DSPy-EdamameFairy-Optimization"
     MLFLOW_RUN_NAME = "miprov2_optimization"
