@@ -96,3 +96,8 @@
 
 - [LangChain / MLflow](https://docs.langchain.com/oss/python/integrations/providers/mlflow_tracking)
 - [MLflow / Tracing LangGraph🦜🕸️](https://mlflow.org/docs/latest/genai/tracing/integrations/listing/langgraph/)
+- [GenAI Evaluation Quickstart](https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/)
+
+### [LiteLLM](https://docs.litellm.ai/)
+
+- [Azure OpenAI](https://docs.litellm.ai/docs/providers/azure/)
