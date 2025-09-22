@@ -118,7 +118,7 @@ def evaluate(
                 HumanMessage(content=question),
             ]
         )
-        return response.content
+        return response.content.__str__()
 
     @scorer
     def is_concise(outputs: str) -> bool:
