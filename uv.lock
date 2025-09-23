@@ -1591,6 +1591,19 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e6/79/d4f20e91327c98096d605646bdc6a5ffedae820f38d378d3515c42ec5e60/forbiddenfruit-0.1.4.tar.gz", hash = "sha256:e3f7e66561a29ae129aac139a85d610dbf3dd896128187ed5454b6421f624253", size = 43756, upload-time = "2021-01-16T21:03:35.401Z" }
 
 [[package]]
+name = "foundry-local-sdk"
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+    { name = "pydantic" },
+    { name = "tqdm" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3b/53/871cfdcd1063bc845278b6f654f35b857bec8f627c387aa40d753f4a3d5d/foundry_local_sdk-0.4.0-py3-none-any.whl", hash = "sha256:d21cab80239c1a715c42fd2cd17a2337a0b14ca7f2d7dc5247c778ee7c7270c1", size = 13959, upload-time = "2025-09-12T21:24:21.892Z" },
+]
+
+[[package]]
 name = "fqdn"
 version = "1.5.1"
 source = { registry = "https://pypi.org/simple" }
@@ -6242,6 +6255,7 @@ dependencies = [
     { name = "dspy" },
     { name = "elasticsearch" },
     { name = "fastapi", extra = ["standard"] },
+    { name = "foundry-local-sdk" },
     { name = "httpx" },
     { name = "jinja2" },
     { name = "langchain-azure-ai" },
@@ -6296,6 +6310,7 @@ requires-dist = [
     { name = "dspy", specifier = ">=3.0.3" },
     { name = "elasticsearch", specifier = ">=9.1.0" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.116.1" },
+    { name = "foundry-local-sdk", specifier = ">=0.4.0" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "jinja2", specifier = ">=3.1.2" },
     { name = "langchain-azure-ai", specifier = ">=0.1.4" },
