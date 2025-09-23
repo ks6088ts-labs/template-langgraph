@@ -268,6 +268,26 @@ docker run --rm \
   streamlit run template_langgraph/services/streamlits/main.py --server.address 0.0.0.0
 ```
 
+#### Using Pre-built Images
+
+You can also use pre-built images from Docker Hub or GitHub Container Registry:
+
+```shell
+# From Docker Hub
+docker run --rm \
+  -p 8501:8501 \
+  -v ./.env:/app/.env \
+  ks6088ts/template-langgraph:latest \
+  streamlit run template_langgraph/services/streamlits/main.py --server.address 0.0.0.0
+
+# From GitHub Container Registry  
+docker run --rm \
+  -p 8501:8501 \
+  -v ./.env:/app/.env \
+  ghcr.io/ks6088ts-labs/template-langgraph:latest \
+  streamlit run template_langgraph/services/streamlits/main.py --server.address 0.0.0.0
+```
+
 #### Multi-Architecture Support
 
 The Docker images are built for both `amd64` and `arm64` architectures, making them compatible with:
