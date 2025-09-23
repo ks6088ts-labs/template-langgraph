@@ -76,6 +76,14 @@ docker-build: ## build Docker image
 docker-run: ## run Docker container
 	docker run --rm $(DOCKER_REPO_NAME)/$(DOCKER_IMAGE_NAME):$(GIT_TAG) $(DOCKER_COMMAND)
 
+.PHONY: docker-run-streamlit
+docker-run-streamlit: ## run Docker container with Streamlit app
+	docker run --rm \
+		-p 8501:8501 \
+		-v $(PWD)/.env:/app/.env \
+		$(DOCKER_REPO_NAME)/$(DOCKER_IMAGE_NAME):$(GIT_TAG) \
+		streamlit run template_langgraph/services/streamlits/main.py --server.address 0.0.0.0
+
 .PHONY: docker-lint
 docker-lint: ## lint Dockerfile
 	docker run --rm -i hadolint/hadolint < Dockerfile
