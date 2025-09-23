@@ -8,6 +8,8 @@ from langchain_ollama import ChatOllama
 from langchain_openai import AzureChatOpenAI
 from openai import APIConnectionError, APIStatusError, APITimeoutError
 
+from template_langgraph.llms.foundry_locals import FoundryLocalWrapper
+from template_langgraph.llms.foundry_locals import Settings as FoundryLocalSettings
 from template_langgraph.loggers import get_logger
 
 load_dotenv(override=True)
@@ -24,7 +26,7 @@ with st.sidebar:
     "# Common Settings"
     stream_mode = st.checkbox(
         label="ストリーム出力を有効にする",
-        value=True,
+        value=False,
         key="STREAM_MODE",
     )
     "# Model"
@@ -33,6 +35,7 @@ with st.sidebar:
         options=[
             "azure",
             "ollama",
+            "foundry_local",
         ],
         index=0,
         key="model_choice",
@@ -66,7 +69,6 @@ with st.sidebar:
         "### Documents"
         "[Azure Portal](https://portal.azure.com/)"
         "[Azure OpenAI Studio](https://oai.azure.com/resource/overview)"
-        "[View the source code](https://github.com/ks6088ts-labs/template-streamlit)"
     elif model_choice == "ollama":
         ollama_model_chat = st.text_input(
             label="OLLAMA_MODEL_CHAT",
@@ -76,10 +78,18 @@ with st.sidebar:
         )
         "### Documents"
         "[Ollama Docs](https://github.com/ollama/ollama)"
-        "[View the source code](https://github.com/ks6088ts-labs/template-streamlit)"
+    elif model_choice == "foundry_local":
+        foundry_local_model_chat = st.text_input(
+            label="FOUNDRY_LOCAL_MODEL_CHAT",
+            value=getenv("FOUNDRY_LOCAL_MODEL_CHAT", "phi-3-mini-4k"),
+            key="FOUNDRY_LOCAL_MODEL_CHAT",
+            type="default",
+        )
+        "### Documents"
+        "[Get started with Foundry Local](https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-local/get-started)"
     else:
-        st.error("Invalid model choice. Please select either 'azure' or 'ollama'.")
-        raise ValueError("Invalid model choice. Please select either 'azure' or 'ollama'.")
+        st.error("Invalid model choice. Please select either 'azure', 'ollama', or 'foundry_local'.")
+        raise ValueError("Invalid model choice. Please select either 'azure', 'ollama', or 'foundry_local'.")
 
 
 def is_azure_configured():
@@ -96,8 +106,12 @@ def is_ollama_configured():
     return st.session_state.get("OLLAMA_MODEL_CHAT") and st.session_state.get("model_choice") == "ollama"
 
 
+def is_foundry_local_configured():
+    return st.session_state.get("FOUNDRY_LOCAL_MODEL_CHAT") and st.session_state.get("model_choice") == "foundry_local"
+
+
 def is_configured():
-    return is_azure_configured() or is_ollama_configured()
+    return is_azure_configured() or is_ollama_configured() or is_foundry_local_configured()
 
 
 def get_model():
@@ -112,7 +126,13 @@ def get_model():
         return ChatOllama(
             model=st.session_state.get("OLLAMA_MODEL_CHAT", ""),
         )
-    raise ValueError("No model is configured. Please set up the Azure or Ollama model in the sidebar.")
+    elif is_foundry_local_configured():
+        return FoundryLocalWrapper(
+            settings=FoundryLocalSettings(
+                foundry_local_model_chat=st.session_state.get("FOUNDRY_LOCAL_MODEL_CHAT", "phi-3-mini-4k"),
+            )
+        ).chat_model
+    raise ValueError("No model is configured. Please set up the Azure, Ollama, or Foundry Local model in the sidebar.")
 
 
 st.title("Chat Playground")
