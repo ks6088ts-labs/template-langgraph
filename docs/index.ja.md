@@ -240,6 +240,58 @@ Streamlit アプリのデモ：
 
 [![streamlit.png](./images/streamlit.png)](https://youtu.be/undxBwyJ3Sc)
 
+### オプション 6: Docker（本番デプロイ）
+
+アプリケーションを Docker で実行すると、環境差による違いを減らし、一貫したデプロイが可能になります。ここではイメージのビルド、Streamlit のコンテナ実行、事前ビルド済みイメージの利用、マルチアーキテクチャ対応について説明します。
+
+#### Docker イメージのビルド
+
+```shell
+# ローカルで Docker イメージをビルド
+make docker-build
+
+# または特定のタグでビルド
+docker build -t ks6088ts/template-langgraph:latest .
+```
+
+#### Streamlit を Docker で実行
+
+```shell
+# Docker で Streamlit アプリを実行する（Makefile ターゲット）
+make docker-run-streamlit
+
+# または .env をコンテナにマウントして手動で実行
+docker run --rm \
+  -p 8501:8501 \
+  -v ./.env:/app/.env \
+  ks6088ts/template-langgraph:latest \
+  streamlit run template_langgraph/services/streamlits/main.py --server.address 0.0.0.0
+```
+
+#### 事前ビルド済みイメージの使用
+
+```shell
+# Docker Hub から実行
+docker run --rm \
+  -p 8501:8501 \
+  -v ./.env:/app/.env \
+  ks6088ts/template-langgraph:latest \
+  streamlit run template_langgraph/services/streamlits/main.py --server.address 0.0.0.0
+
+# GitHub Container Registry から実行
+docker run --rm \
+  -p 8501:8501 \
+  -v ./.env:/app/.env \
+  ghcr.io/ks6088ts-labs/template-langgraph:latest \
+  streamlit run template_langgraph/services/streamlits/main.py --server.address 0.0.0.0
+```
+
+#### マルチアーキテクチャ対応
+
+このリポジトリの Docker イメージは `amd64` と `arm64` 両アーキテクチャ向けにビルドされています。これにより、Intel/AMD の x64 マシンや Apple Silicon（M1/M2/M3/M4）などの ARM 環境でも動作します。
+
+コンテナを起動したら、ブラウザで [http://localhost:8501](http://localhost:8501) にアクセスして Streamlit アプリを確認できます。
+
 ### 追加の実行例
 
 - Issue formatter（構造化出力）:

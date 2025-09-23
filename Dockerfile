@@ -37,4 +37,7 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 # Copy application code after dependencies are installed
 COPY . .
 
+# Set PYTHONPATH to include the working directory for module imports
+ENV PYTHONPATH="${PYTHONPATH}:/app"
+
 CMD ["python", "template_langgraph/core.py"]

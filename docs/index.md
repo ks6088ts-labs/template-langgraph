@@ -240,6 +240,63 @@ Demonstration of the Streamlit app:
 
 [![streamlit.png](./images/streamlit.png)](https://youtu.be/undxBwyJ3Sc)
 
+### Option 6: Docker (Production deployment)
+
+You can run the application in Docker for consistent deployment across environments:
+
+#### Building the Docker Image
+
+```shell
+# Build the Docker image locally
+make docker-build
+
+# Or build with specific tag
+docker build -t ks6088ts/template-langgraph:latest .
+```
+
+#### Running Streamlit in Docker
+
+```shell
+# Run Streamlit app with Docker
+make docker-run-streamlit
+
+# Or run manually with environment file
+docker run --rm \
+  -p 8501:8501 \
+  -v ./.env:/app/.env \
+  ks6088ts/template-langgraph:latest \
+  streamlit run template_langgraph/services/streamlits/main.py --server.address 0.0.0.0
+```
+
+#### Using Pre-built Images
+
+You can also use pre-built images from Docker Hub or GitHub Container Registry:
+
+```shell
+# From Docker Hub
+docker run --rm \
+  -p 8501:8501 \
+  -v ./.env:/app/.env \
+  ks6088ts/template-langgraph:latest \
+  streamlit run template_langgraph/services/streamlits/main.py --server.address 0.0.0.0
+
+# From GitHub Container Registry  
+docker run --rm \
+  -p 8501:8501 \
+  -v ./.env:/app/.env \
+  ghcr.io/ks6088ts-labs/template-langgraph:latest \
+  streamlit run template_langgraph/services/streamlits/main.py --server.address 0.0.0.0
+```
+
+#### Multi-Architecture Support
+
+The Docker images are built for both `amd64` and `arm64` architectures, making them compatible with:
+- Intel/AMD x64 processors
+- Apple Silicon (M1/M2/M3/M4) processors
+- ARM-based servers
+
+Access the Streamlit app at [http://localhost:8501](http://localhost:8501) after running the container.
+
 ### More agent runs
 
 - Issue formatter (structured output):
