@@ -1,15 +1,15 @@
-from base64 import b64encode
+import os
 import tempfile
-from os import getenv
+from base64 import b64encode
+from datetime import datetime
 
 import streamlit as st
+import whisper
 from audio_recorder_streamlit import audio_recorder
 from gtts import gTTS
 from langchain_community.callbacks.streamlit import (
     StreamlitCallbackHandler,
 )
-from langchain_community.document_loaders.parsers.audio import AzureOpenAIWhisperParser
-from langchain_core.documents.base import Blob
 
 from template_langgraph.agents.chat_with_tools_agent.agent import (
     AgentState,
@@ -22,52 +22,64 @@ def image_to_base64(image_bytes: bytes) -> str:
     return b64encode(image_bytes).decode("utf-8")
 
 
+@st.cache_resource(show_spinner=False)
+def load_whisper_model(model_size: str = "base"):
+    """Load a Whisper model only once per session."""
+
+    return whisper.load_model(model_size)
+
+
 if "chat_history" not in st.session_state:
     st.session_state["chat_history"] = []
 
 # Sidebar: 入出力モード選択、ツール選択とエージェントの構築
 with st.sidebar:
     st.subheader("入出力モード")
-    
+
     # 入出力モード選択
     if "input_output_mode" not in st.session_state:
         st.session_state["input_output_mode"] = "テキスト"
-    
+
     input_output_mode = st.radio(
         "モードを選択してください",
         options=["テキスト", "音声"],
         index=0 if st.session_state["input_output_mode"] == "テキスト" else 1,
-        help="テキスト: 従来のテキスト入力/出力, 音声: マイク入力/音声出力"
+        help="テキスト: 従来のテキスト入力/出力, 音声: マイク入力/音声出力",
     )
     st.session_state["input_output_mode"] = input_output_mode
-    
-    # 音声モードの場合、Azure OpenAI設定を表示
+
+    # 音声モードの場合、Whisper 設定を表示
     if input_output_mode == "音声":
         st.subheader("音声認識設定 (オプション)")
-        with st.expander("Azure OpenAI Whisper設定", expanded=False):
-            azure_openai_endpoint = st.text_input(
-                "AZURE_OPENAI_ENDPOINT",
-                value=getenv("AZURE_OPENAI_ENDPOINT", ""),
-                help="Azure OpenAI リソースのエンドポイント"
+        with st.expander("Whisper設定", expanded=False):
+            selected_model = st.sidebar.selectbox(
+                "Whisperモデル",
+                [
+                    "tiny",
+                    "base",
+                    "small",
+                    "medium",
+                    "large",
+                ],
+                index=1,
             )
-            azure_openai_api_key = st.text_input(
-                "AZURE_OPENAI_API_KEY",
-                value=getenv("AZURE_OPENAI_API_KEY", ""),
-                type="password",
-                help="Azure OpenAI リソースのAPIキー"
+            transcription_language = st.sidebar.selectbox(
+                "文字起こし言語",
+                [
+                    "auto",
+                    "ja",
+                    "en",
+                ],
+                index=0,
+                help="autoは言語自動判定です",
             )
-            azure_openai_api_version = st.text_input(
-                "AZURE_OPENAI_API_VERSION", 
-                value=getenv("AZURE_OPENAI_API_VERSION", "2024-02-01"),
-                help="Azure OpenAI APIバージョン"
+            st.markdown(
+                """
+                - Whisperモデルは大きいほど高精度ですが、処理に時間がかかります。
+                - 文字起こし言語を指定することで、認識精度が向上します。
+                """
             )
-            azure_openai_model_stt = st.text_input(
-                "AZURE_OPENAI_MODEL_STT",
-                value=getenv("AZURE_OPENAI_MODEL_STT", "whisper"),
-                help="音声認識用のデプロイ名"
-            )
-            st.caption("※設定しない場合は、音声入力時にプレースホルダーテキストが使用されます")
-    
+
     st.divider()
     st.subheader("使用するツール")
 
@@ -121,60 +133,47 @@ if input_output_mode == "音声":
     audio_bytes = audio_recorder(
         text="クリックして録音",
         recording_color="red",
-        neutral_color="black",
+        neutral_color="gray",
         icon_name="microphone",
         icon_size="2x",
-        key="audio_input"
+        key="audio_input",
     )
-    
+
     if audio_bytes:
         st.audio(audio_bytes, format="audio/wav")
-        
+
         # 音声データを一時ファイルに保存
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
             temp_audio_file.write(audio_bytes)
             temp_audio_file_path = temp_audio_file.name
-        
-        # Azure OpenAI Whisperが設定されている場合は音声認識を実施
+            st.download_button(
+                label="🎧 録音データを保存",
+                data=audio_bytes,
+                file_name=f"recorded_{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav",
+                mime="audio/wav",
+                use_container_width=True,
+            )
         try:
-            if (input_output_mode == "音声" and 
-                azure_openai_endpoint and azure_openai_api_key and 
-                azure_openai_model_stt):
-                
+            if input_output_mode == "音声":
                 with st.spinner("音声を認識中..."):
-                    audio_blob = Blob(path=temp_audio_file_path)
-                    parser = AzureOpenAIWhisperParser(
-                        api_key=azure_openai_api_key,
-                        azure_endpoint=azure_openai_endpoint,
-                        api_version=azure_openai_api_version,
-                        deployment_name=azure_openai_model_stt,
-                    )
-                    documents = parser.lazy_parse(blob=audio_blob)
-                    results = [doc.page_content for doc in documents]
-                    prompt_text = "\n".join(results).strip()
-                    
+                    model = load_whisper_model(selected_model)
+                    language_param = None if transcription_language == "auto" else transcription_language
+                    result = model.transcribe(str(temp_audio_file_path), language=language_param)
+                    transcribed_text = result.get("text", "").strip()
+                    prompt_text = transcribed_text
+
                     if prompt_text:
                         st.success(f"音声認識完了: {prompt_text}")
                         prompt = prompt_text
                     else:
                         st.warning("音声が認識できませんでした")
-                        prompt = None
-            else:
-                # Azure OpenAI設定がない場合はプレースホルダー
-                prompt_text = "音声入力を受信しました（音声認識設定が必要です）"
-                prompt = prompt_text
-                st.info("音声認識を使用するには、サイドバーでAzure OpenAI設定を入力してください")
-                
         except Exception as e:
             st.error(f"音声認識でエラーが発生しました: {e}")
             prompt_text = "音声入力でエラーが発生しました"
-            prompt = prompt_text
         finally:
-            # 一時ファイルを削除
-            import os
             if os.path.exists(temp_audio_file_path):
                 os.unlink(temp_audio_file_path)
-        
+
 else:
     # 既存のテキスト入力モード
     if prompt := st.chat_input(
@@ -259,27 +258,24 @@ if prompt:
         )
         last_message = response["messages"][-1]
         st.session_state["chat_history"].append(last_message)
-        
+
         # レスポンス表示とオーディオ出力
         response_content = last_message.content
         st.write(response_content)
-        
+
         # 音声モードの場合、音声出力を追加
         if input_output_mode == "音声":
             try:
                 # gTTSを使って音声生成
-                tts = gTTS(text=response_content, lang='ja')
+                tts = gTTS(text=response_content, lang="ja")
                 with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as temp_audio_file:
                     tts.save(temp_audio_file.name)
-                    
+
                     # 音声ファイルを読み込んでstreamlit audio widgetで再生
                     with open(temp_audio_file.name, "rb") as audio_file:
                         audio_bytes = audio_file.read()
                         st.audio(audio_bytes, format="audio/mp3", autoplay=True)
-                    
-                    # 一時ファイルを削除
-                    import os
                     os.unlink(temp_audio_file.name)
-                    
+
             except Exception as e:
                 st.warning(f"音声出力でエラーが発生しました: {e}")
