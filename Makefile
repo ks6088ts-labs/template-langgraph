@@ -14,7 +14,7 @@ info: ## show information
 
 .PHONY: install-deps-dev
 install-deps-dev: ## install dependencies for development
-	uv sync --all-extras
+	uv sync --all-groups
 	uv run pre-commit install
 
 .PHONY: install-deps
