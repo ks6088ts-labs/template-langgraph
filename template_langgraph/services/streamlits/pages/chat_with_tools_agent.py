@@ -1,6 +1,9 @@
 from base64 import b64encode
+import tempfile
 
 import streamlit as st
+from audio_recorder_streamlit import audio_recorder
+from gtts import gTTS
 from langchain_community.callbacks.streamlit import (
     StreamlitCallbackHandler,
 )
@@ -19,8 +22,23 @@ def image_to_base64(image_bytes: bytes) -> str:
 if "chat_history" not in st.session_state:
     st.session_state["chat_history"] = []
 
-# Sidebar: ツール選択とエージェントの構築
+# Sidebar: 入出力モード選択、ツール選択とエージェントの構築
 with st.sidebar:
+    st.subheader("入出力モード")
+    
+    # 入出力モード選択
+    if "input_output_mode" not in st.session_state:
+        st.session_state["input_output_mode"] = "テキスト"
+    
+    input_output_mode = st.radio(
+        "モードを選択してください",
+        options=["テキスト", "音声"],
+        index=0 if st.session_state["input_output_mode"] == "テキスト" else 1,
+        help="テキスト: 従来のテキスト入力/出力, 音声: マイク入力/音声出力"
+    )
+    st.session_state["input_output_mode"] = input_output_mode
+    
+    st.divider()
     st.subheader("使用するツール")
 
     # 利用可能なツール一覧を取得
@@ -63,16 +81,54 @@ for msg in st.session_state["chat_history"]:
     else:
         st.chat_message("assistant").write(msg.content)
 
-if prompt := st.chat_input(
-    accept_file="multiple",
-    file_type=[
-        "png",
-        "jpg",
-        "jpeg",
-        "gif",
-        "webp",
-    ],
-):
+# 入力セクション: モードに応じて分岐
+prompt = None
+prompt_text = ""
+prompt_files = []
+
+if input_output_mode == "音声":
+    st.subheader("🎤 音声入力")
+    audio_bytes = audio_recorder(
+        text="クリックして録音",
+        recording_color="red",
+        neutral_color="black",
+        icon_name="microphone",
+        icon_size="2x",
+        key="audio_input"
+    )
+    
+    if audio_bytes:
+        st.audio(audio_bytes, format="audio/wav")
+        # 音声データを一時ファイルに保存
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
+            temp_audio_file.write(audio_bytes)
+            temp_audio_file_path = temp_audio_file.name
+        
+        # TODO: 音声からテキストへの変換実装
+        # 現在は音声入力をプレースホルダーテキストに変換
+        prompt_text = "音声入力を受信しました（音声認識は後で実装予定）"
+        prompt = prompt_text
+        
+        # 一時ファイルを削除
+        import os
+        os.unlink(temp_audio_file_path)
+        
+else:
+    # 既存のテキスト入力モード
+    if prompt := st.chat_input(
+        accept_file="multiple",
+        file_type=[
+            "png",
+            "jpg",
+            "jpeg",
+            "gif",
+            "webp",
+        ],
+    ):
+        pass  # promptは既に設定済み
+
+# 共通の入力処理ロジック
+if prompt:
     user_display_items = []
     message_parts = []
 
@@ -141,4 +197,27 @@ if prompt := st.chat_input(
         )
         last_message = response["messages"][-1]
         st.session_state["chat_history"].append(last_message)
-        st.write(last_message.content)
+        
+        # レスポンス表示とオーディオ出力
+        response_content = last_message.content
+        st.write(response_content)
+        
+        # 音声モードの場合、音声出力を追加
+        if input_output_mode == "音声":
+            try:
+                # gTTSを使って音声生成
+                tts = gTTS(text=response_content, lang='ja')
+                with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as temp_audio_file:
+                    tts.save(temp_audio_file.name)
+                    
+                    # 音声ファイルを読み込んでstreamlit audio widgetで再生
+                    with open(temp_audio_file.name, "rb") as audio_file:
+                        audio_bytes = audio_file.read()
+                        st.audio(audio_bytes, format="audio/mp3", autoplay=True)
+                    
+                    # 一時ファイルを削除
+                    import os
+                    os.unlink(temp_audio_file.name)
+                    
+            except Exception as e:
+                st.warning(f"音声出力でエラーが発生しました: {e}")
