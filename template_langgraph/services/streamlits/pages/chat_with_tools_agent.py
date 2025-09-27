@@ -1,9 +1,18 @@
+import io
+import os
+import tempfile
 from base64 import b64encode
+from datetime import datetime
 
 import streamlit as st
+import whisper
+from audio_recorder_streamlit import audio_recorder
+from gtts import gTTS
 from langchain_community.callbacks.streamlit import (
     StreamlitCallbackHandler,
 )
+from pydub import AudioSegment
+from pydub.effects import speedup
 
 from template_langgraph.agents.chat_with_tools_agent.agent import (
     AgentState,
@@ -16,11 +25,147 @@ def image_to_base64(image_bytes: bytes) -> str:
     return b64encode(image_bytes).decode("utf-8")
 
 
+@st.cache_resource(show_spinner=False)
+def load_whisper_model(model_size: str = "base"):
+    """Load a Whisper model only once per session."""
+
+    return whisper.load_model(model_size)
+
+
+def synthesize_audio(
+    text: str,
+    language: str = "ja",
+    speed: float = 1.0,
+    pitch_shift: int = 0,
+    volume_db: float = 0.0,
+) -> bytes | None:
+    """Convert text to speech audio using gTTS and pydub adjustments."""
+
+    if not text.strip():
+        return None
+
+    try:
+        tts = gTTS(text=text, lang=language)
+        mp3_buffer = io.BytesIO()
+        tts.write_to_fp(mp3_buffer)
+        mp3_buffer.seek(0)
+
+        audio_segment = AudioSegment.from_file(mp3_buffer, format="mp3")
+        original_rate = audio_segment.frame_rate
+
+        if pitch_shift != 0:
+            semitone_ratio = 2.0 ** (pitch_shift / 12.0)
+            shifted = audio_segment._spawn(
+                audio_segment.raw_data,
+                overrides={"frame_rate": int(original_rate * semitone_ratio)},
+            )
+            audio_segment = shifted.set_frame_rate(original_rate)
+
+        if speed != 1.0:
+            if speed > 1.0:
+                audio_segment = speedup(audio_segment, playback_speed=float(speed))
+            else:
+                slowed_rate = max(int(original_rate * float(speed)), 1)
+                audio_segment = audio_segment._spawn(
+                    audio_segment.raw_data,
+                    overrides={"frame_rate": slowed_rate},
+                ).set_frame_rate(original_rate)
+
+        if volume_db != 0:
+            audio_segment += float(volume_db)
+
+        output_buffer = io.BytesIO()
+        audio_segment.export(output_buffer, format="mp3")
+        return output_buffer.getvalue()
+    except Exception as exc:  # pragma: no cover
+        st.error(f"音声合成に失敗しました: {exc}")
+        return None
+
+
 if "chat_history" not in st.session_state:
     st.session_state["chat_history"] = []
 
-# Sidebar: ツール選択とエージェントの構築
+# Sidebar: 入出力モード選択、ツール選択とエージェントの構築
 with st.sidebar:
+    st.subheader("入出力モード")
+
+    # 入出力モード選択
+    if "input_output_mode" not in st.session_state:
+        st.session_state["input_output_mode"] = "テキスト"
+
+    input_output_mode = st.radio(
+        "モードを選択してください",
+        options=["テキスト", "音声"],
+        index=0 if st.session_state["input_output_mode"] == "テキスト" else 1,
+        help="テキスト: 従来のテキスト入力/出力, 音声: マイク入力/音声出力",
+    )
+    st.session_state["input_output_mode"] = input_output_mode
+
+    # 音声モードの場合、Whisper 設定を表示
+    if input_output_mode == "音声":
+        st.subheader("音声認識設定 (オプション)")
+        audio_bytes = audio_recorder(
+            text="クリックして音声入力👉️",
+            recording_color="red",
+            neutral_color="gray",
+            icon_name="microphone",
+            icon_size="2x",
+            key="audio_input",
+        )
+        selected_model = st.sidebar.selectbox(
+            "Whisperモデル",
+            [
+                "tiny",
+                "base",
+                "small",
+                "medium",
+                "large",
+            ],
+            index=1,
+        )
+        transcription_language = st.sidebar.selectbox(
+            "文字起こし言語",
+            [
+                "auto",
+                "ja",
+                "en",
+            ],
+            index=0,
+            help="autoは言語自動判定です",
+        )
+        tts_language = st.sidebar.selectbox(
+            "TTS言語",
+            [
+                "ja",
+                "en",
+                "fr",
+                "de",
+                "ko",
+                "zh-CN",
+            ],
+            index=0,
+        )
+        tts_speed = st.sidebar.slider(
+            "再生速度",
+            min_value=0.5,
+            max_value=2.0,
+            step=0.1,
+            value=1.0,
+        )
+        tts_pitch = st.sidebar.slider(
+            "ピッチ (半音)",
+            min_value=-12,
+            max_value=12,
+            value=0,
+        )
+        tts_volume = st.sidebar.slider(
+            "音量 (dB)",
+            min_value=-20,
+            max_value=10,
+            value=0,
+        )
+
+    st.divider()
     st.subheader("使用するツール")
 
     # 利用可能なツール一覧を取得
@@ -63,16 +208,63 @@ for msg in st.session_state["chat_history"]:
     else:
         st.chat_message("assistant").write(msg.content)
 
-if prompt := st.chat_input(
-    accept_file="multiple",
-    file_type=[
-        "png",
-        "jpg",
-        "jpeg",
-        "gif",
-        "webp",
-    ],
-):
+# 入力セクション: モードに応じて分岐
+prompt = None
+prompt_text = ""
+prompt_files = []
+
+if input_output_mode == "音声":
+    if audio_bytes:
+        st.audio(audio_bytes, format="audio/wav")
+
+        # 音声データを一時ファイルに保存
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
+            temp_audio_file.write(audio_bytes)
+            temp_audio_file_path = temp_audio_file.name
+            st.download_button(
+                label="🎧 録音データを保存",
+                data=audio_bytes,
+                file_name=f"recorded_{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav",
+                mime="audio/wav",
+                use_container_width=True,
+            )
+        try:
+            if input_output_mode == "音声":
+                with st.spinner("音声を認識中..."):
+                    model = load_whisper_model(selected_model)
+                    language_param = None if transcription_language == "auto" else transcription_language
+                    result = model.transcribe(str(temp_audio_file_path), language=language_param)
+                    transcribed_text = result.get("text", "").strip()
+                    prompt_text = transcribed_text
+
+                    if prompt_text:
+                        st.success(f"音声認識完了: {prompt_text}")
+                        prompt = prompt_text
+                    else:
+                        st.warning("音声が認識できませんでした")
+        except Exception as e:
+            st.error(f"音声認識でエラーが発生しました: {e}")
+            prompt_text = "音声入力でエラーが発生しました"
+        finally:
+            if os.path.exists(temp_audio_file_path):
+                os.unlink(temp_audio_file_path)
+
+else:
+    # 既存のテキスト入力モード
+    if prompt := st.chat_input(
+        accept_file="multiple",
+        file_type=[
+            "png",
+            "jpg",
+            "jpeg",
+            "gif",
+            "webp",
+        ],
+    ):
+        pass  # promptは既に設定済み
+
+# 共通の入力処理ロジック
+if prompt:
     user_display_items = []
     message_parts = []
 
@@ -141,4 +333,22 @@ if prompt := st.chat_input(
         )
         last_message = response["messages"][-1]
         st.session_state["chat_history"].append(last_message)
-        st.write(last_message.content)
+
+        # レスポンス表示とオーディオ出力
+        response_content = last_message.content
+        st.write(response_content)
+
+        # 音声モードの場合、音声出力を追加
+        if input_output_mode == "音声":
+            try:
+                with st.spinner("音声を生成中です..."):
+                    audio_bytes = synthesize_audio(
+                        text=response_content,
+                        language=tts_language,
+                        speed=tts_speed,
+                        pitch_shift=tts_pitch,
+                        volume_db=tts_volume,
+                    )
+                    st.audio(audio_bytes, format="audio/mp3", autoplay=True)
+            except Exception as e:
+                st.warning(f"音声出力でエラーが発生しました: {e}")
