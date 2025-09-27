@@ -104,6 +104,14 @@ with st.sidebar:
     # 音声モードの場合、Whisper 設定を表示
     if input_output_mode == "音声":
         st.subheader("音声認識設定 (オプション)")
+        audio_bytes = audio_recorder(
+            text="クリックして音声入力👉️",
+            recording_color="red",
+            neutral_color="gray",
+            icon_name="microphone",
+            icon_size="2x",
+            key="audio_input",
+        )
         selected_model = st.sidebar.selectbox(
             "Whisperモデル",
             [
@@ -206,16 +214,6 @@ prompt_text = ""
 prompt_files = []
 
 if input_output_mode == "音声":
-    st.subheader("🎤 音声入力")
-    audio_bytes = audio_recorder(
-        text="クリックして録音",
-        recording_color="red",
-        neutral_color="gray",
-        icon_name="microphone",
-        icon_size="2x",
-        key="audio_input",
-    )
-
     if audio_bytes:
         st.audio(audio_bytes, format="audio/wav")
 
