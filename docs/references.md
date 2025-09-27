@@ -49,6 +49,7 @@
   - [Jaeger / Minimal deployment example (Elasticsearch backend)](https://www.jaegertracing.io/docs/1.72/deployment/#minimal-deployment-example-elasticsearch-backend)
 - [Prometheus](https://prometheus.io/)
   - [Prometheus / Getting Started](https://prometheus.io/docs/prometheus/latest/getting_started/)
+- [Trace with LangGraph](https://docs.langchain.com/langsmith/trace-with-langgraph)
 
 ### n8n
 
