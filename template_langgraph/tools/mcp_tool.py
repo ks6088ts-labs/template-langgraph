@@ -31,6 +31,7 @@ class McpClientWrapper:
         if settings is None:
             settings = get_mcp_settings()
         self.settings = settings
+        self.client = None
 
     def get_tools(self) -> list[BaseTool]:
         if self.settings.mcp_config_path == "":
@@ -39,6 +40,6 @@ class McpClientWrapper:
             config = json.load(f)
             for _, value in config["servers"].items():
                 value["transport"] = "stdio"
-            client = MultiServerMCPClient(config["servers"])
-            tools = asyncio.run(client.get_tools())
-            return tools
+            self.client = MultiServerMCPClient(config["servers"])
+            self.tools = asyncio.run(self.client.get_tools())
+            return self.tools

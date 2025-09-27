@@ -1,5 +1,9 @@
 {
   "servers": {
+    "math_server": {
+      "command": "uv",
+      "args": ["run", "python", "template_langgraph/mcps/math_server.py"]
+    },
     "playwright": {
       "command": "npx",
       "args": ["-y", "@playwright/mcp@latest", "--caps=vision"]
