@@ -40,6 +40,6 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 COPY . .
 
 # Set PYTHONPATH to include the working directory for module imports
-ENV PYTHONPATH="${PYTHONPATH}:/app"
+ENV PYTHONPATH="/app"
 
 CMD ["python", "template_langgraph/core.py"]
