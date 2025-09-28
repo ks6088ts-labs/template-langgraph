@@ -31,7 +31,7 @@
 
 ## 前提条件
 
-- [Python 3.10+](https://www.python.org/downloads/)
+- [Python 3.13+](https://www.python.org/downloads/)
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) - モダンな Python パッケージマネージャー
 - [GNU Make](https://www.gnu.org/software/make/) - 一般的なタスクの実行用
 - [Docker](https://www.docker.com/) - ベクターデータベースの実行用（オプション）
