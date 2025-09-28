@@ -3,9 +3,10 @@ name = "template-langgraph"
 version = "0.0.1"
 description = "A GitHub template repository for Python"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.13"
 dependencies = [
     "audio-recorder-streamlit>=0.0.10",
+    "audioop-lts>=0.2.2",
     "azure-ai-projects>=1.0.0",
     "azure-cosmos>=4.9.0",
     "azure-identity>=1.23.1",

@@ -22,10 +22,12 @@ WORKDIR /app
 # hadolint ignore=DL3008
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-       build-essential \
-       python3-dev \
-       libssl-dev \
-       libffi-dev \
+    build-essential \
+    python3-dev \
+    libssl-dev \
+    libffi-dev \
+    ffmpeg \
+    libavcodec-extra \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better cache efficiency

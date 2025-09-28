@@ -31,7 +31,7 @@ This template provides working examples of all these patterns using LangGraph.
 
 ## Prerequisites
 
-- [Python 3.10+](https://www.python.org/downloads/)
+- [Python 3.13+](https://www.python.org/downloads/)
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) - Modern Python package manager
 - [GNU Make](https://www.gnu.org/software/make/) - For running common tasks
 - [Docker](https://www.docker.com/) - For running vector databases (optional)
@@ -280,7 +280,7 @@ docker run --rm \
   ks6088ts/template-langgraph:latest \
   streamlit run template_langgraph/services/streamlits/main.py --server.address 0.0.0.0
 
-# From GitHub Container Registry  
+# From GitHub Container Registry
 docker run --rm \
   -p 8501:8501 \
   -v ./.env:/app/.env \
@@ -291,6 +291,7 @@ docker run --rm \
 #### Multi-Architecture Support
 
 The Docker images are built for both `amd64` and `arm64` architectures, making them compatible with:
+
 - Intel/AMD x64 processors
 - Apple Silicon (M1/M2/M3/M4) processors
 - ARM-based servers
