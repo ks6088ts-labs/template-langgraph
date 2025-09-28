@@ -72,9 +72,12 @@ docker-build: ## build Docker image
 		--build-arg GIT_TAG=$(GIT_TAG) \
 		.
 
+# make docker-run DOCKER_COMMAND="streamlit run template_langgraph/services/streamlits/pages/chat_with_tools_agent.py --server.address 0.0.0.0"
 .PHONY: docker-run
 docker-run: ## run Docker container
-	docker run --rm $(DOCKER_REPO_NAME)/$(DOCKER_IMAGE_NAME):$(GIT_TAG) $(DOCKER_COMMAND)
+	docker run --rm \
+		-p 8501:8501 \
+		$(DOCKER_REPO_NAME)/$(DOCKER_IMAGE_NAME):$(GIT_TAG) $(DOCKER_COMMAND)
 
 .PHONY: docker-run-streamlit
 docker-run-streamlit: ## run Docker container with Streamlit app
