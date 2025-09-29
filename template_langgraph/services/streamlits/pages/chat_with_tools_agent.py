@@ -4,7 +4,6 @@ from base64 import b64encode
 from datetime import datetime
 
 import streamlit as st
-import whisper
 from audio_recorder_streamlit import audio_recorder
 from langchain_community.callbacks.streamlit import (
     StreamlitCallbackHandler,
@@ -14,6 +13,7 @@ from template_langgraph.agents.chat_with_tools_agent.agent import (
     AgentState,
     ChatWithToolsAgent,
 )
+from template_langgraph.speeches.stt import SttWrapper
 from template_langgraph.speeches.tts import synthesize_audio
 from template_langgraph.tools.common import get_default_tools
 
@@ -23,10 +23,11 @@ def image_to_base64(image_bytes: bytes) -> str:
 
 
 @st.cache_resource(show_spinner=False)
-def load_whisper_model(model_size: str = "base"):
-    """Load a Whisper model only once per session."""
-
-    return whisper.load_model(model_size)
+def load_stt_wrapper(model_size: str = "base"):
+    """Load and cache the STT model."""
+    stt_wrapper = SttWrapper()
+    stt_wrapper.load_model(model_size)
+    return stt_wrapper
 
 
 if "chat_history" not in st.session_state:
@@ -178,9 +179,9 @@ if input_output_mode == "音声":
         try:
             if input_output_mode == "音声":
                 with st.spinner("音声を認識中..."):
-                    model = load_whisper_model(selected_model)
+                    stt_wrapper = load_stt_wrapper(selected_model)
                     language_param = None if transcription_language == "auto" else transcription_language
-                    result = model.transcribe(str(temp_audio_file_path), language=language_param)
+                    result = stt_wrapper.transcribe(str(temp_audio_file_path), language=language_param)
                     transcribed_text = result.get("text", "").strip()
                     prompt_text = transcribed_text
 
