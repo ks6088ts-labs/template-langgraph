@@ -1,7 +1,6 @@
 import os
 import tempfile
 from base64 import b64encode
-from datetime import datetime
 
 import streamlit as st
 from audio_recorder_streamlit import audio_recorder
@@ -14,7 +13,7 @@ from template_langgraph.agents.chat_with_tools_agent.agent import (
     ChatWithToolsAgent,
 )
 from template_langgraph.speeches.stt import SttWrapper
-from template_langgraph.speeches.tts import synthesize_audio
+from template_langgraph.speeches.tts import TtsWrapper
 from template_langgraph.tools.common import get_default_tools
 
 
@@ -169,35 +168,25 @@ if input_output_mode == "音声":
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
             temp_audio_file.write(audio_bytes)
             temp_audio_file_path = temp_audio_file.name
-            st.download_button(
-                label="🎧 録音データを保存",
-                data=audio_bytes,
-                file_name=f"recorded_{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav",
-                mime="audio/wav",
-                use_container_width=True,
-            )
         try:
-            if input_output_mode == "音声":
-                with st.spinner("音声を認識中..."):
-                    stt_wrapper = load_stt_wrapper(selected_model)
-                    language_param = None if transcription_language == "auto" else transcription_language
-                    result = stt_wrapper.transcribe(str(temp_audio_file_path), language=language_param)
-                    transcribed_text = result.get("text", "").strip()
-                    prompt_text = transcribed_text
+            with st.spinner("音声を認識中..."):
+                stt_wrapper = load_stt_wrapper(selected_model)
+                language_param = None if transcription_language == "auto" else transcription_language
+                transcribed_text = stt_wrapper.transcribe(str(temp_audio_file_path), language=language_param)
+                prompt_text = transcribed_text
 
-                    if prompt_text:
-                        st.success(f"音声認識完了: {prompt_text}")
-                        prompt = prompt_text
-                    else:
-                        st.warning("音声が認識できませんでした")
+                if prompt_text:
+                    st.success(f"音声認識結果: {prompt_text}")
+                    prompt = prompt_text
+                else:
+                    st.warning("音声が認識できませんでした")
         except Exception as e:
             st.error(f"音声認識でエラーが発生しました: {e}")
             prompt_text = "音声入力でエラーが発生しました"
         finally:
             if os.path.exists(temp_audio_file_path):
                 os.unlink(temp_audio_file_path)
-
-else:
+elif input_output_mode == "テキスト":
     # 既存のテキスト入力モード
     if prompt := st.chat_input(
         accept_file="multiple",
@@ -210,6 +199,8 @@ else:
         ],
     ):
         pass  # promptは既に設定済み
+else:
+    st.error("不明な入出力モードです")
 
 # 共通の入力処理ロジック
 if prompt:
@@ -290,7 +281,7 @@ if prompt:
         if input_output_mode == "音声":
             try:
                 with st.spinner("音声を生成中です..."):
-                    audio_bytes = synthesize_audio(
+                    audio_bytes = TtsWrapper().synthesize_audio(
                         text=response_content,
                         language=tts_language,
                         speed=tts_speed,

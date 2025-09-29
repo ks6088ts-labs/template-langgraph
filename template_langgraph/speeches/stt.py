@@ -28,4 +28,4 @@ class SttWrapper:
             audio=audio_path,
             language=language,
         )
-        return result["text"]
+        return result.get("text", "").strip()
