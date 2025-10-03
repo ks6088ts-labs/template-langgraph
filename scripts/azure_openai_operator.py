@@ -4,8 +4,9 @@ from logging import basicConfig
 
 import typer
 from dotenv import load_dotenv
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 
+from template_langgraph.internals.models.image_analysis import ImageCaptioningResult, ObjectDetectionResult
 from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.loggers import get_logger
 
@@ -257,6 +258,67 @@ def responses(
             )
         )
         logger.info(f"Output: {response.content}")
+
+
+@app.command()
+def image_analysis(
+    file_path: str = typer.Option(
+        "./docs/images/streamlit.png",
+        "--file",
+        "-f",
+        help="Path to the image file to analyze",
+    ),
+    type: str = typer.Option(
+        "captioning",
+        "--type",
+        "-t",
+        help="Type of image analysis to perform",
+        case_sensitive=False,
+        show_choices=True,
+        autocompletion=lambda: ["captioning", "object_detection"],
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Enable verbose output",
+    ),
+):
+    set_verbose_logging(verbose)
+
+    result_type: ImageCaptioningResult | ObjectDetectionResult | None = None
+    if type == "captioning":
+        result_type = ImageCaptioningResult
+    elif type == "object_detection":
+        result_type = ObjectDetectionResult
+    else:
+        raise ValueError(f"Unsupported analysis type: {type}")
+
+    llm = AzureOpenAiWrapper().chat_model.with_structured_output(result_type)
+    result = llm.invoke(
+        input=[
+            SystemMessage(
+                content="You are a helpful assistant that performs image analysis tasks. "
+                "You will be provided with an image in base64 format. "
+                "Analyze the image and provide the required information based on the user's request."
+            ),
+            HumanMessage(
+                content=[
+                    {
+                        "type": "text",
+                        "text": "Analyze the following image and provide the required information.",
+                    },
+                    {
+                        "type": "image",
+                        "source_type": "base64",
+                        "data": load_image_to_base64(file_path),
+                        "mime_type": "image/png",
+                    },
+                ]
+            ),
+        ],
+    )
+    logger.info(f"Result: {result}")
 
 
 if __name__ == "__main__":
