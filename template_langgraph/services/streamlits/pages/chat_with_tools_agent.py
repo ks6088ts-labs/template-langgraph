@@ -8,6 +8,7 @@ from audio_recorder_streamlit import audio_recorder
 from langchain_community.callbacks.streamlit import (
     StreamlitCallbackHandler,
 )
+from langfuse.langchain import CallbackHandler
 
 from template_langgraph.agents.chat_with_tools_agent.agent import (
     AgentState,
@@ -296,7 +297,12 @@ def build_graph_messages() -> list:
 def invoke_agent(graph_messages: list) -> AgentState:
     return st.session_state["graph"].invoke(
         {"messages": graph_messages},
-        {"callbacks": [StreamlitCallbackHandler(st.container())]},
+        {
+            "callbacks": [
+                StreamlitCallbackHandler(st.container()),
+                CallbackHandler(),
+            ]
+        },
     )
 
 

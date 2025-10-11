@@ -106,3 +106,7 @@
 ### [LiteLLM](https://docs.litellm.ai/)
 
 - [Azure OpenAI](https://docs.litellm.ai/docs/providers/azure/)
+
+### [Langfuse](https://langfuse.com/)
+
+- [Cookbook: LangGraph Integration](https://langfuse.com/guides/cookbook/integration_langgraph)
