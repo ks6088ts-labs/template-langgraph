@@ -4,6 +4,7 @@ from uuid import uuid4
 import typer
 from dotenv import load_dotenv
 from langchain_core.runnables.config import RunnableConfig
+from langfuse.langchain import CallbackHandler
 
 from template_langgraph.agents.chat_with_tools_agent.agent import graph as chat_with_tools_agent_graph
 from template_langgraph.agents.image_classifier_agent.agent import graph as image_classifier_agent_graph
@@ -126,6 +127,9 @@ def run(
         },
         config=RunnableConfig(
             recursion_limit=recursion_limit,
+            callbacks=[
+                CallbackHandler(),
+            ],
         ),
     ):
         logger.info("-" * 20)
@@ -181,6 +185,9 @@ def news_summarizer_agent(
         ),
         config=RunnableConfig(
             recursion_limit=recursion_limit,
+            callbacks=[
+                CallbackHandler(),
+            ],
         ),
     ):
         logger.info("-" * 20)
@@ -242,6 +249,9 @@ def image_classifier_agent(
         ),
         config=RunnableConfig(
             recursion_limit=recursion_limit,
+            callbacks=[
+                CallbackHandler(),
+            ],
         ),
     ):
         logger.info("-" * 20)
