@@ -9,6 +9,8 @@ from langchain_community.callbacks.streamlit import (
     StreamlitCallbackHandler,
 )
 from langfuse.langchain import CallbackHandler
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.store.memory import InMemoryStore
 
 from template_langgraph.agents.chat_with_tools_agent.agent import (
     AgentState,
@@ -68,7 +70,11 @@ def ensure_agent_graph(selected_tools: list) -> None:
     signature = tuple(tool.name for tool in selected_tools)
     graph_signature = st.session_state.get("graph_tools_signature")
     if "graph" not in st.session_state or graph_signature != signature:
-        st.session_state["graph"] = ChatWithToolsAgent(tools=selected_tools).create_graph()
+        st.session_state["graph"] = ChatWithToolsAgent(
+            tools=selected_tools,
+            checkpointer=InMemorySaver(),  # You can replace this with a persistent checkpointer if needed
+            store=InMemoryStore(),  # You can replace this with a persistent store if needed
+        ).create_graph()
         st.session_state["graph_tools_signature"] = signature
 
 
@@ -296,12 +302,18 @@ def build_graph_messages() -> list:
 
 def invoke_agent(graph_messages: list) -> AgentState:
     return st.session_state["graph"].invoke(
-        {"messages": graph_messages},
+        {
+            "messages": graph_messages,
+        },
         {
             "callbacks": [
                 StreamlitCallbackHandler(st.container()),
                 CallbackHandler(),
-            ]
+            ],
+            "configurable": {
+                "thread_id": "1",
+                "user_id": "user_1",
+            },
         },
     )
 

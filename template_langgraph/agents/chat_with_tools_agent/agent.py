@@ -50,9 +50,16 @@ class BasicToolNode:
 
 
 class ChatWithToolsAgent:
-    def __init__(self, tools=get_default_tools()):
+    def __init__(
+        self,
+        tools=get_default_tools(),
+        checkpointer=None,
+        store=None,
+    ):
         self.llm = AzureOpenAiWrapper().chat_model
         self.tools = tools
+        self.checkpointer = checkpointer
+        self.store = store
 
     def create_graph(self):
         """Create the main graph for the agent."""
@@ -83,6 +90,8 @@ class ChatWithToolsAgent:
         # Compile the graph
         return workflow.compile(
             name=ChatWithToolsAgent.__name__,
+            checkpointer=self.checkpointer,
+            store=self.store,
         )
 
     def chat_with_tools(self, state: AgentState) -> AgentState:
