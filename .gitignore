@@ -168,3 +168,5 @@ generated/
 *.db
 *.wav
 mlartifacts
+*.sqlite
+*.bin

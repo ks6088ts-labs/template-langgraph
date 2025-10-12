@@ -1,5 +1,7 @@
 import os
+import sqlite3
 import tempfile
+import uuid
 from base64 import b64encode
 from dataclasses import dataclass
 
@@ -9,8 +11,8 @@ from langchain_community.callbacks.streamlit import (
     StreamlitCallbackHandler,
 )
 from langfuse.langchain import CallbackHandler
-from langgraph.checkpoint.memory import InMemorySaver
-from langgraph.store.memory import InMemoryStore
+from langgraph.checkpoint.sqlite import SqliteSaver
+from langgraph.store.sqlite import SqliteStore
 
 from template_langgraph.agents.chat_with_tools_agent.agent import (
     AgentState,
@@ -19,6 +21,10 @@ from template_langgraph.agents.chat_with_tools_agent.agent import (
 from template_langgraph.speeches.stt import SttWrapper
 from template_langgraph.speeches.tts import TtsWrapper
 from template_langgraph.tools.common import get_default_tools
+
+checkpoints_conn = sqlite3.connect("checkpoints.sqlite", check_same_thread=False)
+store_conn = sqlite3.connect("store.sqlite", check_same_thread=False)
+thread_id = str(uuid.uuid4())
 
 
 def image_to_base64(image_bytes: bytes) -> str:
@@ -72,8 +78,12 @@ def ensure_agent_graph(selected_tools: list) -> None:
     if "graph" not in st.session_state or graph_signature != signature:
         st.session_state["graph"] = ChatWithToolsAgent(
             tools=selected_tools,
-            checkpointer=InMemorySaver(),  # You can replace this with a persistent checkpointer if needed
-            store=InMemoryStore(),  # You can replace this with a persistent store if needed
+            checkpointer=SqliteSaver(
+                conn=checkpoints_conn,
+            ),
+            store=SqliteStore(
+                conn=store_conn,
+            ),
         ).create_graph()
         st.session_state["graph_tools_signature"] = signature
 
@@ -311,7 +321,7 @@ def invoke_agent(graph_messages: list) -> AgentState:
                 CallbackHandler(),
             ],
             "configurable": {
-                "thread_id": "1",
+                "thread_id": thread_id,
                 "user_id": "user_1",
             },
         },

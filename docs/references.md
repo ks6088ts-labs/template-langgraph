@@ -20,6 +20,7 @@
 - [Add and manage memory](https://docs.langchain.com/oss/python/langgraph/add-memory)
 - [Persistence](https://langchain-ai.github.io/langgraph/concepts/persistence/)
 - [Chatbot with message summarization & external DB memory](https://github.com/langchain-ai/langchain-academy/blob/main/module-2/chatbot-external-memory.ipynb)
+- [LangGraph の会話履歴を SQLite に保持しよう](https://www.creationline.com/tech-blog/chatgpt-ai/75797)
 
 ### LangChain
 
