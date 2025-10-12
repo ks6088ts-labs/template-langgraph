@@ -17,6 +17,10 @@
 - [Custom UI for Deep Agents](https://github.com/langchain-ai/deep-agents-ui)
 - [How to deploy self-hosted standalone server](https://docs.langchain.com/langgraph-platform/deploy-standalone-server)
 - [「現場で活用するための AI エージェント実践入門」リポジトリ](https://github.com/masamasa59/genai-agent-advanced-book)
+- [Add and manage memory](https://docs.langchain.com/oss/python/langgraph/add-memory)
+- [Persistence](https://langchain-ai.github.io/langgraph/concepts/persistence/)
+- [Chatbot with message summarization & external DB memory](https://github.com/langchain-ai/langchain-academy/blob/main/module-2/chatbot-external-memory.ipynb)
+- [LangGraph の会話履歴を SQLite に保持しよう](https://www.creationline.com/tech-blog/chatgpt-ai/75797)
 
 ### LangChain
 
