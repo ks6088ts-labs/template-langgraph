@@ -11,8 +11,10 @@ from langchain_community.callbacks.streamlit import (
     StreamlitCallbackHandler,
 )
 from langfuse.langchain import CallbackHandler
+from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.store.sqlite import SqliteStore
+from langgraph_checkpoint_cosmosdb import CosmosDBSaver
 
 from template_langgraph.agents.chat_with_tools_agent.agent import (
     AgentState,
@@ -22,7 +24,7 @@ from template_langgraph.speeches.stt import SttWrapper
 from template_langgraph.speeches.tts import TtsWrapper
 from template_langgraph.tools.common import get_default_tools
 
-checkpoints_conn = sqlite3.connect("checkpoints.sqlite", check_same_thread=False)
+checkpoint_type = "cosmosdb"  # "cosmosdb" or "sqlite"
 store_conn = sqlite3.connect("store.sqlite", check_same_thread=False)
 thread_id = str(uuid.uuid4())
 
@@ -72,15 +74,35 @@ def ensure_session_state_defaults(tool_names: list[str]) -> None:
     st.session_state.setdefault("selected_tool_names", tool_names)
 
 
+def get_checkpointer():
+    if checkpoint_type == "sqlite":
+        conn = sqlite3.connect("checkpoints.sqlite", check_same_thread=False)
+        return SqliteSaver(conn=conn)
+    if checkpoint_type == "cosmosdb":
+        import os
+
+        from template_langgraph.tools.cosmosdb_tool import get_cosmosdb_settings
+
+        settings = get_cosmosdb_settings()
+        os.environ["COSMOSDB_ENDPOINT"] = settings.cosmosdb_host
+        os.environ["COSMOSDB_KEY"] = settings.cosmosdb_key
+
+        return CosmosDBSaver(
+            database_name=settings.cosmosdb_database_name,
+            container_name="checkpoints",
+        )
+    if checkpoint_type == "memory":
+        return InMemorySaver()
+    return None
+
+
 def ensure_agent_graph(selected_tools: list) -> None:
     signature = tuple(tool.name for tool in selected_tools)
     graph_signature = st.session_state.get("graph_tools_signature")
     if "graph" not in st.session_state or graph_signature != signature:
         st.session_state["graph"] = ChatWithToolsAgent(
             tools=selected_tools,
-            checkpointer=SqliteSaver(
-                conn=checkpoints_conn,
-            ),
+            checkpointer=get_checkpointer(),
             store=SqliteStore(
                 conn=store_conn,
             ),

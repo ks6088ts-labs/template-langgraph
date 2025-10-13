@@ -2543,6 +2543,21 @@ wheels = [
 ]
 
 [[package]]
+name = "langgraph-checkpoint-cosmosdb"
+version = "0.2.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "azure-cosmos" },
+    { name = "azure-identity" },
+    { name = "langchain-core" },
+    { name = "langgraph" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1e/b1/bf84231942ccaf58c793c69b4ae92cbef4df5ff5c58f367929f18f7e7622/langgraph_checkpoint_cosmosdb-0.2.4.tar.gz", hash = "sha256:ba7ebe560fd88be6e0a05be41133bc2f0c55715d9333f608792b13ef83b72d25", size = 8204, upload-time = "2025-07-06T02:26:12.745Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/69/ce/673e7d869b204c6cfd2b65cd9cc6a34342b5185425c8d04976c2229d2736/langgraph_checkpoint_cosmosdb-0.2.4-py3-none-any.whl", hash = "sha256:fbad4a99c3f5a6bc3aad7071b240b5041a4b49c346f2a7440b90cdc632efb960", size = 7122, upload-time = "2025-07-06T02:26:10.9Z" },
+]
+
+[[package]]
 name = "langgraph-checkpoint-sqlite"
 version = "2.0.11"
 source = { registry = "https://pypi.org/simple" }
@@ -5312,6 +5327,7 @@ dependencies = [
     { name = "langchain-text-splitters" },
     { name = "langfuse" },
     { name = "langgraph" },
+    { name = "langgraph-checkpoint-cosmosdb" },
     { name = "langgraph-checkpoint-sqlite" },
     { name = "langgraph-supervisor" },
     { name = "mlflow" },
@@ -5373,6 +5389,7 @@ requires-dist = [
     { name = "langchain-text-splitters", specifier = ">=0.3.9" },
     { name = "langfuse", specifier = ">=3.6.2" },
     { name = "langgraph", specifier = ">=0.6.2" },
+    { name = "langgraph-checkpoint-cosmosdb", specifier = ">=0.2.4" },
     { name = "langgraph-checkpoint-sqlite", specifier = ">=2.0.11" },
     { name = "langgraph-supervisor", specifier = ">=0.0.29" },
     { name = "mlflow", specifier = ">=3.4.0" },
