@@ -4,6 +4,7 @@ import tempfile
 import uuid
 from base64 import b64encode
 from dataclasses import dataclass
+from enum import Enum
 
 import streamlit as st
 from audio_recorder_streamlit import audio_recorder
@@ -11,8 +12,10 @@ from langchain_community.callbacks.streamlit import (
     StreamlitCallbackHandler,
 )
 from langfuse.langchain import CallbackHandler
+from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.store.sqlite import SqliteStore
+from langgraph_checkpoint_cosmosdb import CosmosDBSaver
 
 from template_langgraph.agents.chat_with_tools_agent.agent import (
     AgentState,
@@ -22,7 +25,23 @@ from template_langgraph.speeches.stt import SttWrapper
 from template_langgraph.speeches.tts import TtsWrapper
 from template_langgraph.tools.common import get_default_tools
 
-checkpoints_conn = sqlite3.connect("checkpoints.sqlite", check_same_thread=False)
+
+class CheckpointType(str, Enum):
+    SQLITE = "sqlite"
+    COSMOSDB = "cosmosdb"
+    MEMORY = "memory"
+    NONE = "none"
+
+
+DEFAULT_CHECKPOINT_TYPE = CheckpointType.NONE
+CHECKPOINT_LABELS = {
+    CheckpointType.COSMOSDB.value: "Cosmos DB",
+    CheckpointType.SQLITE.value: "SQLite",
+    CheckpointType.MEMORY.value: "メモリ",
+    CheckpointType.NONE.value: "なし",
+}
+
+
 store_conn = sqlite3.connect("store.sqlite", check_same_thread=False)
 thread_id = str(uuid.uuid4())
 
@@ -70,17 +89,47 @@ def ensure_session_state_defaults(tool_names: list[str]) -> None:
     st.session_state.setdefault("chat_history", [])
     st.session_state.setdefault("input_output_mode", "テキスト")
     st.session_state.setdefault("selected_tool_names", tool_names)
+    st.session_state.setdefault("checkpoint_type", DEFAULT_CHECKPOINT_TYPE.value)
+
+
+def get_selected_checkpoint_type() -> CheckpointType:
+    raw_value = st.session_state.get("checkpoint_type", DEFAULT_CHECKPOINT_TYPE.value)
+    try:
+        checkpoint = CheckpointType(raw_value)
+    except ValueError:
+        st.session_state["checkpoint_type"] = DEFAULT_CHECKPOINT_TYPE.value
+        return DEFAULT_CHECKPOINT_TYPE
+    return checkpoint
+
+
+def get_checkpointer():
+    checkpoint_type = get_selected_checkpoint_type()
+    if checkpoint_type is CheckpointType.SQLITE:
+        conn = sqlite3.connect("checkpoints.sqlite", check_same_thread=False)
+        return SqliteSaver(conn=conn)
+    if checkpoint_type is CheckpointType.COSMOSDB:
+        from template_langgraph.tools.cosmosdb_tool import get_cosmosdb_settings
+
+        settings = get_cosmosdb_settings()
+        os.environ["COSMOSDB_ENDPOINT"] = settings.cosmosdb_host
+        os.environ["COSMOSDB_KEY"] = settings.cosmosdb_key
+
+        return CosmosDBSaver(
+            database_name=settings.cosmosdb_database_name,
+            container_name="checkpoints",
+        )
+    if checkpoint_type is CheckpointType.MEMORY:
+        return InMemorySaver()
+    return None
 
 
 def ensure_agent_graph(selected_tools: list) -> None:
-    signature = tuple(tool.name for tool in selected_tools)
+    signature = (tuple(tool.name for tool in selected_tools), get_selected_checkpoint_type().value)
     graph_signature = st.session_state.get("graph_tools_signature")
     if "graph" not in st.session_state or graph_signature != signature:
         st.session_state["graph"] = ChatWithToolsAgent(
             tools=selected_tools,
-            checkpointer=SqliteSaver(
-                conn=checkpoints_conn,
-            ),
+            checkpointer=get_checkpointer(),
             store=SqliteStore(
                 conn=store_conn,
             ),
@@ -110,6 +159,23 @@ def build_sidebar() -> tuple[str, AudioSettings | None]:
 
         if input_mode == "音声":
             audio_settings = render_audio_controls()
+
+        st.divider()
+        st.subheader("チェックポイント")
+
+        checkpoint_options = [checkpoint.value for checkpoint in CheckpointType]
+        current_checkpoint_value = st.session_state["checkpoint_type"]
+        if current_checkpoint_value not in checkpoint_options:
+            current_checkpoint_value = DEFAULT_CHECKPOINT_TYPE.value
+            st.session_state["checkpoint_type"] = current_checkpoint_value
+        checkpoint_index = checkpoint_options.index(current_checkpoint_value)
+        selected_checkpoint_value = st.selectbox(
+            "保存方法",
+            options=checkpoint_options,
+            index=checkpoint_index,
+            format_func=lambda value: CHECKPOINT_LABELS.get(value, value),
+        )
+        st.session_state["checkpoint_type"] = selected_checkpoint_value
 
         st.divider()
         st.subheader("使用するツール")
