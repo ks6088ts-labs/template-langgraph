@@ -107,10 +107,12 @@ def list_checkpoints(
         logger.info("-" * 60)
 
         for i, checkpoint in enumerate(checkpoints, 1):
+            logger.debug(f"Checkpoint raw data: {checkpoint}")
             thread_id = checkpoint.config["configurable"].get("thread_id", "Unknown")
-            checkpoint_id = checkpoint.config.get("checkpoint_id", "Unknown")
+            checkpoint_id = checkpoint.config["configurable"].get("checkpoint_id", "Unknown")
 
-            logger.info(f"{i}. Thread ID: {thread_id}")
+            logger.info(f"{i}.")
+            logger.info(f"   Thread ID: {thread_id}")
             logger.info(f"   Checkpoint ID: {checkpoint_id}")
 
             # Count messages in this checkpoint
@@ -140,7 +142,12 @@ def list_checkpoints(
 
 @app.command()
 def list_messages(
-    thread_id: str = typer.Argument(help="Thread ID to retrieve messages from"),
+    thread_id: str = typer.Option(
+        ...,
+        "--thread-id",
+        "-i",
+        help="Thread ID of the checkpoint to list messages from",
+    ),
     checkpoint_type: str = typer.Option(
         DEFAULT_CHECKPOINT_TYPE.value,
         "--type",
