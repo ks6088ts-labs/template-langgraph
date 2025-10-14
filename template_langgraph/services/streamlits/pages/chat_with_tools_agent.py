@@ -64,11 +64,6 @@ def load_stt_wrapper(model_size: str = "base"):
     return stt_wrapper
 
 
-# 以前は Streamlit セッションに chat_history を保持していたが、
-# 仕様変更により LangGraph の state (messages) を直接参照する方式へ移行。
-# そのため chat_history の初期化は削除。
-
-
 @dataclass(slots=True)
 class AudioSettings:
     audio_bytes: bytes | None
@@ -93,7 +88,6 @@ class UserSubmission:
 
 
 def ensure_session_state_defaults(tool_names: list[str]) -> None:
-    # chat_history は利用せず（LangGraph 側の messages を利用）
     st.session_state.setdefault("input_output_mode", "テキスト")
     st.session_state.setdefault("selected_tool_names", tool_names)
     st.session_state.setdefault("checkpoint_type", DEFAULT_CHECKPOINT_TYPE.value)
@@ -133,14 +127,6 @@ def get_checkpointer():
 def ensure_agent_graph(selected_tools: list) -> None:
     signature = (tuple(tool.name for tool in selected_tools), get_selected_checkpoint_type().value)
     graph_signature = st.session_state.get("graph_tools_signature")
-    checkpointer = get_checkpointer()
-    if checkpointer:
-        for checkpoint in checkpointer.list(config=None):
-            logger.debug(checkpoint)
-            logger.debug(
-                f"thread_id={checkpoint.config['configurable'].get('thread_id')}, checkpoint={checkpoint.checkpoint['channel_values']}",  # noqa: E501
-            )
-
     if "graph" not in st.session_state or graph_signature != signature:
         st.session_state["graph"] = ChatWithToolsAgent(
             tools=selected_tools,
@@ -470,7 +456,6 @@ def invoke_agent(graph_messages: list) -> AgentState:
             ],
             "configurable": {
                 "thread_id": st.session_state.get("thread_id"),
-                "user_id": "user_1",
             },
         },
     )
