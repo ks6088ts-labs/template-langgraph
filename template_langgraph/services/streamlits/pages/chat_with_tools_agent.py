@@ -47,7 +47,9 @@ CHECKPOINT_LABELS = {
 
 
 store_conn = sqlite3.connect("store.sqlite", check_same_thread=False)
-thread_id = str(uuid.uuid4())
+# thread_id はセッション内で保持し、チェックポイント利用時に既存スレッドを再開できるようにする
+if "thread_id" not in st.session_state:
+    st.session_state["thread_id"] = str(uuid.uuid4())
 
 
 def image_to_base64(image_bytes: bytes) -> str:
@@ -62,8 +64,9 @@ def load_stt_wrapper(model_size: str = "base"):
     return stt_wrapper
 
 
-if "chat_history" not in st.session_state:
-    st.session_state["chat_history"] = []
+# 以前は Streamlit セッションに chat_history を保持していたが、
+# 仕様変更により LangGraph の state (messages) を直接参照する方式へ移行。
+# そのため chat_history の初期化は削除。
 
 
 @dataclass(slots=True)
@@ -90,7 +93,7 @@ class UserSubmission:
 
 
 def ensure_session_state_defaults(tool_names: list[str]) -> None:
-    st.session_state.setdefault("chat_history", [])
+    # chat_history は利用せず（LangGraph 側の messages を利用）
     st.session_state.setdefault("input_output_mode", "テキスト")
     st.session_state.setdefault("selected_tool_names", tool_names)
     st.session_state.setdefault("checkpoint_type", DEFAULT_CHECKPOINT_TYPE.value)
@@ -149,6 +152,27 @@ def ensure_agent_graph(selected_tools: list) -> None:
         st.session_state["graph_tools_signature"] = signature
 
 
+def _list_existing_thread_ids() -> list[str]:
+    """チェックポインタに保存されている thread_id を列挙 (最大50件)。"""
+    checkpointer = get_checkpointer()
+    if not checkpointer:
+        return []
+    thread_ids: set[str] = set()
+    try:
+        for i, snapshot in enumerate(checkpointer.list(config=None)):
+            if i > 1000:  # 念のため無限増加防止
+                break
+            cfg = getattr(snapshot, "config", {}) or {}
+            configurable = cfg.get("configurable", {}) if isinstance(cfg, dict) else {}
+            tid = configurable.get("thread_id")
+            if isinstance(tid, str):
+                thread_ids.add(tid)
+    except Exception as exc:  # noqa: BLE001
+        logger.debug(f"thread list 取得失敗: {exc}")
+    # 直近利用を優先できる情報が無いので単純ソート
+    return sorted(thread_ids)[:50]
+
+
 def build_sidebar() -> tuple[str, AudioSettings | None]:
     audio_settings: AudioSettings | None = None
 
@@ -188,6 +212,27 @@ def build_sidebar() -> tuple[str, AudioSettings | None]:
             format_func=lambda value: CHECKPOINT_LABELS.get(value, value),
         )
         st.session_state["checkpoint_type"] = selected_checkpoint_value
+
+        # スレッド選択 UI （チェックポイント有効時のみ）
+        if get_selected_checkpoint_type() is not CheckpointType.NONE:
+            existing_threads = _list_existing_thread_ids()
+            st.subheader("スレッド")
+            new_label = "<新規作成>"
+            options = [new_label, *existing_threads]
+            current_thread = st.session_state.get("thread_id")
+            # 既存に一致するならその index、なければ 0 (新規)
+            if current_thread in existing_threads:
+                default_index = options.index(current_thread)
+            else:
+                default_index = 0
+            selected = st.selectbox("既存スレッドを選択", options=options, index=default_index)
+            if selected == new_label:
+                if st.button("スレッドを生成", use_container_width=True):
+                    st.session_state["thread_id"] = str(uuid.uuid4())
+                    st.experimental_rerun()
+            else:
+                st.session_state["thread_id"] = selected
+            st.caption(f"現在の thread_id: {st.session_state['thread_id']}")
 
         st.divider()
         st.subheader("使用するツール")
@@ -249,17 +294,25 @@ def render_audio_controls() -> AudioSettings:
 
 
 def render_chat_history() -> None:
-    for msg in st.session_state["chat_history"]:
+    """LangGraph の state 保存されている messages を列挙して表示する。"""
+    agent_messages = get_agent_messages()
+    for msg in agent_messages:
+        role = "assistant"
+        content = ""
+        attachments = []
         if isinstance(msg, dict):
-            attachments = msg.get("attachments", [])
-            with st.chat_message(msg["role"]):
-                if attachments:
-                    for item in attachments:
-                        render_attachment(item)
-                else:
-                    st.write(msg["content"])
-        else:
-            st.chat_message("assistant").write(msg.content)
+            role = msg.get("role", role)
+            content = msg.get("content", content)
+            attachments = msg.get("attachments", []) or []
+        else:  # LangChain Message オブジェクト互換
+            role = getattr(msg, "role", role)
+            content = getattr(msg, "content", content)
+        with st.chat_message(role):
+            if attachments:
+                for item in attachments:
+                    render_attachment(item)
+            if content:
+                st.write(content)
 
 
 def render_attachment(item: dict[str, object]) -> None:
@@ -378,14 +431,31 @@ def render_user_submission(submission: UserSubmission) -> None:
         st.write(submission.content)
 
 
-def build_graph_messages() -> list:
-    graph_messages = []
-    for msg in st.session_state["chat_history"]:
-        if isinstance(msg, dict):
-            graph_messages.append({"role": msg["role"], "content": msg["content"]})
-        else:
-            graph_messages.append(msg)
-    return graph_messages
+def get_agent_messages() -> list:
+    """LangGraph の現在 state から messages を取得。エラー時は空配列。"""
+    if "graph" not in st.session_state:
+        return []
+    try:
+        state = st.session_state["graph"].get_state(
+            {
+                "configurable": {
+                    "thread_id": st.session_state.get("thread_id"),
+                    "user_id": "user_1",
+                },
+            },
+        )
+        values = getattr(state, "values", state)
+        if isinstance(values, dict):
+            return list(values.get("messages", []) or [])
+        return []
+    except Exception as exc:  # noqa: BLE001
+        logger.debug(f"messages state の取得に失敗: {exc}")
+        return []
+
+
+def build_graph_messages_with_new_user(user_content: str) -> list:
+    """既存 messages に新しい user メッセージを追加したリストを返す。"""
+    return [*get_agent_messages(), {"role": "user", "content": user_content}]
 
 
 def invoke_agent(graph_messages: list) -> AgentState:
@@ -399,7 +469,7 @@ def invoke_agent(graph_messages: list) -> AgentState:
                 CallbackHandler(),
             ],
             "configurable": {
-                "thread_id": thread_id,
+                "thread_id": st.session_state.get("thread_id"),
                 "user_id": "user_1",
             },
         },
@@ -431,19 +501,17 @@ render_chat_history()
 submission = collect_user_submission(input_output_mode, audio_settings)
 
 if submission:
-    history_message = submission.to_history_message()
-    st.session_state["chat_history"].append(history_message)
-
     with st.chat_message("user"):
         render_user_submission(submission)
 
-    graph_messages = build_graph_messages()
-
+    updated_messages = build_graph_messages_with_new_user(submission.content)
     with st.chat_message("assistant"):
-        response = invoke_agent(graph_messages)
-        last_message = response["messages"][-1]
-        st.session_state["chat_history"].append(last_message)
-
-        response_content = last_message.content
-        st.write(response_content)
-        synthesize_audio_if_needed(response_content, input_output_mode, audio_settings)
+        response = invoke_agent(updated_messages)
+        latest_messages = response["messages"]
+        last_message = latest_messages[-1] if latest_messages else None
+        if last_message is not None:
+            response_content = getattr(last_message, "content", None) or (
+                last_message.get("content") if isinstance(last_message, dict) else ""
+            )
+            st.write(response_content)
+            synthesize_audio_if_needed(response_content, input_output_mode, audio_settings)
