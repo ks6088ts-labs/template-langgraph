@@ -21,9 +21,13 @@ from template_langgraph.agents.chat_with_tools_agent.agent import (
     AgentState,
     ChatWithToolsAgent,
 )
+from template_langgraph.loggers import get_logger
 from template_langgraph.speeches.stt import SttWrapper
 from template_langgraph.speeches.tts import TtsWrapper
 from template_langgraph.tools.common import get_default_tools
+
+logger = get_logger(__name__)
+logger.setLevel("DEBUG")
 
 
 class CheckpointType(str, Enum):
@@ -126,6 +130,14 @@ def get_checkpointer():
 def ensure_agent_graph(selected_tools: list) -> None:
     signature = (tuple(tool.name for tool in selected_tools), get_selected_checkpoint_type().value)
     graph_signature = st.session_state.get("graph_tools_signature")
+    checkpointer = get_checkpointer()
+    if checkpointer:
+        for checkpoint in checkpointer.list(config=None):
+            logger.debug(checkpoint)
+            logger.debug(
+                f"thread_id={checkpoint.config['configurable'].get('thread_id')}, checkpoint={checkpoint.checkpoint['channel_values']}",  # noqa: E501
+            )
+
     if "graph" not in st.session_state or graph_signature != signature:
         st.session_state["graph"] = ChatWithToolsAgent(
             tools=selected_tools,
