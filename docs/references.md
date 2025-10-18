@@ -142,4 +142,7 @@ codex mcp add mslearn -- npx -y mcp-remote "https://learn.microsoft.com/api/mcp"
 codex mcp remove context7
 ## List MCP servers
 codex mcp list
+
+# Run Codex non-interactively
+codex exec "Playwright MCP を使って Yahoo リアルタイム検索の上位キーワードをまとめて"
 ```

@@ -143,7 +143,7 @@ runner = st.session_state.cli_runner
 process = runner.get("process")
 is_running = bool(process) and process.poll() is None
 
-st.title("Codex CLI Runner")
+st.title("CLI Runner")
 
 with st.sidebar:
     st.header("Command Settings")
@@ -151,8 +151,8 @@ with st.sidebar:
     st.session_state.cli_runner["command"] = st.text_input(
         label="Command",
         key="cli_runner_command_input",
-        value=runner.get("command", ""),
-        placeholder="e.g. ls -la",
+        value="codex exec --help",
+        placeholder="e.g. ls -la; while true; do date +%s; sleep 1; done",
     )
 
     run_clicked = st.button("Run", use_container_width=True)
@@ -211,4 +211,4 @@ _render_logs(runner.get("logs", []))
 
 if is_running and runner.get("auto_refresh", True):
     time.sleep(1)
-    st.experimental_rerun()
+    st.rerun()
