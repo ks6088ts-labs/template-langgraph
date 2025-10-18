@@ -114,3 +114,32 @@
 ### [Langfuse](https://langfuse.com/)
 
 - [Cookbook: LangGraph Integration](https://langfuse.com/guides/cookbook/integration_langgraph)
+
+### [Codex CLI](https://github.com/openai/codex)
+
+- Azure OpenAI で Codex CLI を使う: [Codex Azure OpenAI Integration: Fast & Secure Code Development](https://devblogs.microsoft.com/all-things-azure/codex-azure-openai-integration-fast-secure-code-development/)
+- [OpenAI Codex CLI のクイックスタート](https://note.com/npaka/n/n7b6448020250)
+
+```shell
+# Install Codex CLI
+npm install -g @openai/codex
+
+# Generate shell completion scripts
+codex completion zsh
+
+# Dump configurations
+cat ~/.codex/config.toml
+
+# Set up environment variables
+export AZURE_OPENAI_API_KEY="<your-api-key>"
+
+# MCP server management: https://qiita.com/tomada/items/2eb8d5b5173a4d70b287
+## Add a global MCP server entry
+codex mcp add context7   -- npx -y @upstash/context7-mcp
+codex mcp add playwright -- npx -y @playwright/mcp@latest
+codex mcp add mslearn -- npx -y mcp-remote "https://learn.microsoft.com/api/mcp" # ref. https://zenn.dev/yanskun/articles/codex-remote-mcp
+## Remove MCP server
+codex mcp remove context7
+## List MCP servers
+codex mcp list
+```
