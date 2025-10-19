@@ -146,3 +146,18 @@ codex mcp list
 # Run Codex non-interactively
 codex exec "Playwright MCP を使って Yahoo リアルタイム検索の上位キーワードをまとめて"
 ```
+
+### Model Context Protocol (MCP)
+
+- [MCP Inspector](https://github.com/modelcontextprotocol/inspector)
+
+```shell
+# Running the Inspector
+npx @modelcontextprotocol/inspector
+
+# Run the Codex MCP server (stdio transport)
+codex mcp-server --help
+
+# Run the Inspector with the Codex MCP server
+npx @modelcontextprotocol/inspector -- codex mcp-server
+```
