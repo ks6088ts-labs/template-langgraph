@@ -8,10 +8,6 @@
       "command": "npx",
       "args": ["-y", "@playwright/mcp@latest", "--caps=vision"]
     },
-    "filesystem": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./assets"]
-    },
     "everything": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-everything"]

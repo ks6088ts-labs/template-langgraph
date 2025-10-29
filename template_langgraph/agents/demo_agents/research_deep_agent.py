@@ -1,5 +1,7 @@
 # ruff: noqa: E501
-from template_langgraph.agents.demo_agents.deep_agent_core import create_deep_agent
+from deepagents import create_deep_agent
+
+from template_langgraph.llms.azure_openais import AzureOpenAiWrapper
 from template_langgraph.tools.common import get_default_tools
 
 sub_research_prompt = """You are a dedicated researcher. Your job is to conduct research based on the users questions.
@@ -135,6 +137,7 @@ Use this to run an Azure AI Search for getting KABUTO related information. You c
 
 # Create the agent
 graph = create_deep_agent(
+    model=AzureOpenAiWrapper().chat_model,
     tools=get_default_tools(),
     instructions=research_instructions,
     subagents=[critique_sub_agent, research_sub_agent],
