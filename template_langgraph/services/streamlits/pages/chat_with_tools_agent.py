@@ -35,6 +35,9 @@ load_dotenv(
 )
 
 
+DEFAULT_SYSTEM_PROMPT = os.getenv("CHAT_WITH_TOOLS_AGENT_SYSTEM_PROMPT", "") or ""
+
+
 class CheckpointType(str, Enum):
     SQLITE = "sqlite"
     COSMOSDB = "cosmosdb"
@@ -92,10 +95,11 @@ class UserSubmission:
         return message
 
 
-def ensure_session_state_defaults(tool_names: list[str]) -> None:
+def ensure_session_state_defaults(tool_names: list[str], default_system_prompt: str) -> None:
     st.session_state.setdefault("input_output_mode", "テキスト")
     st.session_state.setdefault("selected_tool_names", tool_names)
     st.session_state.setdefault("checkpoint_type", DEFAULT_CHECKPOINT_TYPE.value)
+    st.session_state.setdefault("chat_with_tools_system_prompt", default_system_prompt)
 
 
 def get_selected_checkpoint_type() -> CheckpointType:
@@ -130,7 +134,14 @@ def get_checkpointer():
 
 
 def ensure_agent_graph(selected_tools: list) -> None:
-    signature = (tuple(tool.name for tool in selected_tools), get_selected_checkpoint_type().value)
+    checkpoint_value = get_selected_checkpoint_type().value
+    session_prompt_value = st.session_state.get("chat_with_tools_system_prompt", "") or ""
+    system_prompt = session_prompt_value if session_prompt_value.strip() else None
+    signature = (
+        tuple(tool.name for tool in selected_tools),
+        checkpoint_value,
+        system_prompt,
+    )
     graph_signature = st.session_state.get("graph_tools_signature")
     if "graph" not in st.session_state or graph_signature != signature:
         st.session_state["graph"] = ChatWithToolsAgent(
@@ -139,7 +150,7 @@ def ensure_agent_graph(selected_tools: list) -> None:
             store=SqliteStore(
                 conn=store_conn,
             ),
-            system_prompt=os.getenv("CHAT_WITH_TOOLS_AGENT_SYSTEM_PROMPT", None),
+            system_prompt=system_prompt,
         ).create_graph()
         st.session_state["graph_tools_signature"] = signature
 
@@ -175,7 +186,7 @@ def build_sidebar() -> tuple[str, AudioSettings | None]:
         tool_name_to_obj = {tool.name: tool for tool in available_tools}
         tool_names = list(tool_name_to_obj.keys())
 
-        ensure_session_state_defaults(tool_names)
+        ensure_session_state_defaults(tool_names, DEFAULT_SYSTEM_PROMPT)
 
         input_mode = st.radio(
             "モードを選択してください",
@@ -240,6 +251,15 @@ def build_sidebar() -> tuple[str, AudioSettings | None]:
         ensure_agent_graph(selected_tools)
 
         st.caption("選択中: " + (", ".join(selected_tool_names) if selected_tool_names else "なし"))
+
+        st.divider()
+        st.subheader("システムプロンプト")
+        st.text_area(
+            "プロンプト",
+            key="chat_with_tools_system_prompt",
+            height=200,
+            help="ChatWithToolsAgent に渡す system prompt を上書きできます",
+        )
 
     return input_mode, audio_settings
 
