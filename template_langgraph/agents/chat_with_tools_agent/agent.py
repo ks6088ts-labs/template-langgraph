@@ -1,7 +1,7 @@
 import asyncio
 import json
 
-from langchain_core.messages import ToolMessage
+from langchain_core.messages import SystemMessage, ToolMessage
 from langgraph.graph import END, StateGraph
 
 from template_langgraph.agents.chat_with_tools_agent.models import AgentState
@@ -55,11 +55,14 @@ class ChatWithToolsAgent:
         tools=get_default_tools(),
         checkpointer=None,
         store=None,
+        system_prompt: str | None = None,
     ):
         self.llm = AzureOpenAiWrapper().chat_model
         self.tools = tools
         self.checkpointer = checkpointer
         self.store = store
+        self.system_prompt = system_prompt
+        self._system_message = SystemMessage(content=system_prompt) if system_prompt else None
 
     def create_graph(self):
         """Create the main graph for the agent."""
@@ -100,9 +103,10 @@ class ChatWithToolsAgent:
         llm_with_tools = self.llm.bind_tools(
             tools=self.tools,
         )
+        messages = self._prepare_messages(state)
         return {
             "messages": [
-                llm_with_tools.invoke(state["messages"]),
+                llm_with_tools.invoke(messages),
             ]
         }
 
@@ -123,6 +127,16 @@ class ChatWithToolsAgent:
         if hasattr(ai_message, "tool_calls") and len(ai_message.tool_calls) > 0:
             return "tools"
         return END
+
+    def _prepare_messages(self, state: AgentState):
+        """Return a message list with the optional system prompt prefixed."""
+        base_messages = list(state) if isinstance(state, list) else list(state.get("messages", []))
+        if not self._system_message:
+            return base_messages
+        if base_messages and isinstance(base_messages[0], SystemMessage):
+            if base_messages[0].content == self._system_message.content:
+                return base_messages
+        return [self._system_message, *base_messages]
 
 
 graph = ChatWithToolsAgent().create_graph()
