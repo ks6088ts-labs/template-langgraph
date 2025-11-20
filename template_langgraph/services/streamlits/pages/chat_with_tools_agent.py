@@ -8,6 +8,7 @@ from enum import Enum
 
 import streamlit as st
 from audio_recorder_streamlit import audio_recorder
+from dotenv import load_dotenv
 from langchain_community.callbacks.streamlit import (
     StreamlitCallbackHandler,
 )
@@ -28,6 +29,10 @@ from template_langgraph.tools.common import get_default_tools
 
 logger = get_logger(__name__)
 logger.setLevel("DEBUG")
+load_dotenv(
+    override=True,
+    verbose=True,
+)
 
 
 class CheckpointType(str, Enum):
@@ -134,6 +139,7 @@ def ensure_agent_graph(selected_tools: list) -> None:
             store=SqliteStore(
                 conn=store_conn,
             ),
+            system_prompt=os.getenv("CHAT_WITH_TOOLS_AGENT_SYSTEM_PROMPT", None),
         ).create_graph()
         st.session_state["graph_tools_signature"] = signature
 
