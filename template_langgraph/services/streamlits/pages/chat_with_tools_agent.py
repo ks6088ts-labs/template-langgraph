@@ -153,6 +153,18 @@ def ensure_agent_graph(selected_tools: list) -> None:
             system_prompt=system_prompt,
         ).create_graph()
         st.session_state["graph_tools_signature"] = signature
+        st.session_state.pop("messages_thread_id", None)
+
+
+def sync_session_messages_with_graph(force: bool = False) -> None:
+    """Ensure st.session_state['messages'] mirrors the current LangGraph state."""
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = []
+    current_thread = st.session_state.get("thread_id")
+    cached_thread = st.session_state.get("messages_thread_id")
+    if force or cached_thread != current_thread:
+        st.session_state["messages"] = get_agent_messages()
+        st.session_state["messages_thread_id"] = current_thread
 
 
 def _list_existing_thread_ids() -> list[str]:
@@ -306,9 +318,9 @@ def render_audio_controls() -> AudioSettings:
 
 
 def render_chat_history() -> None:
-    """LangGraph の state 保存されている messages を列挙して表示する。"""
-    agent_messages = get_agent_messages()
-    for msg in agent_messages:
+    """セッションにキャッシュされた messages を列挙して表示。"""
+    history = st.session_state.get("messages", [])
+    for msg in history:
         role = "assistant"
         content = ""
         attachments = []
@@ -465,9 +477,11 @@ def get_agent_messages() -> list:
         return []
 
 
-def build_graph_messages_with_new_user(user_content: str) -> list:
-    """既存 messages に新しい user メッセージを追加したリストを返す。"""
-    return [*get_agent_messages(), {"role": "user", "content": user_content}]
+def build_graph_messages_with_new_user(user_message: dict[str, object]) -> list:
+    """セッションキャッシュをもとに新しい user メッセージを追加したリストを返す。"""
+    history = list(st.session_state.get("messages", []))
+    history.append(user_message)
+    return history
 
 
 def invoke_agent(graph_messages: list) -> AgentState:
@@ -507,15 +521,21 @@ def synthesize_audio_if_needed(response_content: str, mode: str, audio_settings:
 
 input_output_mode, audio_settings = build_sidebar()
 
+sync_session_messages_with_graph()
+
 render_chat_history()
 
 submission = collect_user_submission(input_output_mode, audio_settings)
 
 if submission:
+    user_history_message = submission.to_history_message()
+    updated_messages = build_graph_messages_with_new_user(user_history_message)
+    st.session_state["messages"] = updated_messages
+    st.session_state["messages_thread_id"] = st.session_state.get("thread_id")
+
     with st.chat_message("user"):
         render_user_submission(submission)
 
-    updated_messages = build_graph_messages_with_new_user(submission.content)
     with st.chat_message("assistant"):
         response = invoke_agent(updated_messages)
         latest_messages = response["messages"]
@@ -526,3 +546,5 @@ if submission:
             )
             st.write(response_content)
             synthesize_audio_if_needed(response_content, input_output_mode, audio_settings)
+        st.session_state["messages"] = list(latest_messages) if latest_messages else updated_messages
+        st.session_state["messages_thread_id"] = st.session_state.get("thread_id")
