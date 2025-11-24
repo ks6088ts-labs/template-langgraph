@@ -1558,7 +1558,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/e6/79/d4f20e91327c98096
 
 [[package]]
 name = "foundry-local-sdk"
-version = "0.5.0"
+version = "0.5.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
@@ -1566,7 +1566,7 @@ dependencies = [
     { name = "tqdm" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6b/5b/8ec740ad2a02f671d0188e9d2ecc50ede6ff18a4affb4fa3730820dccbcd/foundry_local_sdk-0.5.0-py3-none-any.whl", hash = "sha256:e497d63356020a7afd9a2ee666c4c1df582f42323fe7bc7c20215f9aae43f55b", size = 13981, upload-time = "2025-09-23T18:09:39.348Z" },
+    { url = "https://files.pythonhosted.org/packages/ed/6b/76a7fe8f9f4c52cc84eaa1cd1b66acddf993496d55d6ea587bf0d0854d1c/foundry_local_sdk-0.5.1-py3-none-any.whl", hash = "sha256:f3639a3666bc3a94410004a91671338910ac2e1b8094b1587cc4db0f4a7df07e", size = 14003, upload-time = "2025-11-21T05:39:58.099Z" },
 ]
 
 [[package]]
