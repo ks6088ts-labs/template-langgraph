@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Set up uv with caching enabled
         uses: astral-sh/setup-uv@v7
         with:
