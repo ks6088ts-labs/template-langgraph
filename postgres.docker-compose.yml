@@ -4,6 +4,8 @@ services:
     container_name: postgres
     ports:
       - "5432:5432"
+    # WARNING: The following credentials are for local development only.
+    # Change POSTGRES_USER and POSTGRES_PASSWORD for any non-local or production environment.
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
