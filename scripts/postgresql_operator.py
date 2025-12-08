@@ -38,7 +38,7 @@ def test(
     # Set up logging
     if verbose:
         logger.setLevel(logging.DEBUG)
-    logger.info("Creating PostgreSQL database...")
+    logger.info("Connecting to PostgreSQL database...")
 
     # 1. Create a SQLAlchemy engine
     engine = create_engine(database_url)
