@@ -161,3 +161,8 @@ codex mcp-server --help
 # Run the Inspector with the Codex MCP server
 npx @modelcontextprotocol/inspector -- codex mcp-server
 ```
+
+### PostgreSQL
+
+- [PostgreSQL for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=ms-ossdata.vscode-pgsql)
+- [Docker Hub > postgres](https://hub.docker.com/_/postgres/tags)

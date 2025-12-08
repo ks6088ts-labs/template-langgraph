@@ -4420,6 +4420,18 @@ wheels = [
 ]
 
 [[package]]
+name = "psycopg"
+version = "3.3.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "tzdata", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e0/1a/7d9ef4fdc13ef7f15b934c393edc97a35c281bb7d3c3329fbfcbe915a7c2/psycopg-3.3.2.tar.gz", hash = "sha256:707a67975ee214d200511177a6a80e56e654754c9afca06a7194ea6bbfde9ca7", size = 165630, upload-time = "2025-12-06T17:34:53.899Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8c/51/2779ccdf9305981a06b21a6b27e8547c948d85c41c76ff434192784a4c93/psycopg-3.3.2-py3-none-any.whl", hash = "sha256:3e94bc5f4690247d734599af56e51bae8e0db8e4311ea413f801fef82b14a99b", size = 212774, upload-time = "2025-12-06T17:31:41.414Z" },
+]
+
+[[package]]
 name = "psycopg2-binary"
 version = "2.9.11"
 source = { registry = "https://pypi.org/simple" }
@@ -5602,6 +5614,7 @@ dependencies = [
     { name = "opentelemetry-api" },
     { name = "opentelemetry-exporter-otlp" },
     { name = "opentelemetry-sdk" },
+    { name = "psycopg" },
     { name = "psycopg2-binary" },
     { name = "pydantic-settings" },
     { name = "pydub" },
@@ -5610,6 +5623,7 @@ dependencies = [
     { name = "qdrant-client" },
     { name = "sounddevice" },
     { name = "soundfile" },
+    { name = "sqlalchemy" },
     { name = "streamlit" },
     { name = "typer" },
     { name = "youtube-transcript-api" },
@@ -5665,6 +5679,7 @@ requires-dist = [
     { name = "opentelemetry-api", specifier = ">=1.36.0" },
     { name = "opentelemetry-exporter-otlp", specifier = ">=1.36.0" },
     { name = "opentelemetry-sdk", specifier = ">=1.36.0" },
+    { name = "psycopg", specifier = ">=3.3.2" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "pydantic-settings", specifier = ">=2.9.1" },
     { name = "pydub", specifier = ">=0.25.1" },
@@ -5673,6 +5688,7 @@ requires-dist = [
     { name = "qdrant-client", specifier = ">=1.15.1" },
     { name = "sounddevice", specifier = ">=0.5.2" },
     { name = "soundfile", specifier = ">=0.13.1" },
+    { name = "sqlalchemy", specifier = ">=2.0.44" },
     { name = "streamlit", specifier = ">=1.48.0" },
     { name = "typer", specifier = ">=0.16.0" },
     { name = "youtube-transcript-api", specifier = ">=1.2.2" },
