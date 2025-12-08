@@ -1,6 +1,7 @@
 import logging
 
 import typer
+from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
 from sqlalchemy import Column, Integer, String, create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -17,16 +18,72 @@ app = typer.Typer(
 logger = get_logger(__name__)
 
 
+def get_database_url(
+    user: str,
+    password: str,
+    host: str,
+    port: int,
+    dbname: str,
+    use_entra_id: bool,
+    sslmode: str,
+) -> str:
+    if use_entra_id:
+        logger.info("Using Microsoft Entra ID authentication for PostgreSQL.")
+        credential = DefaultAzureCredential()
+        password = credential.get_token("https://ossrdbms-aad.database.windows.net/.default").token
+
+    return f"postgresql+psycopg://{user}:{password}@{host}:{port}/{dbname}?sslmode={sslmode}"
+
+
 @app.command(
     help="Perform basic PostgreSQL operations using SQLAlchemy ORM ref. https://zenn.dev/yuto_mo/articles/5c7ea612947cf2",
 )
 def test(
-    database_url: str = typer.Option(
-        "postgresql+psycopg://user:password@localhost:5432/db",
-        "--database-url",
-        "-d",
-        help="Database connection URL",
-        envvar="DATABASE_URL",
+    user: str = typer.Option(
+        "user",
+        "--user",
+        "-u",
+        help="Database user",
+        envvar="DB_USER",
+    ),
+    password: str = typer.Option(
+        "password",
+        "--password",
+        "-p",
+        help="Database password",
+        envvar="DB_PASSWORD",
+    ),
+    host: str = typer.Option(
+        "localhost",
+        "--host",
+        "-h",
+        help="Database host",
+        envvar="DB_HOST",
+    ),
+    port: int = typer.Option(
+        5432,
+        "--port",
+        "-P",
+        help="Database port",
+        envvar="DB_PORT",
+    ),
+    dbname: str = typer.Option(
+        "db",
+        "--dbname",
+        "-n",
+        help="Database name",
+        envvar="DB_NAME",
+    ),
+    use_entra_id: bool = typer.Option(
+        False,
+        "--use-entra-id",
+        help="Use Azure Entra ID for authentication",
+    ),
+    sslmode: str = typer.Option(
+        "prefer",
+        "--sslmode",
+        help="SSL mode for PostgreSQL connection",
+        envvar="DB_SSLMODE",
     ),
     verbose: bool = typer.Option(
         False,
@@ -39,6 +96,16 @@ def test(
     if verbose:
         logger.setLevel(logging.DEBUG)
     logger.info("Connecting to PostgreSQL database...")
+
+    database_url = get_database_url(
+        user=user,
+        password=password,
+        host=host,
+        port=port,
+        dbname=dbname,
+        use_entra_id=use_entra_id,
+        sslmode=sslmode,
+    )
 
     # 1. Create a SQLAlchemy engine
     engine = create_engine(database_url)

@@ -166,3 +166,29 @@ npx @modelcontextprotocol/inspector -- codex mcp-server
 
 - [PostgreSQL for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=ms-ossdata.vscode-pgsql)
 - [Docker Hub > postgres](https://hub.docker.com/_/postgres/tags)
+- [クイック スタート: Python を使用して Azure Database for PostgreSQL のデータに接続してクエリを実行する](https://learn.microsoft.com/ja-jp/azure/postgresql/flexible-server/connect-python?tabs=cmd%2Cpasswordless#configure-microsoft-entra-integration-on-the-server-passwordless-only)
+
+```shell
+# To run the Docker container with PostgreSQL:
+docker compose -f postgres.docker-compose.yml up -d
+
+# PostgreSQL operator script with Docker
+uv run python scripts/postgresql_operator.py --verbose
+
+# PostgreSQL operator script with Azure Entra ID authentication
+# - active_directory_auth_enabled = True に設定した PostgreSQL サーバーで実行 ref. https://registry.terraform.io/providers/hashicorp/azurerm/4.50.0/docs/resources/postgresql_flexible_server#active_directory_auth_enabled-1
+# - Security > Authentication > Azure AD authentication で設定したユーザーを指定
+# - Azure CLI でログインしておく必要があります: az login
+# - クライアント IP が PostgreSQL のファイアウォールで許可されているか確認してください
+USER="<your-db-user>" # UPN 形式（例: user@domain.onmicrosoft.com）
+HOST="<your-db-host>" # FQDN 形式（例: your-server.postgres.database.azure.com）
+PORT=5432
+DBNAME="<your-db-name>"
+
+uv run python scripts/postgresql_operator.py --verbose \
+  --user $USER \
+  --host $HOST \
+  --port $PORT \
+  --dbname $DBNAME \
+  --use-entra-id
+```
