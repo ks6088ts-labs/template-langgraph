@@ -148,7 +148,7 @@ if st.session_state.encoded_image and st.session_state.captured_image_bytes:
     if not st.session_state.image_analyzed and is_configured():
         with st.spinner("Analyzing image..."):
             client = get_client()
-            initial_question = "Please describe the content of this image in detail."
+            initial_question = "Please describe the content of this image in detail in Japanese."
             st.session_state.messages.append({"role": "user", "content": initial_question})
 
             response = chat_with_image(
