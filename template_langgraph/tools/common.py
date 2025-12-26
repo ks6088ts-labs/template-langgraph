@@ -4,6 +4,7 @@ from template_langgraph.tools.ai_search_tool import search_ai_search
 from template_langgraph.tools.cosmosdb_tool import search_cosmosdb
 from template_langgraph.tools.dify_tool import run_dify_workflow
 from template_langgraph.tools.elasticsearch_tool import search_elasticsearch
+from template_langgraph.tools.fabric_data_agent_tool import search_fabric_data_agent
 from template_langgraph.tools.mcp_tool import McpClientWrapper
 from template_langgraph.tools.qdrant_tool import search_qdrant
 from template_langgraph.tools.sql_database_tool import SqlDatabaseClientWrapper
@@ -20,6 +21,7 @@ def get_default_tools():
             run_dify_workflow,
             search_qdrant,
             search_elasticsearch,
+            search_fabric_data_agent,
         ]
         + SqlDatabaseClientWrapper().get_tools(
             llm=AzureOpenAiWrapper().chat_model,
