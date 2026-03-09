@@ -31,7 +31,7 @@ jobs:
             core.setOutput('no-v', no_v)
             core.setOutput('no-dash', no_dash)
       - name: Build and push tag ${{steps.set_version.outputs.no-dash}}
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/amd64
